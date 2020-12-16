@@ -21,7 +21,7 @@ class World : private sf::NonCopyable
 {
 public:
 	explicit World(sf::RenderWindow& window);			// pass in render window in constructor
-	void udpate(sf::Time dt);		// update scenes
+	void update(sf::Time dt);		// update scenes
 	void draw();					// draw sprites(expensive operation)
 
 private:
@@ -31,8 +31,8 @@ private:
 private:
 	enum Layer					// scene layering
 	{
-		Background,
-		Void,
+		Background,					// highest layer, all children here are in 'one' layer class
+		Void,						// lowest layer
 		LayerCount,
 	};
 

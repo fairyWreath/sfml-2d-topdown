@@ -1,9 +1,39 @@
-#include "ResourceHolder.hpp"
-
-#include <SFML/Graphics.hpp>
-
+#include <stdexcept>
 #include <iostream>
 
+#include "Game.hpp"
+
+int main()
+{
+	try
+	{
+		Game game;
+		game.run();
+	}
+	catch (std::exception& e)		// catch exception here, from other classes
+	{
+		std::cout << "\nEXCEPTION: " << e.what() << std::endl;			// e.what() to print exception
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // Resource Identifier for textures
 namespace Textures
 {
@@ -18,8 +48,7 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Lydian");
 
-	/* loading the resources */
-	// load from file
+	// load  resources from file
 	ResourceHolder<sf::Texture, Textures::Id> textures;				// declare textures class, template types provided after class name
 	try
 	{
@@ -56,3 +85,4 @@ int main()
 	}
 }
 
+*/

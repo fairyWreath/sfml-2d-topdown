@@ -18,7 +18,7 @@
 3. sf::NonCopyable to state that scene nodes cannot be copied(with copy constuctor etc.)
 */
 
-class SceneNode : public sf::Transformable, sf::Drawable, sf::NonCopyable
+class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
 {
 public:
 	typedef std::unique_ptr<SceneNode> Ptr;			// rename unique_ptr to Ptr
