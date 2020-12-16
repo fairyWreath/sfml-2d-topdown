@@ -3,9 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "SceneNode.hpp"
 
 // base class for entities: game elements
-class Entity
+class Entity : public SceneNode			// inhertits from scene node
 {
 public:
 	// set velocity
