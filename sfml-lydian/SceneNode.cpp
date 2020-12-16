@@ -50,7 +50,16 @@ void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	states.transform *= getTransform();		// this contain absolute world's transform
 
 	drawCurrent(target, states);		// draw on current node
+	drawChildren(target, states);
+}
 
+void SceneNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	// do nothing by default, to be overidden
+}
+
+void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) const
+{
 	// draw on all children nodes
 	for (const Ptr& child : nChildren)			// range-based for loop
 	{
@@ -58,8 +67,48 @@ void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-void SceneNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+
+
+/* updating the scene */
+void SceneNode::update(sf::Time dt)
 {
-	// do nothing by default
+	updateCurrent(dt);
+	updateChildren(dt);
 }
 
+void SceneNode::updateCurrent(sf::Time)
+{
+	// to be overidden
+}
+
+void SceneNode::updateChildren(sf::Time dt)
+{
+	for (const Ptr& child : nChildren)
+	{
+		child->update(dt);
+	}
+}
+
+
+// for absolute transforms
+/*
+step up the class hierarchy and accumulate all relative transforms until we reach the root
+*/
+sf::Transform SceneNode::getWorldTransform() const
+{
+	// identity transform below, does not have any affect on the object
+	sf::Transform transform = sf::Transform::Identity;		
+	for (const SceneNode* node = this; node != nullptr; node = node->nParent)		// traverse all parent nodes
+	{
+		// use transformable getTransform method and use * operator to combine the transform
+		transform = node->getTransform() * transform;
+	}
+
+	return transform;
+}
+
+sf::Vector2f SceneNode::getWorldPosition() const
+{
+	// transform to vector2f
+	return getWorldTransform() * sf::Vector2f();
+}

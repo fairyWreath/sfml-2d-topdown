@@ -12,18 +12,6 @@
 #include <vector>
 #include <cassert>
 
-
-// scene layers
-enum Layer
-{
-	Background,
-	Void,
-	Layercount
-
-
-};
-
-
 /*	SceneNode inherits from
 1. sf::Drawable so they can be drawn
 2. sf::Transformable for rotaion, position, scaling
@@ -46,7 +34,12 @@ public:
 	Ptr detachChild(const SceneNode& node);
 
 	// updating the scene
-	
+	void update(sf::Time dt);		// accept tick time as parameter
+
+
+	// absolute transforms
+	sf::Vector2f getWorldPosition() const;
+	sf::Transform getWorldTransform() const;
 
 
 // virtual drawing methods, inherited from sf classes
@@ -66,6 +59,13 @@ private:
 	
 	// draw on current node only, to be used with draw function 
 	virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
+	// draw on node children
+	void drawChildren(sf::RenderTarget& target, sf::RenderStates states) const;
+
+
+	// updating the scene
+	virtual void updateCurrent(sf::Time dt);
+	void updateChildren(sf::Time dt);
 
 private:
 
