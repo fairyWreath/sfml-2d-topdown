@@ -16,7 +16,7 @@ namespace Textures
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Resource Management");
+	sf::RenderWindow window(sf::VideoMode(640, 480), "Lydian");
 
 	/* loading the resources */
 	// load from file
@@ -24,7 +24,7 @@ int main()
 	try
 	{
 		textures.load(Textures::Character, "Media/Textures/Magician-Girl-Down.png");
-		textures.load(Textures::Landscape, "Media/Textures/Desert.png");
+		textures.load(Textures::Landscape, "Media/Textures/Void.png");
 	}
 	catch (std::runtime_error& e)		// catch error address here
 	{
