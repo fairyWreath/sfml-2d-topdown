@@ -24,7 +24,7 @@ private:
 
 	// helper functions 
 	void updateStatistics(sf::Time elapsedTime);
-	void handlePlayerInput(sf::Keyboard::Key key, bool isPressed);
+	
 
 private:
 	static const sf::Time TimePerFrame;			// fps
@@ -38,15 +38,8 @@ private:
 	sf::Time nStatisticsUpdateTime;
 	std::size_t nStatisticsNumFrames;
 
-
 	// pause state
-	bool nIsPaused = false;
-
-	// private members for gamelogic/movement
-	bool nIsMovingUp;
-	bool nIsMovingDown;
-	bool nIsMovingLeft;
-	bool nIsMovingRight;
+	bool nIsPaused;
 
 	// player
 	Player nPlayer;		// player input handling is done inside Game::processInput

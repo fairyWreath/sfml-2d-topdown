@@ -18,16 +18,27 @@ namespace sf
 	class RenderWindow;
 }
 
-class StateStack;
+class StateStack;			// forward declare here, header for statestack included in state.cpp
 class Player;
 
 class State
 {
 public:
 	typedef std::unique_ptr<State> Ptr;			// typedef for state unique ptr
-	struct Context							// state context
+
+	/* state context structure that works as a HOLDER of shared objects between all states
+	-> removes the need to load the same sprite, font etc.
+	*/
+	struct Context						
 	{
+		// constructor that receives resources, window and player class
+		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player);
 	
+		// pointers that hold shared objects above
+		sf::RenderWindow* window;
+		TextureHolder* textures;
+		FontHolder* fonts;
+		Player* player;
 	};
 
 public:

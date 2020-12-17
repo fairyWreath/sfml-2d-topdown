@@ -7,8 +7,11 @@
 namespace sf
 {
 	class Texture;
+	class Font;
 }
 
+
+// namespaces for resources, ie. textures/fonts
 namespace Textures
 {
 	enum ID
@@ -18,10 +21,23 @@ namespace Textures
 	};
 }
 
+namespace Fonts
+{
+	enum ID
+	{
+		Main,
+	};
+}
+
+
 // forward declaration of template class
 template <typename Resource, typename Identifier>
 class ResourceHolder;
 
-typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;			// used forward declarations
+// forward declarations used here
+typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;			// typedef for texture type
+
+// typedef for font resource holder
+typedef ResourceHolder<sf::Font, Fonts::ID> FontHolder;
 
 #endif

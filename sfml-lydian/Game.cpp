@@ -13,10 +13,6 @@ Game::Game() :
 	nStatisticsText(),
 	nStatisticsUpdateTime(),
 	nStatisticsNumFrames(0),
-	nIsMovingUp(false),					// set movement states to false
-	nIsMovingDown(false),
-	nIsMovingLeft(false),
-	nIsMovingRight(false),
 	nIsPaused(false)
 {
 
@@ -138,9 +134,3 @@ void Game::updateStatistics(sf::Time elapsedTime)
 }
 
 
-// handle real time inputs, not from events
-void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
-{
-	if (key == sf::Keyboard::W)				// if pressed k is W
-		nIsMovingUp = isPressed;			// set moveup state to true
-}
