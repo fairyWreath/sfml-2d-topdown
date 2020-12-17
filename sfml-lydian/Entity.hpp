@@ -17,6 +17,7 @@ public:
 	sf::Vector2f getVelocity() const;
 
 private:
+	// velocity movement is done here
 	virtual void updateCurrent(sf::Time dt);			// override SceneNode update
 
 private:

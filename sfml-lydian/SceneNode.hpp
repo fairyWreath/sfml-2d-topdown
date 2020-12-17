@@ -12,6 +12,9 @@
 #include <vector>
 #include <cassert>
 
+
+#include "Category.hpp"			// entitiy categories to dispatch commands
+
 /*	SceneNode inherits from
 1. sf::Drawable so they can be drawn
 2. sf::Transformable for rotaion, position, scaling
@@ -40,6 +43,10 @@ public:
 	// absolute transforms
 	sf::Vector2f getWorldPosition() const;
 	sf::Transform getWorldTransform() const;
+
+
+	// get category for command, virtual function so it can be overidden by other classes
+	virtual unsigned int getCategory() const;
 
 
 // virtual drawing methods, inherited from sf classes

@@ -3,6 +3,7 @@
 
 #include "Character.hpp"
 #include "ResourceHolder.hpp"
+#include "Category.hpp"			// return category for commands
 
 // map corresponding character type to Textures::ID
 static Textures::ID toTextureID(Character::Type type)
@@ -35,4 +36,17 @@ Character::Character(Type type, const TextureHolder& textures) :
 void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(nSprite, states);			// draw from the character sprite
+}
+
+
+// override getCategory virtual function for command dispatch
+unsigned int Character::getCategory() const
+{
+	switch (nType)
+	{
+	case (DarkMagician):					// if matches main character
+		return Category::PlayerCharacter;
+	default:
+		return Category::EnemyCharacter;
+	}
 }

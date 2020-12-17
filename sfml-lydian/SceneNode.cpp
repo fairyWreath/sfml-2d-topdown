@@ -112,3 +112,10 @@ sf::Vector2f SceneNode::getWorldPosition() const
 	// transform to vector2f
 	return getWorldTransform() * sf::Vector2f();
 }
+
+
+// get category for commands
+unsigned int SceneNode::getCategory() const
+{
+	return Category::Scene;			// return scene for SceneNode class
+}

@@ -23,6 +23,9 @@ public:
 	// explicit constructor
 	Character(Type type, const TextureHolder& textures);		// pass in texture resource holder
 
+	// get category for command, overrides base SceneNode function
+	virtual unsigned int getCategory() const;
+
 private:
 	// override drawCurrent function of SceneNode
 	virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
