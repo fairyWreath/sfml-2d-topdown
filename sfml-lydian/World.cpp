@@ -90,18 +90,61 @@ void World::update(sf::Time dt)
 	// repeat the tile here, along the x axis
 	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
-	// get character position/velocity
-	sf::Vector2f position = nPlayerCharacter->getPosition();	// from sf::Transformable
-	sf::Vector2f velocity = nPlayerCharacter->getVelocity();		// also method from sf::Transformable
+	// set initial velocity to null, not moving when not pressed
+	nPlayerCharacter->setVelocity(0.f, 0.f);
 
-	if (position.x <= nWorldBounds.left + 150
-		|| position.x >= nWorldBounds.left + nWorldBounds.width - 150)		// more/less than 150 on each side
-	{
-		velocity.x = -velocity.x;		// change character velocity
-		nPlayerCharacter->setVelocity(velocity);
-	}
+	// forward commands from queue to the scene graph
+	while (!nCommandQueue.isEmpty())			// while not empty
+		nSceneGraph.onCommand(nCommandQueue.pop(), dt);			// pop form queue run command
+
+	// adapt diagonal velocity
+	adaptPlayerVelocity();
 
 	nSceneGraph.update(dt);			// update the scenegraph
+
+
+	// keep player position within view bounds
+	adaptPlayerPosition();
+}
+
+
+
+// command queue operations
+CommandQueue& World::getCommandQueue()
+{
+	return nCommandQueue;
+}
+
+
+
+// misc game logic
+
+// for diagonal movement
+void World::adaptPlayerVelocity()
+{
+	sf::Vector2f velocity = nPlayerCharacter->getVelocity();		// get current velocity
+
+	if (velocity.x != 0.f && velocity.y != 0.f)				// if velocity not nil
+		nPlayerCharacter->setVelocity(velocity / std::sqrt(2.f));		// get diagonal
+
+	nPlayerCharacter->accelerate(0.f, nScrollSpeed);
+}
+
+// keep player within screen bounds
+void World::adaptPlayerPosition()
+{
+	// get viewbound from world view
+	sf::FloatRect viewBounds(nWorldView.getCenter() - nWorldView.getSize() / 2.f, nWorldView.getSize());
+	const float borderDistance = 40.f;			// border distance
+
+
+	// change character position
+	sf::Vector2f position = nPlayerCharacter->getPosition();		// get current position
+	position.x = std::max(position.x, viewBounds.left + borderDistance);
+	position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
+	position.y = std::max(position.y, viewBounds.top + borderDistance);
+	position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
+	nPlayerCharacter->setPosition(position);
 }
 
 

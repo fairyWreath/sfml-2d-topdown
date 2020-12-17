@@ -5,6 +5,7 @@
 
 #include "World.hpp"
 #include "StringHelpers.hpp"
+#include "Player.hpp"
 
 
 // again, inherit it from noncopyable
@@ -17,7 +18,7 @@ public:
 
 private:
 	// internal update functions
-	void processEvents();
+	void processInput();			// process both realtime and events, using the player class
 	void update(sf::Time elapsedTime);
 	void render();				// render to window
 
@@ -46,6 +47,9 @@ private:
 	bool nIsMovingDown;
 	bool nIsMovingLeft;
 	bool nIsMovingRight;
+
+	// player
+	Player nPlayer;		// player input handling is done inside Game::processInput
 
 };
 

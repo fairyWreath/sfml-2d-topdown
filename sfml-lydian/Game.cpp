@@ -47,7 +47,7 @@ void Game::run()
 			timeSinceLastUpdate -= TimePerFrame;
 
 			// process events here
-			processEvents();
+			processInput();
 
 			// if not paused
 			if (!nIsPaused)
@@ -64,63 +64,24 @@ void Game::run()
 
 
 // process game events/input handling
-void Game::processEvents()
+// player class is used here
+void Game::processInput()
 {
+	CommandQueue& commands = nWorld.getCommandQueue();			// get command queue from world class
+
+	// handle event inputs
 	sf::Event event;
-	while (nWindow.pollEvent(event))
+	while (nWindow.pollEvent(event))		// if event is detected
 	{
-		switch (event.type)
-		{
-		case sf::Event::Closed:				// window x button
+		nPlayer.handleEvent(event, commands);			// player class to handle event
+
+		// close window
+		if (event.type == sf::Event::Closed)
 			nWindow.close();
-			break;
-
-		// other different event types
-		
-			/* key pressing */
-		case sf::Event::KeyPressed:
-			handlePlayerInput(event.key.code, true);
-			break;
-
-		case sf::Event::KeyReleased:
-			handlePlayerInput(event.key.code, false);
-			break;
-
-			/*	  SCREEN FOCUS	  */
-		case sf::Event::GainedFocus:
-			nIsPaused = false;
-			break;
-		case sf::Event::LostFocus:			// lost focus
-			nIsPaused = true;
-			break;
-
-
-			/*    MOUSE EVENTS    */
-		case sf::Event::MouseEntered:
-			// triggered when mouse enters the window
-			break;
-		case sf::Event::MouseLeft:
-			// triggered when mouse leaves the window
-			break;
-		case sf::Event::MouseMoved:
-			// triggered when mouse moves INSIDE the window
-			// access the data from event.mouseMove member
-			std::cout << "mouse moved inside window: " << event.mouseMove.x
-				<< " , " << event.mouseMove.y << std::endl;
-
-			break;
-		case sf::Event::MouseButtonPressed:
-			// triggered when button is pressed
-			break;
-		case sf::Event::MouseButtonReleased:
-			// triggered when mouse button is released
-			break;
-		case sf::Event::MouseWheelMoved:
-			// triggered when wheel is moved
-			break;
-
-		}
 	}
+
+	// handle realtime inputs
+	nPlayer.handleRealtimeInput(commands);
 }
 
 

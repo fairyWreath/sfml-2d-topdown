@@ -8,6 +8,7 @@
 #include "SceneNode.hpp"				// for scene graph
 #include "SpriteNode.hpp"				// sprite scenenodes for landscape/background
 #include "Character.hpp"
+#include "CommandQueue.hpp"
 
 
 #include <SFML/System/NonCopyable.hpp>
@@ -24,9 +25,16 @@ public:
 	void update(sf::Time dt);		// update scenes
 	void draw();					// draw sprites(expensive operation)
 
+	// acess commandqueue memory address for writing
+	CommandQueue& getCommandQueue();
+
 private:
 	void loadTextures();		// load textures/sprites from resourceholder
 	void buildScene();			// draw the scenes
+
+	void adaptPlayerVelocity();			// adapt player velocity for eg.diagonal movements
+
+	void adaptPlayerPosition();			// keep player within screen bounds
 
 private:
 	enum Layer					// scene layering
@@ -52,6 +60,10 @@ private:
 
 	float nScrollSpeed;					// scroll speed of moving tyle
 	Character* nPlayerCharacter;		// pointer to player character
+
+
+	// command queue to execute commands
+	CommandQueue nCommandQueue;
 
 };
 

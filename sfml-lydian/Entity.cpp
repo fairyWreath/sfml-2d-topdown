@@ -18,6 +18,18 @@ sf::Vector2f Entity::getVelocity() const
 	return nVelocity;
 }
 
+// accelerate, getVelocity() + new velocity parameter
+void Entity::accelerate(sf::Vector2f velocity)
+{
+	nVelocity += velocity;
+}
+
+void Entity::accelerate(float vx, float vy)
+{
+	nVelocity.x += vx;
+	nVelocity.y += vy;
+}
+
 
 void Entity::updateCurrent(sf::Time dt)
 {

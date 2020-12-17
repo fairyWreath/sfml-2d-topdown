@@ -28,25 +28,38 @@ struct CharacterMover
 };
 
 
-// handle realtime input
+// constructor where all keybindings are set
+Player::Player()
+{
+	// set initial key bindings
+	nKeyBinding[sf::Keyboard::A] = MoveLeft;
+	nKeyBinding[sf::Keyboard::W] = MoveUp;
+	nKeyBinding[sf::Keyboard::D] = MoveRight;
+	nKeyBinding[sf::Keyboard::S] = MoveDown;
+
+	// map action to commands
+	initializeActions();
+
+	// set all commands in cations to character category
+	for (auto& pair : nActionBinding)
+	{
+		pair.second.category = Category::PlayerCharacter;
+	}
+
+}
+
+
+// handle realtime input, function is called every frame
 void Player::handleRealtimeInput(CommandQueue& commands)
 {
-	const float playerSpeed = 30.f;
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))		// if A is pressed
+	// iteratate through keybindings, check if they are being pressed and is a realtime input
+	for (const auto& pair : nKeyBinding)		// iterate through map
 	{
-		// construct command here
-		Command moveLeft;
-		moveLeft.category = Category::PlayerCharacter;	// set category
-
-		/* set action 
-		1. pass in Character GameObject type
-		2. pass in functor characterMover as function parameter
-		*/
-		moveLeft.action = derivedAction<Character>(CharacterMover(-playerSpeed, 0.f));			// - x to move left
-		
-		// push to comandQueue
-		commands.push(moveLeft);
+		if (sf::Keyboard::isKeyPressed(pair.first) && isRealtimeAction(pair.second))
+		{
+			// push to command queue if match
+			commands.push(nActionBinding[pair.second]);			// python like access to std::map
+		}
 	}
 }
 
@@ -66,5 +79,67 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 			std::cout << s.getPosition().x << ", " << s.getPosition().y << std::endl;	// output position
 		};
 		commands.push(output);			// push to command queue
+	}
+}
+
+
+// bind key to action
+void Player::assignKey(Action action, sf::Keyboard::Key key)
+{
+	// remove keys that are already mapped to that action
+	for (auto itr = nKeyBinding.begin(); itr != nKeyBinding.end();)
+	{
+		// if action is the same, remove from the binding
+		if (itr->second == action)
+			nKeyBinding.erase(itr);
+		else
+			itr++;
+	}
+
+	// insert new binding
+	nKeyBinding[key] = action;
+}
+
+// get key from action
+sf::Keyboard::Key Player::getAssignedKey(Action action) const
+{
+	// search in keybinding
+	for (const auto& pair : nKeyBinding)
+	{
+		if (pair.second == action)			// if match, return
+			return pair.first;
+	}
+
+	// return unknown if not found
+	return sf::Keyboard::Unknown;
+}
+
+
+// adding commands/action bindings
+void Player::initializeActions()
+{
+	const float playerSpeed = 200.f;			// set speed
+
+	// add commands here, add to actionbinding dict/map
+	// use functors and command struct template to add commands
+	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(-playerSpeed, 0.f));
+	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(0.f, -playerSpeed));
+	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(+playerSpeed, 0.f));
+	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(0.f, +playerSpeed));
+}
+
+
+// get info on action for realtime or event
+bool Player::isRealtimeAction(Action action)
+{
+	switch (action)
+	{
+	case MoveLeft:
+	case MoveUp:
+	case MoveRight:
+	case MoveDown:
+		return true;
+	default:
+		return false;
 	}
 }

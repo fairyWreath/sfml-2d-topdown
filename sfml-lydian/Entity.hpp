@@ -16,6 +16,10 @@ public:
 	// get the velocity
 	sf::Vector2f getVelocity() const;
 
+	// accelerate, getVelocity() + new velocity parameter
+	void accelerate(sf::Vector2f velocity);
+	void accelerate(float vx, float vy);
+
 private:
 	// velocity movement is done here
 	virtual void updateCurrent(sf::Time dt);			// override SceneNode update

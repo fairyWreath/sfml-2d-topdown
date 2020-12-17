@@ -29,6 +29,21 @@ struct Command
 };
 
 
+// function to downcasts to derived SceneNode classes
+template <typename GameObject, typename Function>
+std::function<void(SceneNode&, sf::Time)> derivedAction(Function fn)		// pass in function type
+{
+	// lambda expression
+	return [=](SceneNode& node, sf::Time dt)
+	{
+		// check downcast is save
+		assert(dynamic_cast<GameObject*>(&node) != nullptr);			// to be converted to GameObject type
+
+		// downcast node and invoke function on it
+		fn(static_cast<GameObject&>(node), dt);
+	};
+}
+
 
 
 #endif

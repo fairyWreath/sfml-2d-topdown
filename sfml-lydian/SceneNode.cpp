@@ -117,5 +117,20 @@ sf::Vector2f SceneNode::getWorldPosition() const
 // get category for commands
 unsigned int SceneNode::getCategory() const
 {
-	return Category::Scene;			// return scene for SceneNode class
+	return Category::Scene;			// return scene for SceneNode class 
+}
+
+// execute command
+// use bitwise & operator to the check that the command's receiver is the same category
+void SceneNode::onCommand(const Command& command, sf::Time dt)
+{
+	// use bitwise & to check category
+	if (command.category & getCategory())
+		command.action(*this, dt);			// pass in SceneNode pointer to command
+
+	// traverse children and execute their commands
+	for (const Ptr& child : nChildren)
+	{
+		child->onCommand(command, dt);
+	}
 }

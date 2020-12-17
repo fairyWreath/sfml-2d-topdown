@@ -14,6 +14,7 @@
 
 
 #include "Category.hpp"			// entitiy categories to dispatch commands
+#include "Command.hpp"
 
 /*	SceneNode inherits from
 1. sf::Drawable so they can be drawn
@@ -49,6 +50,11 @@ public:
 	virtual unsigned int getCategory() const;
 
 
+	// run every time a command is passed to a scenenode, a non virtual function
+	// use bitwise & operator to the check that the command's receiver is the same category
+	void onCommand(const Command& command, sf::Time dt);
+
+
 // virtual drawing methods, inherited from sf classes
 private:
 	/*
@@ -73,6 +79,7 @@ private:
 	// updating the scene
 	virtual void updateCurrent(sf::Time dt);
 	void updateChildren(sf::Time dt);
+
 
 private:
 
