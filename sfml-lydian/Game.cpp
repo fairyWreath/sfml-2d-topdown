@@ -54,7 +54,8 @@ void Game::run()
 				update(TimePerFrame);
 		}
 
-		// update statstics here
+		// update statstics here b  
+
 		updateStatistics(elapsedTime);
 
 		render();			// render changes
