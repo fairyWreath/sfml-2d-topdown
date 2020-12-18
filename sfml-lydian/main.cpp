@@ -1,8 +1,27 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "Game.hpp"
+#include "Application.hpp"
+// #include "Game.hpp"
 
+
+int main()
+{
+	try
+	{
+		Application app;
+		app.run();
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "\nEXCEPTION: " << e.what() << std::endl;
+	}
+
+	return 0;
+}
+
+
+/*
 int main()
 {
 	try
@@ -16,21 +35,7 @@ int main()
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 /*
