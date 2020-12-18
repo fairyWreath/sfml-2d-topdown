@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <iostream>		// for debugging
 
 // constructor for statestack
 StateStack::StateStack(State::Context context) :
@@ -32,8 +33,12 @@ void StateStack::handleEvent(const sf::Event& event)
 	{
 		// let state in the stack handle the event
 		// if false is detected immediately end the loop
-		if (!(*itr)->handleEvent(event))		
-			return;
+		if (!(*itr)->handleEvent(event))
+		{
+			//std::cout << "False event detected\n";
+			break;
+		}
+		
 	}
 
 	// apply stack operations after stack iteration above, when it is already safe
@@ -48,7 +53,7 @@ void StateStack::update(sf::Time dt)
 	for (auto itr = nStack.rbegin(); itr != nStack.rend(); itr++)
 	{
 		if (!(*itr)->update(dt))		// call update function of the state
-			return;
+			break;
 	}
 	// apply stack operations after stack iteration above, when it is already safe
 	applyPendingChanges();
@@ -75,9 +80,12 @@ void StateStack::applyPendingChanges()
 		switch (change.action)
 		{
 		case Push:
+		{
 			nStack.push_back(createState(change.stateID));			// create new state based on change struct state id
+			std::cout << "Created state\n";
 			break;
-	
+		}
+
 		case Pop:
 			nStack.pop_back();			// pop stack from back
 			break;

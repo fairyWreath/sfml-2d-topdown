@@ -1,21 +1,24 @@
 #include "Application.hpp"
 #include "State.hpp"
 #include "StateIdentifiers.hpp"
-#include "StringHelpers.hpp"
-
+#include "Utility.hpp"
 
 // states
 #include "TitleState.hpp"
 #include "GameState.hpp"
 #include "MenuState.hpp"
 #include "PauseState.hpp"
+#include "SettingsState.hpp"
+
+
+#include <iostream>		// for debugging
 
 // set time per frame
 const sf::Time Application::TimePerFrame = sf::seconds(1.f / 60.f);
 
 // application class constructor, initialize members
 Application::Application() :
-	nWindow(sf::VideoMode(640, 480), "Lydian", sf::Style::Close),		// sf::Style::Close means window has x button to close
+	nWindow(sf::VideoMode(1280, 720), "Lydian", sf::Style::Close),		// sf::Style::Close means window has x button to close
 	nTextures(),
 	nFonts(),
 	nPlayer(),
@@ -27,10 +30,21 @@ Application::Application() :
 	// set repeateKeyEnabled of window class to false
 	nWindow.setKeyRepeatEnabled(false);		// set to false means only a SINGLE event will be received
 
-	// load fonts and textures
-	nTextures.load(Textures::TitleScreen, "Media/Textures/Title-Screen.jpg");
-	nTextures.load(Textures::PauseScreen, "Media/Textures/Pause-Screen.jpg");
+	// load context fonts and textures
+	nFonts.load(Fonts::Title, "Media/Fonts/Denalova.ttf");
 	nFonts.load(Fonts::Main, "Media/Fonts/Overlock-Mod.ttf");
+	nFonts.load(Fonts::Label, "Media/Fonts/Overlock-Mod.ttf");
+	
+	nTextures.load(Textures::TitleScreen, "Media/Textures/Title-Screen.png");
+	nTextures.load(Textures::MenuScreen, "Media/Textures/Menu-Screen-Alter.png");
+	nTextures.load(Textures::PauseScreen, "Media/Textures/Pause-Screen.png");
+	nTextures.load(Textures::SettingsScreen, "Media/Textures/Settings-Screen.png");
+
+
+	// load textures for buttons
+	nTextures.load(Textures::MainButtonNormal, "Media/Textures/bar_empty.png");
+	nTextures.load(Textures::MainButtonSelected, "Media/Textures/bar_full.png");
+	nTextures.load(Textures::MainButtonPressed, "Media/Textures/bar_full.png");
 
 	// set misc statistics text
 	nStatisticsText.setFont(nFonts.get(Fonts::Main));
@@ -123,6 +137,8 @@ void Application::render()
 	nWindow.draw(nStatisticsText);
 
 	nWindow.display();			// display scene graph, apply changes
+
+	// std::cout << "Draw\n";
 }
 
 
@@ -151,9 +167,10 @@ void Application::registerStates()
 {
 	// register all of the states, enum in () as the key to the map
 	nStateStack.registerState<TitleState>(States::Title);		// <TitleState> is the template here
-	nStateStack.registerState<GameState>(States::Game);			
 	nStateStack.registerState<MenuState>(States::Menu);
+	nStateStack.registerState<GameState>(States::Game);			
 	nStateStack.registerState<PauseState>(States::Pause);
+	nStateStack.registerState<SettingsState>(States::Settings);
 }
 
 

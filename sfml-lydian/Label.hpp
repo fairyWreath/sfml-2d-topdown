@@ -29,6 +29,11 @@ public:
 	// change text
 	void setText(const std::string& text);
 
+	// functions to allow font/size to be changed, for overloading
+	void setFont(sf::Font& font);
+	void setSize(const float& size);
+	void setColor(const sf::Color& color);
+
 private:
 	// draw to dinwo
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;

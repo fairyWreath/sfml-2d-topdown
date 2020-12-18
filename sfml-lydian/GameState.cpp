@@ -1,5 +1,7 @@
 #include "GameState.hpp"
 
+#include <iostream>
+
 GameState::GameState(StateStack& stack, Context context) :
 	State(stack, context),			// constructor for PARENT class
 	// shared values are stored in the Context structure
@@ -40,8 +42,10 @@ bool GameState::handleEvent(const sf::Event& event)
 	-> if esc is pressed, order from this state to push the pause state to the stack
 	*/
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+	{
+		// std::cout << "Esc pause pressed, go to pause screen\n";
 		requestStackPush(States::Pause);			// push pause state
-
+	}
 	return true;
 }
 

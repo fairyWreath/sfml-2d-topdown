@@ -1,58 +1,90 @@
 #include "MenuState.hpp"
 #include "ResourceHolder.hpp"
 #include "Utility.hpp"
+#include "Button.hpp"
+#include "Label.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
 
+
+#include <iostream>		// for debugging
+
 // MenuState constructor
 MenuState::MenuState(StateStack& stack, Context context) :
 	State(stack, context),
-	nOptions(),
-	nOptionIndex(0)		// set to enum Play the first time
+	nGUIContainer()			// intialize container
 {
-	// get sfml resources from context
-	sf::Texture& texture = context.textures->get(Textures::TitleScreen);
-	sf::Font& font = context.fonts->get(Fonts::Main);
-
-	// set background sprite
+	// set baclground sprite, load from content
+	sf::Texture& texture = context.textures->get(Textures::MenuScreen);
 	nBackgroundSprite.setTexture(texture);
 
-	// creating the menu
-	sf::Text playOption;		// sf::text type to display
-	playOption.setFont(font);
-	playOption.setString("Play");
-	centerOrigin(playOption);
-	playOption.setPosition(context.window->getView().getSize() / 2.f);		// set to middle
-	nOptions.push_back(playOption);			// push back to text vector
 
-	sf::Text exitOption;		// sf::text type to display
-	playOption.setFont(font);
-	playOption.setString("Exit");
-	centerOrigin(exitOption);
-	playOption.setPosition(playOption.getPosition() + sf::Vector2f(0.f, 30.f));		// place beloww the play option text		
-	nOptions.push_back(playOption);			// push back to text vector
+	 //std::cout << "Passed menuscreen\n";
 
-	updateOptionText();		// render text to window
+	/* create buttons (or other components) here		*/
+
+	// create button ptr, pass in context fonts and textures. the fonts/textures to be used already handled in the Button class
+	GUI::Button::Ptr playButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	playButton->setPosition(400, 350);		// set position of the sf::Transformable here
+	playButton->setText("Play");
+	// use lambda function to set callback
+	playButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
+		{
+			// pop menu state and go to game
+			requestStackPop();
+			requestStackPush(States::Game);
+		});
+
+//	std::cout << "Passed button\n";
+
+	// settings button
+	GUI::Button::Ptr settingsButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	settingsButton->setPosition(400, 430);		// set position of the sf::Transformable here
+	settingsButton->setText("Settings");
+	// use lambda function to set callback
+	settingsButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
+		{
+			// push settings state to stack
+			requestStackPush(States::Settings);
+		});
+
+	// return to title menu
+	auto titleButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	titleButton->setPosition(400, 510);
+	titleButton->setText("Return to Title");
+	titleButton->setCallback([this]()
+		{
+			// clear and go to menu
+			requestStateClear();
+			requestStackPush(States::Title);
+		});
+
+	// exit button
+	GUI::Button::Ptr exitButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	exitButton->setPosition(400, 590);
+	exitButton->setText("Exit");
+	exitButton->setCallback([this]() 
+		{
+			requestStackPop();		// pop menu state and exit game
+		});
+
+
+	// create title label
+	auto titleLabel = std::make_shared<GUI::Label>("Easy Carefree Existence", *context.fonts);
+	titleLabel->setPosition(250, 100);
+	titleLabel->setSize(120);
+	titleLabel->setColor(sf::Color(164, 231, 223));
+	titleLabel->setFont(context.fonts->get(Fonts::Title));		// set custom font
+
+	// pack to container
+	nGUIContainer.pack(playButton);
+	nGUIContainer.pack(settingsButton);
+	nGUIContainer.pack(titleButton);
+	nGUIContainer.pack(exitButton);
+
+	nGUIContainer.pack(titleLabel);
 }
-
-// function to control the menu, set display based on currently selected text
-void MenuState::updateOptionText()
-{
-	// if vector for text is empty do nothing
-	if (nOptions.empty())
-		return;
-
-	// white all texts
-	for (auto& text : nOptions)
-	{
-		text.setFillColor(sf::Color::White);
-	}
-
-	// magenta currently selected text
-	nOptions[nOptionIndex].setFillColor(sf::Color::Magenta);
-}
-
 
 // override virtual functions for update, draw and handling events
 void MenuState::draw()
@@ -63,9 +95,8 @@ void MenuState::draw()
 	window.setView(window.getDefaultView());		// set viewport to default
 	window.draw(nBackgroundSprite);				// draw the sprite
 
-	// draw the texts from text vector
-	for (const auto& text : nOptions)
-		window.draw(text);
+	// draw container
+	window.draw(nGUIContainer);
 }
 
 // no updates needed for menu state
@@ -77,51 +108,10 @@ bool MenuState::update(sf::Time)
 // handle events, modifying nOptionIndex
 bool MenuState::handleEvent(const sf::Event& event)
 {
-	// menu logic
-	if (event.type != sf::Event::KeyPressed)		// event has to be keypressed type
-		return false;
+	// pass to guicontainer
+	nGUIContainer.handleEvent(event);
 
-	// if enter is pressed
-	if (event.key.code == sf::Keyboard::Return)
-	{
-		if (nOptionIndex == Play)
-		{
-			requestStackPop();			// pop menu state from stack
-			requestStackPush(States::Game);			// push game state
-		}
-
-		if (nOptionIndex == Exit)
-		{
-			// empty stack, game will close
-			requestStackPop();
-		}
-	}
-
-	// select top option
-	else if (event.key.code == sf::Keyboard::Up)
-	{
-		if (nOptionIndex > 0)
-			nOptionIndex--;
-		else
-			nOptionIndex = nOptions.size() - 1;		// 'go to back of the text container'
-
-		updateOptionText();
-	}
-
-	// select bottom option
-	else if (event.key.code == sf::Keyboard::Down)
-	{
-		if (nOptionIndex < nOptions.size() - 1)
-			nOptionIndex++;
-		else
-			nOptionIndex = 0;		// 'go to back of the text container'
-
-		updateOptionText();
-	}
-
-
-
-	return true;
+	return false;
 }
 
 

@@ -39,5 +39,23 @@ void Label::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	target.draw(nText, states);
 }
 
+// functions to modify label, overloading, for custom lables
+void Label::setFont(sf::Font& font)
+{
+	nText.setFont(font);
+}
+
+// set custom size
+void Label::setSize(const float& size)
+{
+	nText.setCharacterSize(size);
+}
+
+// set custom label
+void Label::setColor(const sf::Color& color)
+{
+	nText.setFillColor(color);
+}
+
 
 }

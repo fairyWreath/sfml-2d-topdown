@@ -17,9 +17,17 @@ namespace Textures
 	enum ID
 	{
 		TitleScreen,
+		MenuScreen,
 		PauseScreen,
+		SettingsScreen,
+
 		DarkMagician,
 		Void,
+
+		// buttons
+		MainButtonNormal,
+		MainButtonSelected,
+		MainButtonPressed
 	};
 }
 
@@ -27,7 +35,9 @@ namespace Fonts
 {
 	enum ID
 	{
+		Title,		//denalova
 		Main,
+		Label
 	};
 }
 

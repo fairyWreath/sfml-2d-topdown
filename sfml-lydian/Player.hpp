@@ -22,7 +22,8 @@ public:
 		MoveLeft,
 		MoveUp,
 		MoveRight,
-		MoveDown
+		MoveDown,
+		ActionCount
 	};
 
 

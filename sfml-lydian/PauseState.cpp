@@ -72,7 +72,7 @@ bool PauseState::handleEvent(const sf::Event& event)
 	{
 		// pop pause state from the stacl
 		requestStackPop();
-		std::cout << "Esc is pressed, return to game\n";
+		// std::cout << "Esc is pressed, return to game\n";
 	}
 
 	// backspace to go to main menu
@@ -81,7 +81,7 @@ bool PauseState::handleEvent(const sf::Event& event)
 		// clear and go to menu
 		requestStateClear();
 		requestStackPush(States::Menu);
-		std::cout << "Bkscp is pressed, return to menu\n";
+		// std::cout << "Bkscp is pressed, return to menu\n";
 	}
 
 	return false;		// return false to pause the screen

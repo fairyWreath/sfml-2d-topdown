@@ -1,5 +1,7 @@
 #include "World.hpp"
 
+#include <iostream>
+
 // world constructor
 World::World(sf::RenderWindow& window) :
 	nWindow(window),

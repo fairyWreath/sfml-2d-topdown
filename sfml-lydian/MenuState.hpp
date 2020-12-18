@@ -5,6 +5,9 @@
 
 #include "State.hpp"
 
+// ui container
+#include "Container.hpp"
+
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 
@@ -19,26 +22,14 @@ public:
 	virtual void draw();
 	virtual bool update(sf::Time dt);
 	virtual bool handleEvent(const sf::Event& event);
-	
-
-	// for displaying/updating the option text
-	void updateOptionText();
-
-private:
-	// enum for options/state navigation
-	enum OptionNames
-	{
-		Play, 
-		Exit
-	};
 
 private:
 	// sfml members
 	sf::Sprite nBackgroundSprite;
 
-	// vector of text coressponding to the enum
-	std::vector<sf::Text> nOptions;
-	std::size_t nOptionIndex;
+
+	// GUI container
+	GUI::Container nGUIContainer;
 
 };
 
