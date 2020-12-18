@@ -48,7 +48,7 @@ public:
 	// virtual destructor
 	virtual ~State();
 
-	// virtual screen displaying functions
+	// virtual screen displaying functions, to be used in Application
 	virtual void draw() = 0;			// set to 'null'
 	virtual bool update(sf::Time dt) = 0;
 	virtual bool handleEvent(const sf::Event& event) = 0;

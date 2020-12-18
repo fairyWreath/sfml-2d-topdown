@@ -89,9 +89,21 @@ private:
 
 	// std::map with factory functions where changes can be made
 	// factory functions that create a new state ON DEMAND
-	std::map<States::ID, std::function<State::Ptr()>> nFactories;
+	std::map<States::ID, std::function<State::Ptr()>> nFactories;			// function return Ptr() type
 
 };
 
+// templates are defined in headers
+// insert mappings to factory functions for calling state on-demand
+template <typename T>
+void StateStack::registerState(States::ID stateID)
+{
+	/* lambda expression for map value
+	*/
+	nFactories[stateID] = [this]()				// this capture clause to get statestack
+	{
+		return State::Ptr(new T(*this, nContext));			// create new statepointer, cnstrcutro passed in current statestack and context
+	};
+}
 
 #endif

@@ -14,19 +14,6 @@ StateStack::StateStack(State::Context context) :
 }
 
 
-// insert mappings to factory functions for calling state on-demand
-template <typename T>
-void StateStack::registerState(States::ID stateID)
-{
-	/* lambda expression for map value
-	*/
-	nFactories[stateID] = [this]()				// this capture clause to get statestack
-	{
-		return State::Ptr(new T(*this, nContext));			// create new statepointer, cnstrcutro passed in current statestack and context
-	};
-}
-
-
 // create new State from nFactories map, reutrning a unique_ptr to that state
 State::Ptr StateStack::createState(States::ID stateID)
 {
