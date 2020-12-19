@@ -1,5 +1,41 @@
 #include "Entity.hpp"
 
+Entity::Entity(int hitpoints) :
+	nVelocity(),
+	nHitpoints(hitpoints)
+{
+}
+
+// functions for modifying hp
+void Entity::damage(int amount)
+{
+	assert(amount > 0);			// amount has to be positive
+
+	nHitpoints -= amount;
+}
+
+void Entity::heal(int amount)
+{
+	assert(amount > 0);
+	nHitpoints += amount;
+}
+
+void Entity::destroy()
+{
+	nHitpoints = 0;
+}
+
+bool Entity::isDestroyed() const
+{
+	return nHitpoints <= 0;
+}
+
+int Entity::getHitpoints() const
+{
+	return nHitpoints;
+}
+
+
 
 // setting the velocity
 void Entity::setVelocity(sf::Vector2f velocity)

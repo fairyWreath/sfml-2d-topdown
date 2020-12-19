@@ -21,7 +21,11 @@ namespace Textures
 		PauseScreen,
 		SettingsScreen,
 
+		// characters
 		DarkMagician,
+		Shinobu,
+		Izuko,
+
 		Void,
 
 		// buttons

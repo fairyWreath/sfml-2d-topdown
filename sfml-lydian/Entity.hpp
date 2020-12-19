@@ -9,6 +9,20 @@
 class Entity : public SceneNode			// inhertits from scene node
 {
 public:
+
+	// add hitpoints
+	explicit Entity(int hitpoints);
+	
+	// functions to modify hitpoints from outside
+	void heal(int amount);
+	void damage(int amount);
+	void destroy();
+
+	// getting hitpoint values / status from outside
+	int getHitpoints() const;
+	bool isDestroyed() const;
+
+
 	// set velocity
 	void setVelocity(sf::Vector2f velocity);			// set velocity using sf velocity type
 	void setVelocity(float vx, float vy);						// set velocity from float types
@@ -25,6 +39,9 @@ private:
 	virtual void updateCurrent(sf::Time dt);			// override SceneNode update
 
 private:
+	// store hitpoint
+	int nHitpoints;
+
 	sf::Vector2f nVelocity;
 
 };

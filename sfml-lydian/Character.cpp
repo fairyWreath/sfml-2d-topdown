@@ -5,6 +5,13 @@
 #include "ResourceHolder.hpp"
 #include "Category.hpp"			// return category for commands
 
+#include "DataTables.hpp"
+
+namespace
+{
+	const std::vector<CharacterData> CharacterTable = initializeCharacterData();
+}
+
 // map corresponding character type to Textures::ID
 static Textures::ID toTextureID(Character::Type type)
 {
@@ -12,6 +19,12 @@ static Textures::ID toTextureID(Character::Type type)
 	{
 	case Character::DarkMagician:
 		return Textures::DarkMagician;
+	
+	case Character::Shinobu:
+		return Textures::Shinobu;
+
+	case Character::Izuko:
+		return Textures::Izuko;
 	}
 	
 	// default
@@ -21,6 +34,7 @@ static Textures::ID toTextureID(Character::Type type)
 // character class constructor
 Character::Character(Type type, const TextureHolder& textures) : 
 	nType(type),
+	Entity(100),			// temporary
 	nSprite(textures.get(toTextureID(type)))		// get sprite from texture id type
 {
 	/* align to origin/center

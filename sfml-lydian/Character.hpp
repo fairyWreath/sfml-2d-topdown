@@ -17,6 +17,9 @@ public:
 	enum Type
 	{
 		DarkMagician,
+		Shinobu,
+		Izuko,
+		TypeCount
 	};
 
 public:

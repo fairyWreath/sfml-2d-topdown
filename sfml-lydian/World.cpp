@@ -35,6 +35,8 @@ void World::loadTextures()
 	// loading from textures class template, load with identifier and filepath
 	nTextures.load(Textures::Void, "Media/Textures/Void.png");
 	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
+	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
+	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
 }
 
 
@@ -75,6 +77,17 @@ void World::buildScene()
 
 
 	// add other textures, eg. escort characters
+	auto shinobu = std::make_unique<Character>(Character::Shinobu, nTextures);
+	shinobu->setPosition(nSpawnPosition.x + 100.f, nSpawnPosition.y + 100.f);
+	shinobu->setVelocity(0.f, nScrollSpeed);
+	nSceneLayers[Void]->attachChild(std::move(shinobu));
+
+	auto izuko = std::make_unique<Character>(Character::Izuko, nTextures);
+	izuko->setPosition(nSpawnPosition.x - 100.f, nSpawnPosition.y + 100.f);
+	izuko->setVelocity(0.f, nScrollSpeed);
+	nSceneLayers[Void]->attachChild(std::move(izuko));
+	
+	
 	// can attach them to nPlayercharacter node
 }
 

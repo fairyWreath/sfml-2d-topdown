@@ -87,7 +87,16 @@ bool SettingsState::handleEvent(const sf::Event& event)
 		updateLabels();
 	}
 	else
+	{
+		// esc to go back, pop settings off stack
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+		{
+			requestStackPop();
+		}
+
+
 		nGUIContainer.handleEvent(event);		// if no, pass event to gui components
+	}
 
 	return false;
 }
