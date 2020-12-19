@@ -14,7 +14,10 @@
 
 
 #include "Category.hpp"			// entitiy categories to dispatch commands
-#include "Command.hpp"
+
+// forward declare commands
+struct Command;
+class CommandQueue;
 
 /*	SceneNode inherits from
 1. sf::Drawable so they can be drawn
@@ -38,7 +41,7 @@ public:
 	Ptr detachChild(const SceneNode& node);
 
 	// updating the scene
-	void update(sf::Time dt);		// accept tick time as parameter
+	void update(sf::Time dt, CommandQueue& commands);		// accept tick time as parameter
 
 
 	// absolute transforms
@@ -77,8 +80,8 @@ private:
 
 
 	// updating the scene
-	virtual void updateCurrent(sf::Time dt);
-	void updateChildren(sf::Time dt);
+	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);
+	void updateChildren(sf::Time dt, CommandQueue& commands);
 
 
 private:

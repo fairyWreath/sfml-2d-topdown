@@ -1,12 +1,14 @@
 #include "World.hpp"
 
 #include <iostream>
+#include <algorithm>		// std::sort
 
 // world constructor
-World::World(sf::RenderWindow& window) :
+World::World(sf::RenderWindow& window, FontHolder& fonts) :
 	nWindow(window),
 	nWorldView(window.getDefaultView()),		// default window view, view covers whole window
 	nTextures(),		// set these to empty first
+	nFonts(fonts),
 	nSceneGraph(),	
 	nSceneLayers(),
 	nWorldBounds(				// floatrect type
@@ -19,6 +21,7 @@ World::World(sf::RenderWindow& window) :
 		nWorldView.getSize().x  / 2.f,			// middle x 
 		nWorldBounds.height - nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
 	),
+	nNonPlayerSpawnPoints(),
 	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
 	nPlayerCharacter(nullptr)		// set nullptr to character
 {
@@ -37,6 +40,7 @@ void World::loadTextures()
 	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
 	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
+	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
 }
 
 
@@ -68,27 +72,15 @@ void World::buildScene()
 
 	// add the user character
 	// pass in character type and texture holder
-	std::unique_ptr<Character> main = std::make_unique<Character>(Character::DarkMagician, nTextures);
+	std::unique_ptr<Character> main = std::make_unique<Character>(Character::DarkMagician, nTextures, nFonts);
 	nPlayerCharacter = main.get();			// get RAW  C pointer from unique_ptr
 	nPlayerCharacter->setPosition(nSpawnPosition);			// set to spawn position
 	nPlayerCharacter->setVelocity(40.f, nScrollSpeed);		// set velocity, 40 to right and 50 up (-50.f x)
 	// add unique_ptr of the character to 2nd scene layer
 	nSceneLayers[Void]->attachChild(std::move(main));
-
-
-	// add other textures, eg. escort characters
-	auto shinobu = std::make_unique<Character>(Character::Shinobu, nTextures);
-	shinobu->setPosition(nSpawnPosition.x + 100.f, nSpawnPosition.y + 100.f);
-	shinobu->setVelocity(0.f, nScrollSpeed);
-	nSceneLayers[Void]->attachChild(std::move(shinobu));
-
-	auto izuko = std::make_unique<Character>(Character::Izuko, nTextures);
-	izuko->setPosition(nSpawnPosition.x - 100.f, nSpawnPosition.y + 100.f);
-	izuko->setVelocity(0.f, nScrollSpeed);
-	nSceneLayers[Void]->attachChild(std::move(izuko));
 	
-	
-	// can attach them to nPlayercharacter node
+	// add NPCS
+	addNPCs();
 }
 
 // drawing the scene graph, expensive operation
@@ -115,7 +107,9 @@ void World::update(sf::Time dt)
 	// adapt diagonal velocity
 	adaptPlayerVelocity();
 
-	nSceneGraph.update(dt);			// update the scenegraph
+	spawnNonPlayerCharacters();
+
+	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
 
 	// keep player position within view bounds
@@ -164,3 +158,71 @@ void World::adaptPlayerPosition()
 
 
 
+// spawn points constructor
+World::SpawnPoint::SpawnPoint(Character::Type type, float x, float y) :
+	type(type), x(x), y(y)
+{
+}
+
+
+
+// spawn npcs
+void World::spawnNonPlayerCharacters()
+{
+	// while there are npcs to spawn
+	// if npc y coordiante lies below the top member, create it at spawn point (within bounds)
+	// .back() to access end of vector
+	while (!nNonPlayerSpawnPoints.empty() && nNonPlayerSpawnPoints.back().y > getFieldBounds().top)
+	{
+		SpawnPoint spawn = nNonPlayerSpawnPoints.back();
+
+		// create character
+		std::unique_ptr<Character> npc = std::make_unique<Character>(spawn.type, nTextures, nFonts);
+		npc->setPosition(spawn.x, spawn.y);
+		//  npc->setRotation(180.f);			// face down
+
+		// attach to layer
+		nSceneLayers[Void]->attachChild(std::move(npc));
+		nNonPlayerSpawnPoints.pop_back();
+	}
+}
+
+
+// getting bounds
+sf::FloatRect World::getViewBounds() const
+{
+	return sf::FloatRect(nWorldView.getCenter() - nWorldView.getSize() / 2.f, nWorldView.getSize());
+}
+
+
+sf::FloatRect World::getFieldBounds() const
+{
+	// view bounds + some area top for entities to spawn
+	sf::FloatRect bounds = getViewBounds();
+	bounds.top -= 100.f;
+	bounds.height += 100.f;
+	return bounds;
+}
+
+// adding npcs
+void World::addNPC(Character::Type type, float relX, float relY)		// based on nspawnposition
+{
+	// create spawn type
+	SpawnPoint spawn(type, nSpawnPosition.x + relX, nSpawnPosition.y + relY);
+	nNonPlayerSpawnPoints.push_back(spawn);			// push to vector
+}
+
+void World::addNPCs()
+{
+	addNPC(Character::Izuko, 0.f, -300.f);
+	addNPC(Character::Shinobu, 0.f, -200.f);
+	addNPC(Character::Shinobu, -400.f, -300.f);
+	addNPC(Character::Shinobu, 350.f, -300.f);
+
+
+	// sort according to y values, lower enemis are checked first
+	std::sort(nNonPlayerSpawnPoints.begin(), nNonPlayerSpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)
+		{
+			return lhs.y < rhs.y;
+		});
+}

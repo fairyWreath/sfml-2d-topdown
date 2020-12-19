@@ -21,7 +21,7 @@
 class World : private sf::NonCopyable
 {
 public:
-	explicit World(sf::RenderWindow& window);			// pass in render window in constructor
+	explicit World(sf::RenderWindow& window, FontHolder& fonts);			// pass in render window in constructor
 	void update(sf::Time dt);		// update scenes
 	void draw();					// draw sprites(expensive operation)
 
@@ -36,6 +36,19 @@ private:
 
 	void adaptPlayerPosition();			// keep player within screen bounds
 
+
+	// spawn all enemies
+	void spawnNonPlayerCharacters();
+
+	// adding npcs
+	void addNPC(Character::Type type, float relX, float relY);
+	void addNPCs();		// add a lot at once, hard coded
+
+
+	// float rect for bounds, used in spawning
+	sf::FloatRect getViewBounds() const;
+	sf::FloatRect getFieldBounds() const;
+
 private:
 	enum Layer					// scene layering
 	{
@@ -44,11 +57,23 @@ private:
 		LayerCount,
 	};
 
+	// structure for determining spawn points
+	struct SpawnPoint
+	{
+		// character type and location of the spawns
+		SpawnPoint(Character::Type type, float x, float y);
+
+		Character::Type type;
+		float x;
+		float y;
+	};
+
 private:
 	sf::RenderWindow& nWindow;		// memory address of window, gained from game class later on
 	sf::View nWorldView;			// world view
 
 	TextureHolder nTextures;		// texture holder template class to hold sprites/textures
+	FontHolder& nFonts;
 	SceneNode nSceneGraph;			// root node of the scene graph
 
 
@@ -60,6 +85,9 @@ private:
 
 	float nScrollSpeed;					// scroll speed of moving tyle
 	Character* nPlayerCharacter;		// pointer to player character
+
+	// enemy spawn points
+	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
 
 
 	// command queue to execute commands

@@ -25,6 +25,7 @@ namespace Textures
 		DarkMagician,
 		Shinobu,
 		Izuko,
+		Hitagi,
 
 		Void,
 

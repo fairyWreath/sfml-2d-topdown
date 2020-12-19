@@ -1,6 +1,7 @@
 #include "SceneNode.hpp"
 
-#include "Foreach.hpp"
+#include "Command.hpp"
+#include "CommandQueue.hpp"
 
 SceneNode::SceneNode() : 
 	nChildren(),			// 	 leave children empty
@@ -70,22 +71,22 @@ void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) 
 
 
 /* updating the scene */
-void SceneNode::update(sf::Time dt)
+void SceneNode::update(sf::Time dt, CommandQueue& commands)
 {
-	updateCurrent(dt);
-	updateChildren(dt);
+	updateCurrent(dt, commands);
+	updateChildren(dt, commands);
 }
 
-void SceneNode::updateCurrent(sf::Time)
+void SceneNode::updateCurrent(sf::Time, CommandQueue&)
 {
 	// to be overidden
 }
 
-void SceneNode::updateChildren(sf::Time dt)
+void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
 {
 	for (const Ptr& child : nChildren)
 	{
-		child->update(dt);
+		child->update(dt, commands);
 	}
 }
 

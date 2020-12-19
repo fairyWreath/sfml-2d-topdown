@@ -67,7 +67,7 @@ void Entity::accelerate(float vx, float vy)
 }
 
 
-void Entity::updateCurrent(sf::Time dt)
+void Entity::updateCurrent(sf::Time dt, CommandQueue&)
 {
 	// longer time(dt) leads to a bigger step
 	/* transformable move method

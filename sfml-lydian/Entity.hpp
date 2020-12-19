@@ -34,9 +34,11 @@ public:
 	void accelerate(sf::Vector2f velocity);
 	void accelerate(float vx, float vy);
 
-private:
-	// velocity movement is done here
-	virtual void updateCurrent(sf::Time dt);			// override SceneNode update
+protected:
+	// velocity movement is done here, to be accessed by child class
+	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);			// override SceneNode update
+
+	// update for children classes
 
 private:
 	// store hitpoint

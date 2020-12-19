@@ -5,6 +5,9 @@
 
 #include <cmath>
 
+
+#define PI 3.141592653589793238462643383f
+
 // display key for keybindings
 std::string toString(sf::Keyboard::Key key)
 {
@@ -132,4 +135,15 @@ void centerOrigin(sf::Text& text)
 {
 	sf::FloatRect bounds = text.getLocalBounds();
 	text.setOrigin(std::floor(bounds.left + bounds.width / 2.f), std::floor(bounds.top + bounds.height / 2.f));
+}
+
+// radian/degree conversion
+float toDegree(float radian)
+{
+	return radian * 180.f / PI;
+}
+
+float toRadian(float degree)
+{
+	return degree * PI / 180.f;
 }
