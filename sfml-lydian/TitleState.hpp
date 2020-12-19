@@ -4,10 +4,12 @@
 // class for title state or title screen
 
 #include "State.hpp"
+#include "Container.hpp"
 
 // class will contain sprite and text
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+
 
 // inherit from state class
 class TitleState : public State
@@ -24,10 +26,12 @@ public:
 private:
 	// sfml member classes to store sprites, etc. for menu
 	sf::Sprite nBackgroundSprite;		// background sprite for title menu
-	sf::Text nText;
 	
+	sf::Text nText;
 	bool nShowText;					// used for blinking
 	sf::Time nTextEffectTime;
+
+	GUI::Container nGUIContainer;		// for title label
 };
 
 

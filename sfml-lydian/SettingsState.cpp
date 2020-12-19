@@ -4,6 +4,8 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+#include <iostream>
+
 SettingsState::SettingsState(StateStack& stack, Context context) :
 	State(stack, context),
 	nGUIContainer()
@@ -21,14 +23,22 @@ SettingsState::SettingsState(StateStack& stack, Context context) :
 
 	// create button to go back, pop settingstate off the stack
 	auto backButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	backButton->setPosition(80.f, 470.f);
+	backButton->setPosition(80.f, 550.f);
 	backButton->setText("Back");
 	// use std::bind to set std::function, pop settings state off the stack
 	backButton->setCallback(std::bind(&SettingsState::requestStackPop, this));
 
+	// settings label
+	auto settingsLabel = std::make_shared<GUI::Label>("Settings", *context.fonts);
+	settingsLabel->setPosition(80.f, 20.f);
+	settingsLabel->setColor(sf::Color::Cyan);
+	settingsLabel->setFont(context.fonts->get(Fonts::Title));		// delanova
+	settingsLabel->setSize(90);
+
 
 	// pack the back button
 	nGUIContainer.pack(backButton);
+	nGUIContainer.pack(settingsLabel);
 }
 
 
@@ -57,6 +67,7 @@ bool SettingsState::handleEvent(const sf::Event& event)
 	// iterate through binding buttons to check if a key is being pressed
 	for (std::size_t action = 0; action < Player::ActionCount; action++)
 	{
+		// first 'activate' key to change with enter
 		if (nBindingButtons[action]->isActive())	// if a button is toggled/active, from component class
 		{
 			isKeyBinding = true;
@@ -70,8 +81,11 @@ bool SettingsState::handleEvent(const sf::Event& event)
 		}
 	}
 
+
 	if (isKeyBinding)
+	{
 		updateLabels();
+	}
 	else
 		nGUIContainer.handleEvent(event);		// if no, pass event to gui components
 
@@ -109,7 +123,7 @@ void SettingsState::addButtonLabel(Player::Action action, float y, const std::st
 
 	// create label
 	nBindingLabels[action] = std::make_shared<GUI::Label>("", *context.fonts);
-	nBindingLabels[action]->setPosition(300.f, y + 15.f);		// place beside button
+	nBindingLabels[action]->setPosition(620.f, y + 12.f);		// place beside button
 
 	// pack to container
 	nGUIContainer.pack(nBindingButtons[action]);

@@ -9,8 +9,10 @@ namespace GUI
 {
 
 Label::Label(const std::string& text, const FontHolder& fonts) :
-	nText(text, fonts.get(Fonts::Label), 16)			// set string, font and size to sf::Text, get font from fontholder
+	nText(text, fonts.get(Fonts::Label), 30)			// set string, font and size to sf::Text, get font from fontholder
 {
+	// set initial text color
+	nText.setFillColor(sf::Color::Magenta);
 }
 
 

@@ -82,7 +82,7 @@ void StateStack::applyPendingChanges()
 		case Push:
 		{
 			nStack.push_back(createState(change.stateID));			// create new state based on change struct state id
-			std::cout << "Created state\n";
+			// std::cout << "Created state\n";
 			break;
 		}
 

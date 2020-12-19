@@ -36,7 +36,7 @@ Application::Application() :
 	nFonts.load(Fonts::Label, "Media/Fonts/Overlock-Mod.ttf");
 	
 	nTextures.load(Textures::TitleScreen, "Media/Textures/Title-Screen.png");
-	nTextures.load(Textures::MenuScreen, "Media/Textures/Menu-Screen-Alter.png");
+	nTextures.load(Textures::MenuScreen, "Media/Textures/Menu-Screen.png");
 	nTextures.load(Textures::PauseScreen, "Media/Textures/Pause-Screen.png");
 	nTextures.load(Textures::SettingsScreen, "Media/Textures/Settings-Screen.png");
 

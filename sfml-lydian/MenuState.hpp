@@ -26,10 +26,11 @@ public:
 private:
 	// sfml members
 	sf::Sprite nBackgroundSprite;
-
+	// sf::Text nText;
 
 	// GUI container
 	GUI::Container nGUIContainer;
+
 
 };
 

@@ -4,6 +4,7 @@
 // class for pause state
 
 #include "State.hpp"
+#include "Container.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -20,13 +21,12 @@ public:
 	virtual bool update(sf::Time dt);
 	virtual bool handleEvent(const sf::Event& event);
 
-
-
 private:
 	// sfml members
 	sf::Sprite nBackgroundSprite;
 	sf::Text nPausedText;
-	sf::Text nInstructionText;
+	GUI::Container nGUIContainer;
+
 
 };
 

@@ -5,6 +5,7 @@
 
 #include <sstream>			// string stream
 
+#include <SFML/Window/Keyboard.hpp>
 
 // forward declaration of sf classes
 namespace sf
@@ -16,6 +17,11 @@ namespace sf
 // convert to string
 template <typename Type>
 std::string toString(const Type& value);
+
+
+// from Keyboard::Key to string
+std::string toString(sf::Keyboard::Key key);
+
 
 // center sfml objects in a window
 void centerOrigin(sf::Sprite& sprite);

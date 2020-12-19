@@ -91,7 +91,10 @@ void Player::assignKey(Action action, sf::Keyboard::Key key)
 	{
 		// if action is the same, remove from the binding
 		if (itr->second == action)
+		{
 			nKeyBinding.erase(itr);
+			break;
+		}
 		else
 			itr++;
 	}
