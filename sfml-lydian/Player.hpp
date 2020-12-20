@@ -23,6 +23,8 @@ public:
 		MoveUp,
 		MoveRight,
 		MoveDown,
+		LaunchNormal,
+		LaunchSpecial,
 		ActionCount
 	};
 

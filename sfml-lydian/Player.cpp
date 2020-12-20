@@ -2,6 +2,8 @@
 #include "Character.hpp"
 #include "CommandQueue.hpp"
 
+using namespace std::placeholders;		// for std::bind 
+
 #include <iostream>
 
 // struct with functions/ command to apply
@@ -37,6 +39,9 @@ Player::Player()
 	nKeyBinding[sf::Keyboard::D] = MoveRight;
 	nKeyBinding[sf::Keyboard::S] = MoveDown;
 
+	nKeyBinding[sf::Keyboard::Space] = LaunchNormal;
+	nKeyBinding[sf::Keyboard::B] = LaunchSpecial;
+
 	// map action to commands
 	initializeActions();
 
@@ -59,6 +64,8 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 		{
 			// push to command queue if match
 			commands.push(nActionBinding[pair.second]);			// python like access to std::map
+
+			//std::cout << "Key detected, command pushed";
 		}
 	}
 }
@@ -129,6 +136,14 @@ void Player::initializeActions()
 	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(0.f, -playerSpeed));
 	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(+playerSpeed, 0.f));
 	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(0.f, +playerSpeed));
+
+	// launching attacks
+	// action is launchnormal from character class
+	/* std::bind
+	-> binds fixed parameters to function, with _1, _2 as prams/placeholder
+	*/
+	nActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormal, _1));
+	nActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
 }
 
 
@@ -141,6 +156,7 @@ bool Player::isRealtimeAction(Action action)
 	case MoveUp:
 	case MoveRight:
 	case MoveDown:
+	case LaunchNormal:
 		return true;
 	default:
 		return false;

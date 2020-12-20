@@ -13,6 +13,11 @@ namespace Category
 		SupportCharacter = 1 << 2,
 		EnemyCharacter = 1 << 3,
 		EnemyMobs = 1 << 4,
+
+		AlliedProjectile = 1 << 6,
+		EnemyProjectile = 1 << 7,
+
+		SceneVoidLayer = 1 << 8,
 	};
 }
 

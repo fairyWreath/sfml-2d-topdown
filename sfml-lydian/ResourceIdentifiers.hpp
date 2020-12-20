@@ -29,6 +29,11 @@ namespace Textures
 
 		Void,
 
+		// projectiles
+		AlliedNormal,			// normal flower projectiles
+		EnemyNormal,
+		SpecialHeart,
+
 		// buttons
 		MainButtonNormal,
 		MainButtonSelected,

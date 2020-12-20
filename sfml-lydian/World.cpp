@@ -179,7 +179,7 @@ void World::spawnNonPlayerCharacters()
 		// create character
 		std::unique_ptr<Character> npc = std::make_unique<Character>(spawn.type, nTextures, nFonts);
 		npc->setPosition(spawn.x, spawn.y);
-		//  npc->setRotation(180.f);			// face down
+		// npc->setRotation(180.f);			// face down
 
 		// attach to layer
 		nSceneLayers[Void]->attachChild(std::move(npc));
@@ -214,11 +214,19 @@ void World::addNPC(Character::Type type, float relX, float relY)		// based on ns
 
 void World::addNPCs()
 {
-	addNPC(Character::Izuko, 0.f, -300.f);
-	addNPC(Character::Shinobu, 0.f, -200.f);
-	addNPC(Character::Shinobu, -400.f, -300.f);
-	addNPC(Character::Shinobu, 350.f, -300.f);
+	/*
+	addNPC(Character::Izuko, -400.f, -100.f);
+	addNPC(Character::Izuko, -400.f, 50.f);
+	addNPC(Character::Izuko, -400.f, 200.f);
+	
+	addNPC(Character::Shinobu, -400.f, -200.f);
+	addNPC(Character::Shinobu, -400.f, 0.f);
+	addNPC(Character::Shinobu, -400.f, 200.f);
 
+	addNPC(Character::Hitagi, -200.f, -400.f);
+	addNPC(Character::Hitagi, 0.f, -400.f);
+	addNPC(Character::Hitagi, 200.f, -400.f);
+	*/
 
 	// sort according to y values, lower enemis are checked first
 	std::sort(nNonPlayerSpawnPoints.begin(), nNonPlayerSpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)

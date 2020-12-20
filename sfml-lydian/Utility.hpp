@@ -6,6 +6,7 @@
 #include <sstream>			// string stream
 
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/System/Vector2.hpp>
 
 // forward declaration of sf classes
 namespace sf
@@ -27,10 +28,18 @@ std::string toString(sf::Keyboard::Key key);
 void centerOrigin(sf::Sprite& sprite);
 void centerOrigin(sf::Text& text);
 
+// vector operations
+float length(sf::Vector2f vector);			// get modulus
+sf::Vector2f unitVector(sf::Vector2f vector);		// get unit vector, direction / length
+
 
 // radian/degree conversion
 float toDegree(float radian);
 float toRadian(float degree);
+
+
+// generate random int
+int randomInt(int exclusiveMax);
 
 #include "Utility.inl"
 #endif
