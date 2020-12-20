@@ -3,6 +3,8 @@
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 
+#include "Utility.hpp"
+
 SceneNode::SceneNode() : 
 	nChildren(),			// 	 leave children empty
 	nParent(nullptr)		// constructor initialize parent pointer to null
@@ -118,7 +120,7 @@ sf::Vector2f SceneNode::getWorldPosition() const
 // get category for commands
 unsigned int SceneNode::getCategory() const
 {
-	return Category::Scene;			// return scene for SceneNode class 
+	return Category::SceneVoidLayer;			// return scene for SceneNode class 
 }
 
 // execute command
@@ -134,4 +136,22 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 	{
 		child->onCommand(command, dt);
 	}
+}
+
+// for base return empty
+sf::FloatRect SceneNode::getBoundingRect() const
+{
+	return sf::FloatRect();
+}
+
+// get distance between two scenenodes
+float distance(const SceneNode& left, const SceneNode& right)
+{
+	return length(left.getWorldPosition() - right.getWorldPosition());
+}
+
+// check if collide
+bool collision(const SceneNode& left, const SceneNode& right)
+{
+	return left.getBoundingRect().intersects(right.getBoundingRect());
 }

@@ -57,6 +57,9 @@ public:
 	// use bitwise & operator to the check that the command's receiver is the same category
 	void onCommand(const Command& command, sf::Time dt);
 
+	// get bouding floatrect, for collisions
+	sf::FloatRect getBoundingRect() const;
+
 
 // virtual drawing methods, inherited from sf classes
 private:
@@ -90,6 +93,10 @@ private:
 	std::vector<Ptr> nChildren;				// use unique_ptr<SceneNode> not SceneNode as std::vector has to be a completed type
 	SceneNode* nParent;						// pointer to parent node
 };
+
+// functions go get collision and distance between two scene nodes
+bool collision(const SceneNode& left, const SceneNode& right);		// check if two nodes collide
+float distance(const SceneNode& left, const SceneNode& right);
 
 
 #endif

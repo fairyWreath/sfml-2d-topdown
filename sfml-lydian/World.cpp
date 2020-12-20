@@ -1,7 +1,12 @@
 #include "World.hpp"
 
+#include "Projectile.hpp"
+
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include <iostream>
 #include <algorithm>		// std::sort
+#include <limits>		// std::numeric_limits
 
 // world constructor
 World::World(sf::RenderWindow& window, FontHolder& fonts) :
@@ -11,6 +16,7 @@ World::World(sf::RenderWindow& window, FontHolder& fonts) :
 	nFonts(fonts),
 	nSceneGraph(),	
 	nSceneLayers(),
+	nActiveEnemies(),
 	nWorldBounds(				// floatrect type
 		0.f,	// left x position
 		0.f,	// top y position
@@ -41,6 +47,10 @@ void World::loadTextures()
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
 	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
 	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
+
+	nTextures.load(Textures::AlliedNormal, "Media/Textures/Shinobu-Resized.png");
+	nTextures.load(Textures::SpecialHeart, "Media/Textures/Shinobu-Resized.png");
+
 }
 
 
@@ -102,7 +112,10 @@ void World::update(sf::Time dt)
 
 	// forward commands from queue to the scene graph
 	while (!nCommandQueue.isEmpty())			// while not empty
+	{
+		std::cout << "command popped\n";
 		nSceneGraph.onCommand(nCommandQueue.pop(), dt);			// pop form queue run command
+	}
 
 	// adapt diagonal velocity
 	adaptPlayerVelocity();
@@ -228,9 +241,68 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, 200.f, -400.f);
 	*/
 
+	// addNPC(Character::Hitagi, 0.f, -400.f);
+
+
 	// sort according to y values, lower enemis are checked first
 	std::sort(nNonPlayerSpawnPoints.begin(), nNonPlayerSpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)
 		{
 			return lhs.y < rhs.y;
 		});
 }
+
+
+void World::guideSpecialAttacks()
+{
+	Command enemyCollector;
+	enemyCollector.category = Category::EnemyCharacter;
+
+	// function to collect all currently alive enemies
+	// derived action to downcast from node type to Character type, use inline function
+	enemyCollector.action = derivedAction<Character>(
+		[this](Character& enemy, sf::Time)
+		{
+			if(!enemy.isDestroyed())	// if enemy is still alive
+				nActiveEnemies.push_back(&enemy);
+		});
+
+
+	// function that guides the special attacks to enemies which are closest to player
+	Command specialGuider;
+	specialGuider.category = Category::AlliedProjectile;
+	specialGuider.action = derivedAction<Projectile>([this](Projectile& projectile, sf::Time)
+	{
+			// ignore non-guided projectiles
+			if (!projectile.isGuided())
+				return;
+
+			/*	std::numeric_limits
+			get, eg. maximum number of a type
+			std::numeric_limits<type>::max();
+			*/
+			float minDistance = std::numeric_limits<float>::max();  // get max float amount
+			Character* closestEnemy = nullptr;
+
+			// find enemiees from active enemies
+			for (Character*& enemy : nActiveEnemies)
+			{	
+				// float enemyDistance = 10;
+				float enemyDistance = distance(projectile, *enemy);			// scenenode function to get distance between two nodes
+
+				if (enemyDistance < minDistance)
+				{
+					closestEnemy = enemy;
+					minDistance = enemyDistance;
+				}
+			}
+
+			if (closestEnemy)	// guide projectile
+				projectile.guideTowards(closestEnemy->getWorldPosition());
+	});
+
+	// push commands
+	nCommandQueue.push(enemyCollector);
+	nCommandQueue.push(specialGuider);
+	nActiveEnemies.clear();			// clear active enemies
+}
+

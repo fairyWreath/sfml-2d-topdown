@@ -37,12 +37,21 @@ private:
 	void adaptPlayerPosition();			// keep player within screen bounds
 
 
+	// collisions
+	void handleCollisions();
+
 	// spawn all enemies
 	void spawnNonPlayerCharacters();
 
 	// adding npcs
 	void addNPC(Character::Type type, float relX, float relY);
 	void addNPCs();		// add a lot at once, hard coded
+
+	// destroy entities outside the view
+	void destroyEntitiesOutsideView();
+
+	// guiding special missiles
+	void guideSpecialAttacks();
 
 
 	// float rect for bounds, used in spawning
@@ -89,6 +98,8 @@ private:
 	// enemy spawn points
 	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
 
+	// active/alive enemis
+	std::vector<Character*> nActiveEnemies;
 
 	// command queue to execute commands
 	CommandQueue nCommandQueue;

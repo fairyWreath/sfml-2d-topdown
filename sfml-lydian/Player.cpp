@@ -80,6 +80,8 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 		Command output;
 		output.category = Category::PlayerCharacter;
 		
+		std::cout << "Event detected\n";
+
 		// lambda expression to construct action
 		output.action = [](SceneNode& s, sf::Time)
 		{
@@ -157,6 +159,7 @@ bool Player::isRealtimeAction(Action action)
 	case MoveRight:
 	case MoveDown:
 	case LaunchNormal:
+	case LaunchSpecial:
 		return true;
 	default:
 		return false;

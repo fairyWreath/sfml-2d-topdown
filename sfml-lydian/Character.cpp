@@ -53,7 +53,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nDirectionIndex(0),				// initial index at 0
 	nIsLaunchingNormal(false),		// set initial firing states to false
 	nIsLaunchingSpecial(false),
-	nNormalAttackRateLevel(1),
+	nNormalAttackRateLevel(5),	// attack speed here
 	nSpreadLevel(1),
 	nSpecialAmount(2),
 	nAttackCountdown(sf::Time::Zero),
@@ -76,11 +76,13 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	updateTexts();
 
 	// creating attack commands, using lambda expressions
-	nLaunchNormalCommand.category = Category::SceneVoidLayer;
+    nLaunchNormalCommand.category = Category::SceneVoidLayer;
 	nLaunchNormalCommand.action = [this, &textures](SceneNode& node, sf::Time time)
 	{
 		// use this(character class) and context textures
 		// below function is owned by Character class
+		std::cout << "command executed\n";
+
 		createNormalAttack(node, textures);
 	};
 
@@ -291,8 +293,13 @@ void Character::launchNormal()
 
 void Character::launchSpecial()
 {
+	std::cout << "Launched special attack\n";
+
+
 	if (nSpecialAmount > 0)
 	{
+		std::cout << "Launched special attack\n";
+
 		nIsLaunchingSpecial = true;
 		nSpecialAmount--;
 	}
@@ -322,10 +329,11 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	// check from flag and cooldown must be 0
 	if (nIsLaunchingNormal && nAttackCountdown <= sf::Time::Zero)
 	{
-		std::cout << "Command pushed\n";
-
 		// push the command
 		commands.push(nLaunchNormalCommand);
+
+		std::cout << "Command pushed\n";
+		
 
 		// add to cooldown
 		nAttackCountdown += sf::seconds(1.f / (nNormalAttackRateLevel + 1));

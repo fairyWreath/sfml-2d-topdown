@@ -41,5 +41,8 @@ float toRadian(float degree);
 // generate random int
 int randomInt(int exclusiveMax);
 
+// get distance between
+
+
 #include "Utility.inl"
 #endif
