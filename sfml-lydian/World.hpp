@@ -17,6 +17,12 @@
 
 #include <array>		// statistically fixed sized array
 
+// forward declare
+namespace sf
+{
+	class RenderWindow;
+}
+
 // inherit world from sf::NonCopyable, prevents copy constructor
 class World : private sf::NonCopyable
 {

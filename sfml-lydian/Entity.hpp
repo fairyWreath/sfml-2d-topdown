@@ -20,8 +20,7 @@ public:
 
 	// getting hitpoint values / status from outside
 	int getHitpoints() const;
-	bool isDestroyed() const;
-
+	virtual bool isDestroyed() const;
 
 	// set velocity
 	void setVelocity(sf::Vector2f velocity);			// set velocity using sf velocity type

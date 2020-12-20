@@ -12,6 +12,8 @@
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 
+#include "Powerup.hpp"
+
 #include <cmath>
 
 #include <iostream>
@@ -92,6 +94,17 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		// missiles are only a single projectile
 		createProjectile(node, Projectile::SpecialHeart, 0.f, 0.5f, textures);
 	};
+
+
+	// commands to allow enemis to drop powerups
+	nDropPowerupCommand.category = Category::SceneVoidLayer;
+	nDropPowerupCommand.action = [this, &textures](SceneNode& node, sf::Time)
+	{
+		createPowerup(node, textures);
+	};
+
+	// test create
+
 }
 
 // creating attacks
@@ -122,7 +135,7 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	// create projectile ptr
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
 
-	std::cout << "created projectile\n";
+//	std::cout << "created projectile\n";
 
 	// set offset and speed 
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
@@ -135,6 +148,20 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 
 	// attach to scene graph
 	node.attachChild(std::move(projectile));
+}
+
+
+// create powerups
+void Character::createPowerup(SceneNode& node, const TextureHolder& textures) const
+{
+	// get random pickup type
+	auto type = static_cast<Powerup::Type>(randomInt(Powerup::TypeCount - 1));		// currently exclude last one
+
+	// create pickup here
+	auto powerup = std::make_unique<Powerup>(type, textures);
+	powerup->setPosition(getWorldPosition());		// set from current position
+	powerup->setVelocity(0.f, 1.f);				// set slow movement
+	node.attachChild(std::move(powerup));		// attach to child to draw
 }
 
 
@@ -187,6 +214,8 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 	// update text nodes
 	updateTexts();
+
+//	commands.push(nDropPowerupCommand);
 }
 
 
@@ -278,15 +307,21 @@ void Character::collectSpecialAttacks(unsigned int count)
 	nSpecialAmount += count;
 }
 
+// change velocity from entity
+void Character::increaseMovementSpeed()
+{
+	
+}
+
 // attack function, set flags to true
 void Character::launchNormal()
 {
-	std::cout << "Launched normal attack\n";
+//	std::cout << "Launched normal attack\n";
 
 	// only attack if interval not 0
 	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
 	{
-		std::cout << "Flag set true\n";
+//		std::cout << "Flag set true\n";
 		nIsLaunchingNormal = true;		// set flag to true
 	}
 }
@@ -313,7 +348,7 @@ void Character::checkPickupDrop(CommandQueue& commands)
 	if (!isAllied() && randomInt(3) == 0)
 	{
 		// push command
-		commands.push(nDropPickupCommand);
+		commands.push(nDropPowerupCommand);
 	}
 }
 
@@ -332,16 +367,17 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		// push the command
 		commands.push(nLaunchNormalCommand);
 
-		std::cout << "Command pushed\n";
+//		std::cout << "Command pushed\n";
 		
 
 		// add to cooldown
-		nAttackCountdown += sf::seconds(1.f / (nNormalAttackRateLevel + 1));
+		nAttackCountdown += CharacterTable[nType].actionInterval / (nNormalAttackRateLevel + 1.f);
 		nIsLaunchingNormal = false;		// set flag back to false
 	}
 	else if (nAttackCountdown > sf::Time::Zero)		// else, decrease countdown
 	{
 		nAttackCountdown -= dt;
+		nIsLaunchingNormal = false;
 	}
 
 	// check for special attack

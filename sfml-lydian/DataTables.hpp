@@ -46,9 +46,9 @@ struct ProjectileData
 
 
 // power pickups
-struct PickupData
+struct PowerupData
 {
-	// function that acceps character, to modify character
+	// function that acceps character, to modify character, accepts a single Character parameter
 	std::function<void(Character&)> action;
 	Textures::ID texture;
 };
@@ -56,6 +56,6 @@ struct PickupData
 // initialize data and get their vectors
 std::vector<CharacterData> initializeCharacterData();
 std::vector<ProjectileData> initializeProjectileData();
-std::vector<PickupData> initializePickupData();
+std::vector<PowerupData> initializePowerupData();
 
 #endif

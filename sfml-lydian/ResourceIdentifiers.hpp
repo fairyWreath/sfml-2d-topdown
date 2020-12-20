@@ -37,7 +37,14 @@ namespace Textures
 		// buttons
 		MainButtonNormal,
 		MainButtonSelected,
-		MainButtonPressed
+		MainButtonPressed,
+
+		// powerups
+		HealthRefill,
+		SpecialAttackRefill,
+		AttackSpread,
+		AttackRate,
+		MovementSpeed
 	};
 }
 

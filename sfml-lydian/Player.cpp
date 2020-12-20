@@ -31,7 +31,8 @@ struct CharacterMover
 
 
 // constructor where all keybindings are set
-Player::Player()
+Player::Player() :
+	nPlayerSpeed(200.f)
 {
 	// set initial key bindings
 	nKeyBinding[sf::Keyboard::A] = MoveLeft;
@@ -130,14 +131,12 @@ sf::Keyboard::Key Player::getAssignedKey(Action action) const
 // adding commands/action bindings
 void Player::initializeActions()
 {
-	const float playerSpeed = 200.f;			// set speed
-
 	// add commands here, add to actionbinding dict/map
 	// use functors and command struct template to add commands
-	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(-playerSpeed, 0.f));
-	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(0.f, -playerSpeed));
-	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(+playerSpeed, 0.f));
-	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(0.f, +playerSpeed));
+	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(-nPlayerSpeed, 0.f));
+	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(0.f, -nPlayerSpeed));
+	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(+nPlayerSpeed, 0.f));
+	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(0.f, +nPlayerSpeed));
 
 	// launching attacks
 	// action is launchnormal from character class

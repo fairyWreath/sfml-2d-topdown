@@ -10,8 +10,8 @@
 
 #include <memory>
 #include <vector>
-#include <cassert>
-
+#include <cassert>		
+#include <set>					// python set()
 
 #include "Category.hpp"			// entitiy categories to dispatch commands
 
@@ -29,6 +29,9 @@ class SceneNode : public sf::Transformable, public sf::Drawable, private sf::Non
 {
 public:
 	typedef std::unique_ptr<SceneNode> Ptr;			// rename unique_ptr to Ptr
+
+	// collision pairs between two scenenodes
+	typedef std::pair<SceneNode*, SceneNode*> Pair;
 
 public:
 	SceneNode();
@@ -57,8 +60,20 @@ public:
 	// use bitwise & operator to the check that the command's receiver is the same category
 	void onCommand(const Command& command, sf::Time dt);
 
+	/* for collisions */
+	void checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& collisionPairs);
+
+	// check between *this and children
+	void checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs);
+
 	// get bouding floatrect, for collisions
 	sf::FloatRect getBoundingRect() const;
+
+	// remove dangling wrecks
+	void removeWrecks();
+
+	virtual bool isMarkedForRemoval() const;
+	virtual bool isDestroyed() const;
 
 
 // virtual drawing methods, inherited from sf classes
@@ -92,6 +107,9 @@ private:
 	// children only store their position, scale and rotation relative to their parent
 	std::vector<Ptr> nChildren;				// use unique_ptr<SceneNode> not SceneNode as std::vector has to be a completed type
 	SceneNode* nParent;						// pointer to parent node
+
+	// scenenode category
+	Category::Type nDefaultCategory;
 };
 
 // functions go get collision and distance between two scene nodes

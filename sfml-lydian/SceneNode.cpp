@@ -5,6 +5,8 @@
 
 #include "Utility.hpp"
 
+#include <algorithm>
+
 SceneNode::SceneNode() : 
 	nChildren(),			// 	 leave children empty
 	nParent(nullptr)		// constructor initialize parent pointer to null
@@ -138,11 +140,78 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 	}
 }
 
+/* collisions */
+// check collision between *this and its children with argument node
+void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs)
+{
+	// compare to *this / parent
+	// if nodes are different and if both are not yet distroyed, and if both collide
+	if (this != &node && collision(*this, node)
+		&& !isDestroyed() && !node.isDestroyed())
+	{
+		collisionPairs.insert(std::minmax(this, &node));			// minmax, returns pair with min as first
+	}
+
+	// compare to parameter node children
+	for (const auto& child : nChildren)
+	{
+		child->checkNodeCollision(node, collisionPairs);
+	}
+}
+
+// check collisions between whole scene graph against all nodes
+void SceneNode::checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& collisionPairs)
+{
+	checkNodeCollision(sceneGraph, collisionPairs);
+
+	for (const auto& child : sceneGraph.nChildren)
+	{
+		checkSceneCollision(*child, collisionPairs);
+	}
+}
+
+/* cleaning up */
+void SceneNode::removeWrecks()
+{
+	/* std::remove_if
+	- std::removeif(first iterator, last iteraotr, predicate)
+	- predicate accepts container type and returns bool
+	- rearranges container so elements to NOt be removed are at the front
+	*/
+	/* std::mem_fn
+	-> create a function that return true if and only if the member function passed is true, in this case MarkedforRoemval
+	*/
+	auto removeBegin = std::remove_if(nChildren.begin(), nChildren.end(), std::mem_fn(&SceneNode::isMarkedForRemoval));
+
+	// removebegin returns starting iterator to where elements are to be removed
+	nChildren.erase(removeBegin, nChildren.end());
+
+	// recursively call to remove wrecks from children
+	std::for_each(nChildren.begin(), nChildren.end(), std::mem_fn(&SceneNode::removeWrecks));
+}
+
+
 // for base return empty
 sf::FloatRect SceneNode::getBoundingRect() const
 {
 	return sf::FloatRect();
 }
+
+
+
+bool SceneNode::isMarkedForRemoval() const
+{
+	// remove by default if entitiy is destroyed
+	return isDestroyed();
+}
+
+bool SceneNode::isDestroyed() const
+{
+	// scenes do not need to be removed
+	return false;
+}
+
+
 
 // get distance between two scenenodes
 float distance(const SceneNode& left, const SceneNode& right)

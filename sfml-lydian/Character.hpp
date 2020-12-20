@@ -48,6 +48,8 @@ public:
 	void increaseSpread();
 	void collectSpecialAttacks(unsigned int count);
 
+	void increaseMovementSpeed();
+
 	// actual implementation not put here, since we need concept of how much time has elapsed
 	// simply marks flags to true
 	void launchNormal();
@@ -74,7 +76,7 @@ private:
 	void createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, const TextureHolder& textures) const;
 	
 	
-	void createPickup(SceneNode& node, const TextureHolder& textures) const;
+	void createPowerup(SceneNode& node, const TextureHolder& textures) const;
 
 
 	// update texts
@@ -102,8 +104,8 @@ private:
 	int nSpecialAmount;			// amount for special attacks
 
 
-	// command to drop current pickup
-	Command nDropPickupCommand;
+	// command to drop current powerups from dead enemies
+	Command nDropPowerupCommand;
 
 	// for movements
 	float nTravelledDistance;		// distance already travelled in a direction

@@ -1,6 +1,7 @@
 #include "DataTables.hpp"
 #include "Character.hpp"
 #include "Projectile.hpp"
+#include "Powerup.hpp"
 
 // for std::bind() placeholders
 using namespace std::placeholders;
@@ -64,6 +65,25 @@ std::vector<ProjectileData> initializeProjectileData()
 	data[Projectile::SpecialHeart].damage = 200;
 	data[Projectile::SpecialHeart].speed = 150.f;
 	data[Projectile::SpecialHeart].texture = Textures::SpecialHeart;
+
+	return data;
+}
+
+std::vector<PowerupData> initializePowerupData()
+{
+	std::vector<PowerupData> data(Powerup::TypeCount);
+	
+	data[Powerup::HealthRefill].texture = Textures::HealthRefill;
+	data[Powerup::HealthRefill].action = [](Character& ch) {ch.heal(25);  };
+
+	data[Powerup::SpecialAttackRefill].texture = Textures::SpecialAttackRefill;
+	data[Powerup::SpecialAttackRefill].action = std::bind(&Character::collectSpecialAttacks, _1, 3);	// add 3 special attacks
+
+	data[Powerup::AttackRate].texture = Textures::AttackRate;
+	data[Powerup::AttackRate].action = std::bind(&Character::increaseAttackRate, _1);	// no parameters
+	
+	data[Powerup::AttackSpread].texture = Textures::AttackSpread;
+	data[Powerup::AttackSpread].action = std::bind(&Character::increaseSpread, _1);
 
 	return data;
 }

@@ -1,6 +1,7 @@
 #include "World.hpp"
 
 #include "Projectile.hpp"
+#include "Powerup.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -49,7 +50,7 @@ void World::loadTextures()
 	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
 
 	nTextures.load(Textures::AlliedNormal, "Media/Textures/Shinobu-Resized.png");
-	nTextures.load(Textures::SpecialHeart, "Media/Textures/Shinobu-Resized.png");
+	nTextures.load(Textures::SpecialHeart, "Media/Textures/Hitagi-Resized.png");
 
 }
 
@@ -110,15 +111,26 @@ void World::update(sf::Time dt)
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
 
+
+	// guide special attacks
+	guideSpecialAttacks();
+
 	// forward commands from queue to the scene graph
 	while (!nCommandQueue.isEmpty())			// while not empty
 	{
-		std::cout << "command popped\n";
+	//	std::cout << "command popped\n";
 		nSceneGraph.onCommand(nCommandQueue.pop(), dt);			// pop form queue run command
 	}
 
+
+
 	// adapt diagonal velocity
 	adaptPlayerVelocity();
+
+	handleCollisions();
+
+	// remove wrecks, starting from root scene graph
+	nSceneGraph.removeWrecks();
 
 	spawnNonPlayerCharacters();
 
@@ -241,7 +253,8 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, 200.f, -400.f);
 	*/
 
-	// addNPC(Character::Hitagi, 0.f, -400.f);
+	 addNPC(Character::Shinobu, 0.f, -400.f);
+
 
 
 	// sort according to y values, lower enemis are checked first
@@ -304,5 +317,73 @@ void World::guideSpecialAttacks()
 	nCommandQueue.push(enemyCollector);
 	nCommandQueue.push(specialGuider);
 	nActiveEnemies.clear();			// clear active enemies
+}
+
+
+
+/* collisions */
+
+// check if match parameter types
+static bool matchesCategories(SceneNode::Pair& colliders, Category::Type first, Category::Type second)
+{
+	unsigned int firstCategory = colliders.first->getCategory();
+	unsigned int secondCategory = colliders.second->getCategory();
+
+	// check both cases, use & bitwise operator
+	if (first & firstCategory && second & secondCategory)
+	{
+		return true;
+	}
+	else if (second & firstCategory && first & secondCategory)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void World::handleCollisions()
+{
+	// set up collision pair set
+	std::set<SceneNode::Pair> collisionPairs;
+	// get all pairs from the main scenegraph
+	nSceneGraph.checkSceneCollision(nSceneGraph, collisionPairs);
+
+	std::cout << "Number of collisions: " << collisionPairs.size() << "\n";
+
+	for (SceneNode::Pair pair : collisionPairs)
+	{
+		/* implemenation of matching collisions here */
+
+		// betweenplaye and enemy character
+		if (matchesCategories(pair, Category::PlayerCharacter, Category::EnemyCharacter))
+		{
+			auto& player = static_cast<Character&>(*pair.first);
+			auto& enemy = static_cast<Character&>(*pair.second);
+
+			player.damage(enemy.getHitpoints());			// damage equal to enemy health
+			enemy.destroy();
+		}
+		else if (matchesCategories(pair, Category::AlliedProjectile, Category::EnemyCharacter)
+			|| matchesCategories(pair, Category::EnemyProjectile, Category::PlayerCharacter))
+		{
+			auto& projectile = static_cast<Projectile&>(*pair.first);
+			auto& character = static_cast<Character&>(*pair.second);
+
+			character.damage(projectile.getDamage());			// damage enemy based on projectile
+			projectile.destroy();					// destroy projectile
+		}
+		else if (matchesCategories(pair, Category::PlayerCharacter, Category::Powerup))
+		{
+			auto& player = static_cast<Character&>(*pair.first);
+			auto& powerup = static_cast<Powerup&>(*pair.second);
+
+			powerup.apply(player);
+			powerup.destroy();
+		}
+	}
+
 }
 
