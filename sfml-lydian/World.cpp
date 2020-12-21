@@ -110,7 +110,10 @@ void World::update(sf::Time dt)
 
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
-
+	
+	
+	// destroy entities outside view
+	destroyEntitiesOutsideView();
 
 	// guide special attacks
 	guideSpecialAttacks();
@@ -137,10 +140,29 @@ void World::update(sf::Time dt)
 	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
 
+
 	// keep player position within view bounds
 	adaptPlayerPosition();
 }
 
+
+void World::destroyEntitiesOutsideView()
+{
+	// make new command to destroy entities, push it to the queue
+	Command command;
+	// affects enemies and projectiles
+	command.category = Category::Projectile | Category::EnemyCharacter;
+	// set up the command, downcast to entity
+	command.action = derivedAction<Entity>([this](Entity& entity, sf::Time)
+	{
+			if (!getFieldBounds().intersects(entity.getBoundingRect()))
+			{
+				entity.destroy();
+			}
+	});
+
+	nCommandQueue.push(command);
+}
 
 
 // command queue operations

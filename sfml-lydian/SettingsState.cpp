@@ -14,16 +14,24 @@ SettingsState::SettingsState(StateStack& stack, Context context) :
 	nBackgroundSprite.setTexture(context.textures->get(Textures::SettingsScreen));
 
 	// draw buttons and labels
-	addButtonLabel(Player::MoveLeft, 150.f, "Left", context);
-	addButtonLabel(Player::MoveRight, 230.f, "Right", context);
-	addButtonLabel(Player::MoveUp, 310.f, "Up", context);
-	addButtonLabel(Player::MoveDown, 390.f, "Down", context);
+
+	// 66.5 x to centre button on left column
+	addButtonLabel(Player::MoveLeft, 40.f, 150.f, "Left", context);
+	addButtonLabel(Player::MoveRight, 40.f, 230.f, "Right", context);
+	addButtonLabel(Player::MoveUp, 40.f, 310.f, "Up", context);
+	addButtonLabel(Player::MoveDown, 40.f, 390.f, "Down", context);
+
+	addButtonLabel(Player::LaunchNormal, 640.f, 150.f, "Normal Attack", context);
+	addButtonLabel(Player::LaunchSpecial, 640.f, 230.f, "Special Attack", context);
+
 
 	updateLabels();			// update initial labels
 
 	// create button to go back, pop settingstate off the stack
 	auto backButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	backButton->setPosition(80.f, 550.f);
+
+	// 386.5f x to centre button
+	backButton->setPosition(386.5f, 550.f);
 	backButton->setText("Back");
 	// use std::bind to set std::function, pop settings state off the stack
 	backButton->setCallback(std::bind(&SettingsState::requestStackPop, this));
@@ -122,17 +130,17 @@ void SettingsState::updateLabels()
 
 
 // add button and label based on given action parameter, y param for position, string param for button text
-void SettingsState::addButtonLabel(Player::Action action, float y, const std::string& text, Context context)
+void SettingsState::addButtonLabel(Player::Action action, float x, float y, const std::string& text, Context context)
 {
 	// create button, in ths static array
 	nBindingButtons[action] = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	nBindingButtons[action]->setPosition(80.f, y);
+	nBindingButtons[action]->setPosition(x, y);
 	nBindingButtons[action]->setText(text);
 	nBindingButtons[action]->setToggle(true);			// button can be toggled
 
 	// create label
 	nBindingLabels[action] = std::make_shared<GUI::Label>("", *context.fonts);
-	nBindingLabels[action]->setPosition(620.f, y + 12.f);		// place beside button
+	nBindingLabels[action]->setPosition(x + 520.f, y + 12.f);		// place beside button
 
 	// pack to container
 	nGUIContainer.pack(nBindingButtons[action]);

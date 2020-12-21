@@ -61,8 +61,6 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	{
 		// use this(character class) and context textures
 		// below function is owned by Character class
-		std::cout << "command executed\n";
-
 		createNormalAttack(node, textures);
 	};
 
@@ -96,6 +94,10 @@ void Character::createNormalAttack(SceneNode& node, const TextureHolder& texture
 	switch (nSpreadLevel)
 	{
 	case 1:
+		createProjectile(node, type, 0.5f, 0.0f, 45, textures);
+		//createProjectile(node, type, +0.0f, 0.33f, textures);
+		break;
+	case 2:
 		createProjectile(node, type, 0.0f, 0.5f, textures);
 		break;
 	default:
@@ -123,8 +125,28 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	float sign = isAllied() ? -1.f : +1.f;
 	projectile->setPosition(getWorldPosition() + offset * sign);
 	projectile->setVelocity(velocity * sign);
-
+	
 	// attach to scene graph
+	node.attachChild(std::move(projectile));
+}
+
+
+void Character::createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, float angleDeg,
+	const TextureHolder& textures) const
+{
+	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
+	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
+
+	float radians = -toRadian(angleDeg);
+	std::cout << radians << std::endl;
+	float vx = projectile->getMaxSpeed() * std::cos(radians);
+	float vy = projectile->getMaxSpeed() * std::sin(radians);
+
+	sf::Vector2f velocity(vx, vy);
+	projectile->setPosition(getWorldPosition() + offset);
+	projectile->setVelocity(velocity);
+	projectile->setRotation(angleDeg + 90.f);
+
 	node.attachChild(std::move(projectile));
 }
 

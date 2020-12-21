@@ -76,6 +76,10 @@ private:
 	// creating a single projectile
 	void createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, const TextureHolder& textures) const;
 	
+	// create with direction
+	void createProjectile(SceneNode& node, Projectile::Type type, float xOffset, float yOffset, float angle,
+		const TextureHolder& textures) const;
+
 	
 	void createPowerup(SceneNode& node, const TextureHolder& textures) const;
 

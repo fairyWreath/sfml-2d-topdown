@@ -30,7 +30,7 @@ private:
 	void updateLabels();
 
 	// add button, with parameters for text and player action(keybindings), y for position
-	void addButtonLabel(Player::Action action, float y, const std::string& text, Context context);
+	void addButtonLabel(Player::Action action, float x, float y, const std::string& text, Context context);
 
 private:
 	sf::Sprite nBackgroundSprite;
