@@ -13,6 +13,10 @@ public:
 	{
 		AlliedNormal,			// normal heart projectiles
 		AlliedSingle,
+
+		AlliedSingleBurst,
+		AlliedSingleQuick,
+
 		EnemyNormal,
 		SpecialHeart,
 		TypeCount

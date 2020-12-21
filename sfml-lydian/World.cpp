@@ -55,6 +55,9 @@ void World::loadTextures()
 	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
 	nTextures.load(Textures::EnemyNormal, "Media/Textures/Pink-Flower.png");
 	nTextures.load(Textures::AlliedSingle, "Media/Textures/Pink-Beam.png");
+	nTextures.load(Textures::AlliedSingleBurst, "Media/Textures/Green-Plasma-Beam.png");
+	nTextures.load(Textures::AlliedSingleQuick, "Media/Textures/Slim-Blue-Beam-Small.png");
+
 }
 
 
@@ -282,10 +285,22 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, 200.f, -400.f);
 	*/
 
-	 addNPC(Character::Shinobu, -200.f, 200.f);
+	// addNPC(Character::Shinobu, -200.f, 200.f);
 	 
-	 addNPC(Character::Yotsugi, -300.f, 300.f);
 
+	 addNPC(Character::Yotsugi, -300.f, 300.f);
+	 addNPC(Character::Yotsugi, 0.f, 300.f);
+	 addNPC(Character::Yotsugi, 300.f, 300.f);
+	 addNPC(Character::Yotsugi, -300.f, -300.f);
+	 addNPC(Character::Yotsugi, 0.f, -300.f);
+	 addNPC(Character::Yotsugi, 300.f, -300.f);
+
+	 addNPC(Character::Yotsugi, -300.f, -300.f);
+	 addNPC(Character::Yotsugi, -300.f, 0.f);
+	 addNPC(Character::Yotsugi, -300.f, 300.f);
+	 addNPC(Character::Yotsugi, 300.f, -300.f);
+	 addNPC(Character::Yotsugi, 300.f, 0.f);
+	 addNPC(Character::Yotsugi, 300.f, 300.f);
 
 
 	// sort according to y values, lower enemis are checked first
@@ -422,3 +437,15 @@ void World::handleCollisions()
 
 }
 
+
+// mission status
+bool World::hasAlivePlayer() const
+{
+	return !nPlayerCharacter->isMarkedForRemoval();
+}
+
+bool World::gameReachedEnd() const
+{
+	// character within world bounds
+	return !nWorldBounds.contains(nPlayerCharacter->getPosition());
+}

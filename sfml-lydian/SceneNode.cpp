@@ -7,9 +7,10 @@
 
 #include <iostream>
 
-SceneNode::SceneNode() : 
+SceneNode::SceneNode(Category::Type category) : 
 	nChildren(),			// 	 leave children empty
-	nParent(nullptr)		// constructor initialize parent pointer to null
+	nParent(nullptr),		// constructor initialize parent pointer to null
+	nDefaultCategory(category)
 {
 }
 

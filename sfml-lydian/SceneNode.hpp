@@ -34,7 +34,7 @@ public:
 	typedef std::pair<SceneNode*, SceneNode*> Pair;
 
 public:
-	SceneNode();
+	explicit SceneNode(Category::Type category = Category::None);
 
 	// node insertion
 	void attachChild(Ptr child);

@@ -12,7 +12,8 @@ namespace States
 		Settings,
 		Loading,
 		Pause,
-		Game
+		Game,
+		GameEnd
 	};
 }
 

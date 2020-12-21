@@ -20,6 +20,7 @@ namespace Textures
 		MenuScreen,
 		PauseScreen,
 		SettingsScreen,
+		GameEndScreen,
 
 		// characters
 		DarkMagician,
@@ -33,7 +34,11 @@ namespace Textures
 		// projectiles
 		AlliedNormal,			// normal flower projectiles
 		EnemyNormal,
-		AlliedSingle,
+		AlliedSingle,		// normal attacks
+
+		AlliedSingleBurst,	
+		AlliedSingleQuick,
+
 		SpecialHeart,
 
 		// buttons

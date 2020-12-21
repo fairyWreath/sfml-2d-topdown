@@ -8,6 +8,7 @@
 #include "SceneNode.hpp"				// for scene graph
 #include "SpriteNode.hpp"				// sprite scenenodes for landscape/background
 #include "Character.hpp"
+#include "Powerup.hpp"
 #include "CommandQueue.hpp"
 
 
@@ -34,6 +35,10 @@ public:
 	// acess commandqueue memory address for writing
 	CommandQueue& getCommandQueue();
 
+	// end game states
+	bool hasAlivePlayer() const;
+	bool gameReachedEnd() const;
+
 private:
 	void loadTextures();		// load textures/sprites from resourceholder
 	void buildScene();			// draw the scenes
@@ -52,6 +57,11 @@ private:
 	// adding npcs
 	void addNPC(Character::Type type, float relX, float relY);
 	void addNPCs();		// add a lot at once, hard coded
+
+
+	// adding powerups
+	void addPowerup(Powerup::Type type, float relX, float relY);
+	void addPowerups();
 
 	// destroy entities outside the view
 	void destroyEntitiesOutsideView();

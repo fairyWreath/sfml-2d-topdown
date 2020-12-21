@@ -35,10 +35,19 @@ public:
 		AttackDown,
 		AttackDownRight,
 
+		ChangeProjectile,
+
 		ActionCount
 	};
 
+	enum MissionStatus
+	{
+		MissionRunning,	
+		MissionSuccess,
+		MissionFailure
+	};
 
+public:
 	Player();				// keybindings are set in constructor
 
 	/* for key bindings */
@@ -46,12 +55,15 @@ public:
 
 	sf::Keyboard::Key getAssignedKey(Action action) const;				// get key from action
 
-public:
 	// hanlde on time events, pass in event and queue
 	void handleEvent(const sf::Event& event, CommandQueue& commands);
 
 	// handle realtime states, only pass in queue
 	void handleRealtimeInput(CommandQueue& commands);	
+
+	// set/get missions
+	void setMissionStatus(MissionStatus status);
+	MissionStatus getMissionStatus() const;
 
 private:
 	/* for action bindings */
@@ -66,6 +78,9 @@ private:
 
 	std::map<sf::Keyboard::Key, Action> nKeyBinding;		// key to action map
 	std::map<Action, Command> nActionBinding;				// action to command map
+
+
+	MissionStatus nCurrentMissionStatus;
 };
 
 

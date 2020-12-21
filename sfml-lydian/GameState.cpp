@@ -8,6 +8,7 @@ GameState::GameState(StateStack& stack, Context context) :
 	nWorld(*context.window, *context.fonts),		// initalize world class with context window
 	nPlayer(*context.player)
 {
+	nPlayer.setMissionStatus(Player::MissionRunning);
 }
 
 // draw for GameState means drawing the world and all of its scenes
@@ -23,6 +24,22 @@ bool GameState::update(sf::Time dt)
 {
 	// update the world
 	nWorld.update(dt);
+
+	// if player is dead
+	if (!nWorld.hasAlivePlayer())
+	{
+		nPlayer.setMissionStatus(Player::MissionFailure);
+		
+		// push game over stack
+		requestStackPush(States::GameEnd);
+	}
+	else if (nWorld.gameReachedEnd())
+	{
+		nPlayer.setMissionStatus(Player::MissionSuccess);
+		requestStackPush(States::GameEnd);
+	}
+	
+
 
 	// get command queue and handle inputs here, for REAL TIME INPUTS, let player class handle
 	CommandQueue& commands = nWorld.getCommandQueue();

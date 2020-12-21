@@ -9,6 +9,7 @@
 #include "MenuState.hpp"
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
+#include "GameEndState.hpp"
 
 
 #include <iostream>		// for debugging
@@ -36,10 +37,10 @@ Application::Application() :
 	nFonts.load(Fonts::Label, "Media/Fonts/Overlock-Mod.ttf");
 	
 	nTextures.load(Textures::TitleScreen, "Media/Textures/Title-Screen.png");
-	nTextures.load(Textures::MenuScreen, "Media/Textures/Menu-Screen.png");
+	nTextures.load(Textures::MenuScreen, "Media/Textures/road-night.png");
 	nTextures.load(Textures::PauseScreen, "Media/Textures/Pause-Screen.png");
 	nTextures.load(Textures::SettingsScreen, "Media/Textures/Settings-Screen.png");
-
+	nTextures.load(Textures::GameEndScreen, "Media/Textures/city-2-night.png");
 
 	// load textures for buttons
 	nTextures.load(Textures::MainButtonNormal, "Media/Textures/bar_empty.png");
@@ -171,6 +172,7 @@ void Application::registerStates()
 	nStateStack.registerState<GameState>(States::Game);			
 	nStateStack.registerState<PauseState>(States::Pause);
 	nStateStack.registerState<SettingsState>(States::Settings);
+	nStateStack.registerState<GameEndState>(States::GameEnd);
 }
 
 

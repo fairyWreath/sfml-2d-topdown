@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#define SETTINGS_COUNT 6
+
 SettingsState::SettingsState(StateStack& stack, Context context) :
 	State(stack, context),
 	nGUIContainer()
@@ -73,7 +75,7 @@ bool SettingsState::handleEvent(const sf::Event& event)
 	bool isKeyBinding = false;		// to know if keybindings are changed or not
 
 	// iterate through binding buttons to check if a key is being pressed
-	for (std::size_t action = 0; action < Player::ActionCount; action++)
+	for (std::size_t action = 0; action < SETTINGS_COUNT; action++)
 	{
 		// first 'activate' key to change with enter
 		if (nBindingButtons[action]->isActive())	// if a button is toggled/active, from component class
@@ -118,7 +120,7 @@ void SettingsState::updateLabels()
 	Player& player = *getContext().player;
 
 	// set all labels based on the bindings
-	for (std::size_t i = 0; i < Player::ActionCount; i++)
+	for (std::size_t i = 0; i < SETTINGS_COUNT; i++)
 	{
 		// get the key, changing i size_t type to enum Action type
 		sf::Keyboard::Key key = player.getAssignedKey(static_cast<Player::Action>(i));

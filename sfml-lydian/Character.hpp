@@ -5,7 +5,6 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 
-
 #include "Entity.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "TextNode.hpp"
@@ -73,6 +72,12 @@ public:
 	// singular attacks
 	void launchSingle(AttackType type);
 
+	// change projectile type
+	void changeProjectile();
+
+	// launch attack based on current type, used for bots
+	void launchAttack();
+
 private:
 	// override drawCurrent function of SceneNode
 	virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -127,6 +132,9 @@ private:
 
 	// current attack type
 	AttackType nAttackType;
+
+	// current projectile type
+	Projectile::Type nCurrentProjectileType;
 
 	// command to drop current powerups from dead enemies
 	Command nDropPowerupCommand;

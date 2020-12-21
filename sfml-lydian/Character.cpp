@@ -33,12 +33,13 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nDirectionIndex(0),				// initial index at 0
 	nIsLaunchingNormal(false),		// set initial firing states to false
 	nIsLaunchingSpecial(false),
-	nNormalAttackRateLevel(1),	// attack speed here
+	nNormalAttackRateLevel(5),	// attack speed here
 	nSpreadLevel(1),
 	nSpecialAmount(2),
 	nAttackCountdown(sf::Time::Zero),
 	nIsMarkedForRemoval(false),
 	nAttackType(NormalCircular),
+	nCurrentProjectileType(Projectile::AlliedSingle),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	/* align to origin/center
@@ -80,21 +81,28 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		createPowerup(node, textures);
 	};
 
-	// test create
-
+	
+	// default attack type for bots
+	if (!isAllied())
+	{
+		nAttackType = SingleUp;
+		nCurrentProjectileType = Projectile::EnemyNormal;
+	}
 }
 
 // creating attacks
 void Character::createNormalAttack(SceneNode& node, const TextureHolder& textures) const
 {
 	// check if ally or enemy
-	Projectile::Type type = isAllied() ? nAttackType == NormalCircular ? Projectile::AlliedNormal : Projectile::AlliedSingle
-		: Projectile::EnemyNormal;
+//	Projectile::Type type = isAllied() ? nAttackType == NormalCircular ? Projectile::AlliedNormal : Projectile::AlliedSingle
+	//	: Projectile::EnemyNormal;
 
+	Projectile::Type type = nCurrentProjectileType;
 
 	switch (nAttackType)
 	{
 	case NormalCircular:
+		type = Projectile::AlliedNormal;
 		createProjectile(node, type, 0.5f, 0.0f, 0, textures);
 		createProjectile(node, type, +0.35f, -0.35f, 45, textures);
 		createProjectile(node, type, 0.0f, -0.5f, 90, textures);
@@ -140,7 +148,7 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	// create projectile ptr
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
 
-	std::cout << "created projectile\n";
+//	std::cout << "created projectile\n";
 
 	// set offset and speed 
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
@@ -171,6 +179,8 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	projectile->setPosition(getWorldPosition() + offset);
 	projectile->setVelocity(velocity);
 	
+	//std::cout << "created projectile\n";
+
 	/* sf::Transformable.setRotation()
 	-> set rotation in angles, clockwise from 12 o clock
 	*/
@@ -348,6 +358,17 @@ void Character::increaseMovementSpeed()
 	
 }
 
+
+// based on current attack type
+void Character::launchAttack()
+{
+	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
+	{
+		//		std::cout << "Flag set true\n";
+		nIsLaunchingNormal = true;		// set flag to true
+	}
+}
+
 // attack function, set flags to true
 void Character::launchNormal()
 {
@@ -388,6 +409,36 @@ void Character::launchSpecial()
 }
 
 
+// change projectile type
+void Character::changeProjectile()
+{
+	// only for allied characters
+	if (isAllied())
+	{
+		std::vector<Projectile::Type> alliedTypes = {Projectile::AlliedSingle, Projectile::AlliedSingleBurst, 
+			Projectile::AlliedSingleQuick};
+
+
+		auto itr = std::find(alliedTypes.begin(), alliedTypes.end(), nCurrentProjectileType);
+
+		assert(itr != alliedTypes.end());
+//		std::cout << "proj changed\n";
+
+		itr = std::next(itr, 1);
+		if (itr == alliedTypes.end())
+			itr = alliedTypes.begin();
+
+	/*	if (*itr == Projectile::AlliedSingleBurst)
+			std::cout << "changed to burst\n";
+
+		if (*itr == Projectile::AlliedSingleQuick)
+			std::cout << "changed to quick\n";*/
+
+		nCurrentProjectileType = *itr;
+	}
+}
+
+
 // randomly select if drop is a power pickup or no
 void Character::checkPickupDrop(CommandQueue& commands)
 {
@@ -405,7 +456,7 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
 	// enemy tries to fire all the time
 	if (!isAllied())
-		launchNormal();
+		launchAttack();			// launch bsed on current attacktype
 
 
 	// check from flag and cooldown must be 0
@@ -414,7 +465,7 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		// push the command
 		commands.push(nLaunchNormalCommand);
 
-		std::cout << "Command pushed\n";
+//		std::cout << "Command pushed\n";
 		
 
 		// add to cooldown

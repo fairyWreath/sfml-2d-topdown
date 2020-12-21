@@ -52,6 +52,7 @@ Player::Player() :
 	nKeyBinding[sf::Keyboard::N] = AttackDown;
 	nKeyBinding[sf::Keyboard::M] = AttackDownRight;
 
+	nKeyBinding[sf::Keyboard::F] = ChangeProjectile;
 
 	// map action to commands
 	initializeActions();
@@ -184,6 +185,9 @@ void Player::initializeActions()
 		Character::AttackType::SingleDown));
 	nActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
 		Character::AttackType::SingleDownRight));
+
+
+	nActionBinding[ChangeProjectile].action = derivedAction<Character>(std::bind(&Character::changeProjectile, _1));
 }
 
 
@@ -204,3 +208,15 @@ bool Player::isRealtimeAction(Action action)
 		return false;
 	}
 }
+
+// missions
+void Player::setMissionStatus(MissionStatus status)
+{
+	nCurrentMissionStatus = status;
+}
+
+Player::MissionStatus Player::getMissionStatus() const
+{
+	return nCurrentMissionStatus;
+}
+
