@@ -26,7 +26,7 @@ public:
 
 
 	virtual unsigned int getCategory() const;			// projectile category
-	virtual sf::FloatRect getBoundingrect() const;		// get bouds
+	virtual sf::FloatRect getBoundingRect() const;		// get bouds
 
 	// prjectile values, from datatable
 	float getMaxSpeed() const;

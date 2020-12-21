@@ -8,6 +8,7 @@
 
 #include <cmath>
 
+#include <iostream>
 
 // get table data
 namespace
@@ -76,8 +77,12 @@ void Projectile::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) 
 }
 
 // bouding rect from forld transform and sprite
-sf::FloatRect Projectile::getBoundingrect() const
+sf::FloatRect Projectile::getBoundingRect() const
 {
+	//sf::FloatRect result = getWorldTransform().transformRect(nSprite.getGlobalBounds());
+
+	//std::cout << result.height << "\n";
+
 	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
 }
 

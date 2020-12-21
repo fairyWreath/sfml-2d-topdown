@@ -67,7 +67,8 @@ public:
 	void checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs);
 
 	// get bouding floatrect, for collisions
-	sf::FloatRect getBoundingRect() const;
+	virtual sf::FloatRect getBoundingRect() const;
+
 
 	// remove dangling wrecks
 	void removeWrecks();

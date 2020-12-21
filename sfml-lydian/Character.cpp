@@ -23,28 +23,6 @@ namespace
 	const std::vector<CharacterData> CharacterTable = initializeCharacterData();
 }
 
-// map corresponding character type to Textures::ID
-static Textures::ID toTextureID(Character::Type type)
-{
-	switch (type)
-	{
-	case Character::DarkMagician:
-		return Textures::DarkMagician;
-	
-	case Character::Shinobu:
-		return Textures::Shinobu;
-
-	case Character::Izuko:
-		return Textures::Izuko;
-
-	case Character::Hitagi:
-		return Textures::Hitagi;
-	}
-	
-	// default
-	return Textures::DarkMagician;
-}
-
 // character class constructor
 Character::Character(Type type, const TextureHolder& textures, const FontHolder& fonts) :
 	nType(type),
@@ -60,7 +38,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nSpecialAmount(2),
 	nAttackCountdown(sf::Time::Zero),
 	nIsMarkedForRemoval(false),
-	nSprite(textures.get(toTextureID(type)))		// get sprite from texture id type
+	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	/* align to origin/center
 	- when first added, sprite is set to corner
@@ -265,8 +243,14 @@ void Character::updateTexts()
 
 
 // get rect from world transform + sprite
-sf::FloatRect Character::getBoudingRect() const
+sf::FloatRect Character::getBoundingRect() const
 {
+	/*sf::FloatRect result = getWorldTransform().transformRect(nSprite.getGlobalBounds());
+
+	std::cout << result.height << "\n";
+
+	std::cout << "Aaaa\n";*/
+
 	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
 }
 
@@ -348,7 +332,7 @@ void Character::checkPickupDrop(CommandQueue& commands)
 	if (!isAllied() && randomInt(3) == 0)
 	{
 		// push command
-		commands.push(nDropPowerupCommand);
+	//	commands.push(nDropPowerupCommand);
 	}
 }
 

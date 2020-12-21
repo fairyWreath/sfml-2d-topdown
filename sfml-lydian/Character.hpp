@@ -22,6 +22,7 @@ public:
 		Shinobu,
 		Izuko,
 		Hitagi,
+		Yotsugi,
 		TypeCount
 	};
 
@@ -32,7 +33,7 @@ public:
 	// get category for command, overrides base SceneNode function
 	virtual unsigned int getCategory() const;
 
-	virtual sf::FloatRect getBoudingRect() const;
+	virtual sf::FloatRect getBoundingRect() const;
 		
 	// remove when destroyed
 	virtual bool isMarkedForRemoval() const;

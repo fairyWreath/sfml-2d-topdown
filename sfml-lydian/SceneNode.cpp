@@ -1,11 +1,11 @@
 #include "SceneNode.hpp"
-
 #include "Command.hpp"
 #include "CommandQueue.hpp"
-
 #include "Utility.hpp"
 
 #include <algorithm>
+
+#include <iostream>
 
 SceneNode::SceneNode() : 
 	nChildren(),			// 	 leave children empty
@@ -144,6 +144,13 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 // check collision between *this and its children with argument node
 void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs)
 {
+//	std::cout << "checked\n";
+
+	/*if (node.getCategory() == Category::PlayerCharacter)
+	{
+		std::cout << "character checked\n";
+	}*/
+
 	// compare to *this / parent
 	// if nodes are different and if both are not yet distroyed, and if both collide
 	if (this != &node && collision(*this, node)
@@ -153,7 +160,7 @@ void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPai
 	}
 
 	// compare to parameter node children
-	for (const auto& child : nChildren)
+	for (auto& child : nChildren)
 	{
 		child->checkNodeCollision(node, collisionPairs);
 	}
@@ -164,7 +171,7 @@ void SceneNode::checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& colli
 {
 	checkNodeCollision(sceneGraph, collisionPairs);
 
-	for (const auto& child : sceneGraph.nChildren)
+	for (auto& child : sceneGraph.nChildren)
 	{
 		checkSceneCollision(*child, collisionPairs);
 	}

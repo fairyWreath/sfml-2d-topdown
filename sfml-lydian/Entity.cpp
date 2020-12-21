@@ -1,5 +1,7 @@
 #include "Entity.hpp"
 
+#include <iostream>
+
 Entity::Entity(int hitpoints) :
 	nVelocity(),
 	nHitpoints(hitpoints)
@@ -27,6 +29,15 @@ void Entity::destroy()
 
 bool Entity::isDestroyed() const
 {
+	//if (nHitpoints <= 0)
+	//{
+	//	std::cout << "health is less\n";
+	//}
+	//else
+	//{
+	//	std::cout << "health is more\n";
+	//}
+
 	return nHitpoints <= 0;
 }
 

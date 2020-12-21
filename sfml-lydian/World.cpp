@@ -336,6 +336,8 @@ static bool matchesCategories(SceneNode::Pair& colliders, Category::Type first, 
 	}
 	else if (second & firstCategory && first & secondCategory)
 	{
+		// swap to match category
+		std::swap(colliders.first, colliders.second);
 		return true;
 	}
 	else
@@ -351,7 +353,7 @@ void World::handleCollisions()
 	// get all pairs from the main scenegraph
 	nSceneGraph.checkSceneCollision(nSceneGraph, collisionPairs);
 
-	std::cout << "Number of collisions: " << collisionPairs.size() << "\n";
+	//std::cout << "Number of collisions: " << collisionPairs.size() << "\n";
 
 	for (SceneNode::Pair pair : collisionPairs)
 	{
@@ -360,6 +362,8 @@ void World::handleCollisions()
 		// betweenplaye and enemy character
 		if (matchesCategories(pair, Category::PlayerCharacter, Category::EnemyCharacter))
 		{
+		//	std::cout << "character collision detected\n";
+
 			auto& player = static_cast<Character&>(*pair.first);
 			auto& enemy = static_cast<Character&>(*pair.second);
 

@@ -26,6 +26,7 @@ namespace Textures
 		Shinobu,
 		Izuko,
 		Hitagi,
+		Yotsugi,
 
 		Void,
 
