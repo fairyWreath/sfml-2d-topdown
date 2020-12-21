@@ -75,21 +75,33 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 // handle one time events
 void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 {
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)	// if key is pressed
-	{
-		// construct command here
-		Command output;
-		output.category = Category::PlayerCharacter;
-		
-		std::cout << "Event detected\n";
+	//if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)	// if key is pressed
+	//{
+	//	// construct command here
+	//	Command output;
+	//	output.category = Category::PlayerCharacter;
+	//	
+	//	std::cout << "Event detected\n";
 
-		// lambda expression to construct action
-		output.action = [](SceneNode& s, sf::Time)
-		{
-			std::cout << s.getPosition().x << ", " << s.getPosition().y << std::endl;	// output position
-		};
-		commands.push(output);			// push to command queue
+	//	// lambda expression to construct action
+	//	output.action = [](SceneNode& s, sf::Time)
+	//	{
+	//		std::cout << s.getPosition().x << ", " << s.getPosition().y << std::endl;	// output position
+	//	};
+	//	commands.push(output);			// push to command queue
+	//}
+
+	// handle one time events
+	if (event.type == sf::Event::KeyPressed)
+	{
+		// find from keybindings
+		auto found = nKeyBinding.find(event.key.code);
+
+		// if found and action is event-based
+		if (found != nKeyBinding.end() && !isRealtimeAction(found->second))
+			commands.push(nActionBinding[found->second]);
 	}
+
 }
 
 
@@ -158,8 +170,9 @@ bool Player::isRealtimeAction(Action action)
 	case MoveRight:
 	case MoveDown:
 	case LaunchNormal:
-	case LaunchSpecial:
 		return true;
+	case LaunchSpecial:
+		return false;
 	default:
 		return false;
 	}

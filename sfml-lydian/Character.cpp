@@ -94,8 +94,11 @@ void Character::createNormalAttack(SceneNode& node, const TextureHolder& texture
 	switch (nSpreadLevel)
 	{
 	case 1:
-		createProjectile(node, type, 0.5f, 0.0f, 45, textures);
-		//createProjectile(node, type, +0.0f, 0.33f, textures);
+		createProjectile(node, type, 0.5f, 0.0f, 0, textures);
+		createProjectile(node, type, +0.35f, 0.35f, 45, textures);
+		createProjectile(node, type, 0.0f, 0.5f, 90, textures);
+		createProjectile(node, type, -0.35f, 0.35f, 135, textures);
+		createProjectile(node, type, -0.5f, 0.0f, 180, textures);
 		break;
 	case 2:
 		createProjectile(node, type, 0.0f, 0.5f, textures);
@@ -145,7 +148,7 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	sf::Vector2f velocity(vx, vy);
 	projectile->setPosition(getWorldPosition() + offset);
 	projectile->setVelocity(velocity);
-	projectile->setRotation(angleDeg + 90.f);
+	projectile->setRotation(angleDeg);
 
 	node.attachChild(std::move(projectile));
 }

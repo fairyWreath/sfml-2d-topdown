@@ -106,7 +106,7 @@ void World::draw()
 void World::update(sf::Time dt)
 {
 	// repeat the tile here, along the x axis
-	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
+//	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
