@@ -12,6 +12,7 @@ public:
 	enum Type
 	{
 		AlliedNormal,			// normal heart projectiles
+		AlliedSingle,
 		EnemyNormal,
 		SpecialHeart,
 		TypeCount

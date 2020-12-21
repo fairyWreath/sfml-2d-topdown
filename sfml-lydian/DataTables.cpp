@@ -27,6 +27,8 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Shinobu].directions.push_back(Direction(45, 100));		// 45 degrees, 100 units
 	data[Character::Shinobu].directions.push_back(Direction(-45, 200));		// -45 degrees, 200 units
 	data[Character::Shinobu].directions.push_back(Direction(45, 100));		// 45 degrees, 100 units, back again
+	//data[Character::Shinobu].actionInterval = sf::seconds(3);
+
 
 	// character and movement pattern for izuko
 	data[Character::Izuko].hitpoints = 100;
@@ -49,6 +51,8 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Yotsugi].hitpoints = 300.f;
 	data[Character::Yotsugi].speed = 100.f;
 	data[Character::Yotsugi].texture = Textures::Yotsugi;
+//	data[Character::Yotsugi].actionInterval = sf::seconds(3);
+
 
 
 	return data;
@@ -65,6 +69,10 @@ std::vector<ProjectileData> initializeProjectileData()
 	data[Projectile::EnemyNormal].damage = 10;
 	data[Projectile::EnemyNormal].speed = 300.f;
 	data[Projectile::EnemyNormal].texture = Textures::EnemyNormal;
+
+	data[Projectile::AlliedSingle].damage = 10;
+	data[Projectile::AlliedSingle].speed = 300.f;
+	data[Projectile::AlliedSingle].texture = Textures::AlliedSingle;
 
 	data[Projectile::SpecialHeart].damage = 200;
 	data[Projectile::SpecialHeart].speed = 150.f;

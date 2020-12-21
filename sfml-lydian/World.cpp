@@ -48,10 +48,13 @@ void World::loadTextures()
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
 	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
 	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
+	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");
 
-	nTextures.load(Textures::AlliedNormal, "Media/Textures/Shinobu-Resized.png");
-	nTextures.load(Textures::SpecialHeart, "Media/Textures/Hitagi-Resized.png");
 
+	nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
+	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
+	nTextures.load(Textures::EnemyNormal, "Media/Textures/Pink-Flower.png");
+	nTextures.load(Textures::AlliedSingle, "Media/Textures/Pink-Beam.png");
 }
 
 
@@ -73,6 +76,10 @@ void World::buildScene()
 	// after the background is loaded, configure the tile to repeat itself
 	sf::Texture& texture = nTextures.get(Textures::Void);			// get memory address of background texture
 	sf::IntRect textureRect(nWorldBounds);				// texture rect with int coordinates, converted from worldbounds
+
+
+
+
 	texture.setRepeated(true);				// repeate texture tile
 
 	// add bacgkround sprite to the scene, with SpriteNode class
@@ -183,7 +190,7 @@ void World::adaptPlayerVelocity()
 	if (velocity.x != 0.f && velocity.y != 0.f)				// if velocity not nil
 		nPlayerCharacter->setVelocity(velocity / std::sqrt(2.f));		// get diagonal
 
-	nPlayerCharacter->accelerate(0.f, nScrollSpeed);
+//	nPlayerCharacter->accelerate(0.f, nScrollSpeed);
 }
 
 // keep player within screen bounds
@@ -275,7 +282,9 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, 200.f, -400.f);
 	*/
 
-	 addNPC(Character::Shinobu, 0.f, -400.f);
+	 addNPC(Character::Shinobu, -200.f, 200.f);
+	 
+	 addNPC(Character::Yotsugi, -300.f, 300.f);
 
 
 

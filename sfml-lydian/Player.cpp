@@ -43,6 +43,16 @@ Player::Player() :
 	nKeyBinding[sf::Keyboard::Space] = LaunchNormal;
 	nKeyBinding[sf::Keyboard::B] = LaunchSpecial;
 
+	nKeyBinding[sf::Keyboard::K] = AttackRight;
+	nKeyBinding[sf::Keyboard::I] = AttackUpRight;
+	nKeyBinding[sf::Keyboard::U] = AttackUp;
+	nKeyBinding[sf::Keyboard::Y] = AttackUpLeft;
+	nKeyBinding[sf::Keyboard::H] = AttackLeft;
+	nKeyBinding[sf::Keyboard::B] = AttackDownLeft;
+	nKeyBinding[sf::Keyboard::N] = AttackDown;
+	nKeyBinding[sf::Keyboard::M] = AttackDownRight;
+
+
 	// map action to commands
 	initializeActions();
 
@@ -157,6 +167,23 @@ void Player::initializeActions()
 	*/
 	nActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormal, _1));
 	nActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
+
+	nActionBinding[AttackRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1, 
+		Character::AttackType::SingleRight));
+	nActionBinding[AttackUpRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleUpRight));
+	nActionBinding[AttackUp].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleUp));
+	nActionBinding[AttackUpLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleUpLeft));
+	nActionBinding[AttackLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleLeft));
+	nActionBinding[AttackDownLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleDownLeft));
+	nActionBinding[AttackDown].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleDown));
+	nActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+		Character::AttackType::SingleDownRight));
 }
 
 

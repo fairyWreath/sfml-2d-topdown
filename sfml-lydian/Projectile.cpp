@@ -41,6 +41,7 @@ bool Projectile::isGuided() const
 	switch (nType)
 	{
 	case AlliedNormal:
+	case AlliedSingle:
 	case EnemyNormal:
 		return false;
 	case SpecialHeart:
@@ -92,6 +93,7 @@ unsigned int Projectile::getCategory() const
 	switch (nType)
 	{
 	case AlliedNormal:
+	case AlliedSingle:
 	case SpecialHeart:
 		return Category::AlliedProjectile;
 	case EnemyNormal:

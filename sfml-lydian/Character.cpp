@@ -33,11 +33,12 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nDirectionIndex(0),				// initial index at 0
 	nIsLaunchingNormal(false),		// set initial firing states to false
 	nIsLaunchingSpecial(false),
-	nNormalAttackRateLevel(5),	// attack speed here
+	nNormalAttackRateLevel(1),	// attack speed here
 	nSpreadLevel(1),
 	nSpecialAmount(2),
 	nAttackCountdown(sf::Time::Zero),
 	nIsMarkedForRemoval(false),
+	nAttackType(NormalCircular),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	/* align to origin/center
@@ -87,27 +88,47 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 void Character::createNormalAttack(SceneNode& node, const TextureHolder& textures) const
 {
 	// check if ally or enemy
-	Projectile::Type type = isAllied() ? Projectile::AlliedNormal : Projectile::EnemyNormal;
+	Projectile::Type type = isAllied() ? nAttackType == NormalCircular ? Projectile::AlliedNormal : Projectile::AlliedSingle
+		: Projectile::EnemyNormal;
 
-	// create based on spread level
-	
-	switch (nSpreadLevel)
+
+	switch (nAttackType)
 	{
-	case 1:
+	case NormalCircular:
 		createProjectile(node, type, 0.5f, 0.0f, 0, textures);
-		createProjectile(node, type, +0.35f, 0.35f, 45, textures);
-		createProjectile(node, type, 0.0f, 0.5f, 90, textures);
-		createProjectile(node, type, -0.35f, 0.35f, 135, textures);
+		createProjectile(node, type, +0.35f, -0.35f, 45, textures);
+		createProjectile(node, type, 0.0f, -0.5f, 90, textures);
+		createProjectile(node, type, -0.35f, -0.35f, 135, textures);
+		createProjectile(node, type, -0.5f, 0.0f, 180, textures);
+		createProjectile(node, type, -0.35f, 0.35f, 225, textures);
+		createProjectile(node, type, 0.0f, 0.5f, 270, textures);
+		createProjectile(node, type, +0.35f, 0.35f, 315, textures);
+		break;
+	case SingleRight:
+		createProjectile(node, type, 0.5f, 0.0f, 0, textures);
+		break;
+	case SingleUpRight:
+		createProjectile(node, type, +0.35f, -0.35f, 45, textures);
+		break;
+	case SingleUp:
+		createProjectile(node, type, 0.0f, -0.5f, 90, textures);
+		break;
+	case SingleUpLeft:
+		createProjectile(node, type, -0.35f, -0.35f, 135, textures);
+		break;
+	case SingleLeft:
 		createProjectile(node, type, -0.5f, 0.0f, 180, textures);
 		break;
-	case 2:
-		createProjectile(node, type, 0.0f, 0.5f, textures);
+	case SingleDownLeft:
+		createProjectile(node, type, -0.35f, 0.35f, 225, textures);
 		break;
-	default:
-		createProjectile(node, type, 0.0f, 0.5f, textures);
+	case SingleDown:
+		createProjectile(node, type, 0.0f, 0.5f, 270, textures);
+		break;
+	case SingleDownRight:
+		createProjectile(node, type, +0.35f, 0.35f, 315, textures);
 		break;
 	}
-
 }
 
 
@@ -115,10 +136,11 @@ void Character::createNormalAttack(SceneNode& node, const TextureHolder& texture
 void Character::createProjectile(SceneNode& node, Projectile::Type type, float xOffset, 
 	float yOffset, const TextureHolder& textures) const
 {
+
 	// create projectile ptr
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
 
-//	std::cout << "created projectile\n";
+	std::cout << "created projectile\n";
 
 	// set offset and speed 
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
@@ -141,14 +163,18 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
 
 	float radians = -toRadian(angleDeg);
-	std::cout << radians << std::endl;
+	//std::cout << radians << std::endl;
 	float vx = projectile->getMaxSpeed() * std::cos(radians);
 	float vy = projectile->getMaxSpeed() * std::sin(radians);
 
 	sf::Vector2f velocity(vx, vy);
 	projectile->setPosition(getWorldPosition() + offset);
 	projectile->setVelocity(velocity);
-	projectile->setRotation(angleDeg);
+	
+	/* sf::Transformable.setRotation()
+	-> set rotation in angles, clockwise from 12 o clock
+	*/
+	projectile->setRotation(90 - angleDeg);
 
 	node.attachChild(std::move(projectile));
 }
@@ -325,7 +351,8 @@ void Character::increaseMovementSpeed()
 // attack function, set flags to true
 void Character::launchNormal()
 {
-//	std::cout << "Launched normal attack\n";
+	// std::cout << "Launched normal attack\n";
+	nAttackType = NormalCircular;
 
 	// only attack if interval not 0
 	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
@@ -335,14 +362,25 @@ void Character::launchNormal()
 	}
 }
 
+void Character::launchSingle(AttackType type)
+{
+	nAttackType = type;
+
+	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
+	{
+		//		std::cout << "Flag set true\n";
+		nIsLaunchingNormal = true;		// set flag to true
+	}
+}
+
 void Character::launchSpecial()
 {
-	std::cout << "Launched special attack\n";
+	//std::cout << "Launched special attack\n";
 
 
 	if (nSpecialAmount > 0)
 	{
-		std::cout << "Launched special attack\n";
+		//std::cout << "Launched special attack\n";
 
 		nIsLaunchingSpecial = true;
 		nSpecialAmount--;
@@ -376,7 +414,7 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		// push the command
 		commands.push(nLaunchNormalCommand);
 
-//		std::cout << "Command pushed\n";
+		std::cout << "Command pushed\n";
 		
 
 		// add to cooldown

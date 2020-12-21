@@ -26,6 +26,20 @@ public:
 		TypeCount
 	};
 
+	enum AttackType
+	{
+		NormalCircular,
+
+		SingleRight,
+		SingleUpRight,
+		SingleUp,
+		SingleUpLeft,
+		SingleLeft,
+		SingleDownLeft,
+		SingleDown,
+		SingleDownRight,
+	};
+
 public:
 	// explicit constructor
 	Character(Type type, const TextureHolder& textures, const FontHolder& fonts);		// pass in texture resource holder
@@ -55,6 +69,9 @@ public:
 	// simply marks flags to true
 	void launchNormal();
 	void launchSpecial();
+
+	// singular attacks
+	void launchSingle(AttackType type);
 
 private:
 	// override drawCurrent function of SceneNode
@@ -108,6 +125,8 @@ private:
 	int nSpreadLevel;
 	int nSpecialAmount;			// amount for special attacks
 
+	// current attack type
+	AttackType nAttackType;
 
 	// command to drop current powerups from dead enemies
 	Command nDropPowerupCommand;

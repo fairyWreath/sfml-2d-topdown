@@ -25,6 +25,16 @@ public:
 		MoveDown,
 		LaunchNormal,
 		LaunchSpecial,
+
+		AttackRight,
+		AttackUpRight,
+		AttackUp,
+		AttackUpLeft,
+		AttackLeft,
+		AttackDownLeft,
+		AttackDown,
+		AttackDownRight,
+
 		ActionCount
 	};
 

@@ -33,6 +33,7 @@ namespace Textures
 		// projectiles
 		AlliedNormal,			// normal flower projectiles
 		EnemyNormal,
+		AlliedSingle,
 		SpecialHeart,
 
 		// buttons
