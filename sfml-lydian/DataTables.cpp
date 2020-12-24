@@ -51,7 +51,7 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Yotsugi].hitpoints = 300.f;
 	data[Character::Yotsugi].speed = 100.f;
 	data[Character::Yotsugi].texture = Textures::Yotsugi;
-//	data[Character::Yotsugi].actionInterval = sf::seconds(3);
+	data[Character::Yotsugi].actionInterval = sf::seconds(3);
 
 
 
@@ -105,6 +105,38 @@ std::vector<PowerupData> initializePowerupData()
 	
 	data[Powerup::AttackSpread].texture = Textures::AttackSpread;
 	data[Powerup::AttackSpread].action = std::bind(&Character::increaseSpread, _1);
+
+	return data;
+}
+
+
+CollisionData::CollisionData(Category::Type first, Category::Type second, CollisionPair::Type cType)
+{
+	collisionPair = std::make_pair(first, second);
+	type = cType;
+}
+
+CollisionData::CollisionData()
+{
+
+}
+
+std::vector<CollisionData> initializeCollisionData()
+{
+
+	std::vector<CollisionData> data(CollisionPair::TypeCount);
+
+	data[CollisionPair::PlayerCharacterEnemyCharacter] = CollisionData(Category::PlayerCharacter,
+		Category::EnemyCharacter, CollisionPair::PlayerCharacterEnemyCharacter);
+
+	data[CollisionPair::AlliedProjectileEnemyCharacter] = CollisionData(Category::AlliedProjectile,
+		Category::EnemyCharacter, CollisionPair::AlliedProjectileEnemyCharacter);
+
+	data[CollisionPair::EnemyProjectilePlayerCharacter] = CollisionData(Category::EnemyProjectile,
+		Category::PlayerCharacter, CollisionPair::EnemyProjectilePlayerCharacter);
+
+	data[CollisionPair::PlayerCharacterPowerup] = CollisionData(Category::PlayerCharacter,
+		Category::Powerup, CollisionPair::PlayerCharacterPowerup);
 
 	return data;
 }

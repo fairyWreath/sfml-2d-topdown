@@ -37,6 +37,10 @@ public:
 
 		ChangeProjectile,
 
+		ModifyPlayerSpeed,
+
+		BoostPlayerCharacter,
+
 		ActionCount
 	};
 
@@ -74,7 +78,6 @@ private:
 	static bool isRealtimeAction(Action action);			// check if action is real time or event driven
 
 private:
-	float nPlayerSpeed;
 
 	std::map<sf::Keyboard::Key, Action> nKeyBinding;		// key to action map
 	std::map<Action, Command> nActionBinding;				// action to command map

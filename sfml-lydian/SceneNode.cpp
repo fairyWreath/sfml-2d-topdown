@@ -2,10 +2,16 @@
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 #include "Utility.hpp"
+#include "DataTables.hpp"
 
 #include <algorithm>
 
 #include <iostream>
+
+namespace
+{
+	const std::vector<CollisionData> collisionTable = initializeCollisionData();
+}
 
 SceneNode::SceneNode(Category::Type category) : 
 	nChildren(),			// 	 leave children empty
@@ -142,22 +148,31 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 }
 
 /* collisions */
+static bool checkForCollision(unsigned int first, unsigned int second)
+{
+	for (const auto& pair : collisionTable)
+	{
+		if (first == pair.collisionPair.first && second == pair.collisionPair.second)
+			return true;
+		else if (second == pair.collisionPair.first && first == pair.collisionPair.second)
+			return true;
+	}
+
+	// no match
+	return false;
+}
+
+
 // check collision between *this and its children with argument node
 void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs)
 {
-//	std::cout << "checked\n";
-
-	/*if (node.getCategory() == Category::PlayerCharacter)
+	if (checkForCollision(this->getCategory(), node.getCategory()))
 	{
-		std::cout << "character checked\n";
-	}*/
-
-	// compare to *this / parent
-	// if nodes are different and if both are not yet distroyed, and if both collide
-	if (this != &node && collision(*this, node)
-		&& !isDestroyed() && !node.isDestroyed())
-	{
-		collisionPairs.insert(std::minmax(this, &node));			// minmax, returns pair with min as first
+		if (this != &node && collision(*this, node)
+			&& !isDestroyed() && !node.isDestroyed())
+		{
+			collisionPairs.insert(std::minmax(this, &node));			// minmax, returns pair with min as first
+		}
 	}
 
 	// compare to parameter node children

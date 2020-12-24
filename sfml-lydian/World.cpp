@@ -43,7 +43,7 @@ World::World(sf::RenderWindow& window, FontHolder& fonts) :
 void World::loadTextures()
 {
 	// loading from textures class template, load with identifier and filepath
-	nTextures.load(Textures::Void, "Media/Textures/Void.png");
+	nTextures.load(Textures::Void, "Media/Textures/void.png");
 	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
 	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
@@ -116,7 +116,7 @@ void World::draw()
 void World::update(sf::Time dt)
 {
 	// repeat the tile here, along the x axis
-//	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
+	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
@@ -271,7 +271,7 @@ void World::addNPC(Character::Type type, float relX, float relY)		// based on ns
 
 void World::addNPCs()
 {
-	/*
+	
 	addNPC(Character::Izuko, -400.f, -100.f);
 	addNPC(Character::Izuko, -400.f, 50.f);
 	addNPC(Character::Izuko, -400.f, 200.f);
@@ -283,7 +283,7 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, -200.f, -400.f);
 	addNPC(Character::Hitagi, 0.f, -400.f);
 	addNPC(Character::Hitagi, 200.f, -400.f);
-	*/
+	
 
 	// addNPC(Character::Shinobu, -200.f, 200.f);
 	 
@@ -301,7 +301,7 @@ void World::addNPCs()
 	 addNPC(Character::Yotsugi, 300.f, -300.f);
 	 addNPC(Character::Yotsugi, 300.f, 0.f);
 	 addNPC(Character::Yotsugi, 300.f, 300.f);
-
+	   
 
 	// sort according to y values, lower enemis are checked first
 	std::sort(nNonPlayerSpawnPoints.begin(), nNonPlayerSpawnPoints.end(), [](SpawnPoint lhs, SpawnPoint rhs)
@@ -421,7 +421,7 @@ void World::handleCollisions()
 		{
 			auto& projectile = static_cast<Projectile&>(*pair.first);
 			auto& character = static_cast<Character&>(*pair.second);
-
+			
 			character.damage(projectile.getDamage());			// damage enemy based on projectile
 			projectile.destroy();					// destroy projectile
 		}

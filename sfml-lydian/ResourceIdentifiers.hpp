@@ -51,7 +51,16 @@ namespace Textures
 		SpecialAttackRefill,
 		AttackSpread,
 		AttackRate,
-		MovementSpeed
+		MovementSpeed,
+
+		// texture atlases
+		//Entities,
+		//TitleScreen,
+		//Void,
+		//Buttons,
+		Explosion,
+		Particle,
+		EndLine
 	};
 }
 

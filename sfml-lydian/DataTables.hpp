@@ -4,6 +4,7 @@
 // store character attributes
 
 #include "ResourceIdentifiers.hpp"
+#include "Category.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -53,9 +54,32 @@ struct PowerupData
 	Textures::ID texture;
 };
 
+namespace CollisionPair
+{
+	enum Type
+	{
+		// types of collision between entities
+		PlayerCharacterEnemyCharacter,
+		AlliedProjectileEnemyCharacter,
+		EnemyProjectilePlayerCharacter,
+		PlayerCharacterPowerup,
+		TypeCount,
+	};
+}
+
+// for collisions
+struct CollisionData
+{
+	typedef std::pair<Category::Type, Category::Type> pair;
+	CollisionData();
+	CollisionData(Category::Type first, Category::Type second, CollisionPair::Type cType);
+	pair collisionPair;
+	CollisionPair::Type type;
+};
+
 // initialize data and get their vectors
 std::vector<CharacterData> initializeCharacterData();
 std::vector<ProjectileData> initializeProjectileData();
 std::vector<PowerupData> initializePowerupData();
-
+std::vector<CollisionData> initializeCollisionData();
 #endif

@@ -11,6 +11,7 @@
 #include "CommandQueue.hpp"
 #include "Projectile.hpp"
 
+
 class Character : public Entity			// indirectly inherits SceneNode
 {
 public:
@@ -62,8 +63,6 @@ public:
 	void increaseSpread();
 	void collectSpecialAttacks(unsigned int count);
 
-	void increaseMovementSpeed();
-
 	// actual implementation not put here, since we need concept of how much time has elapsed
 	// simply marks flags to true
 	void launchNormal();
@@ -77,6 +76,13 @@ public:
 
 	// launch attack based on current type, used for bots
 	void launchAttack();
+
+	// get speed for player class
+	float getCharacterSpeed();
+
+	void modifyCharacterSpeed(float amount);
+
+	void boostCharacter();
 
 private:
 	// override drawCurrent function of SceneNode
@@ -109,6 +115,9 @@ private:
 	// update texts
 	void updateTexts();
 
+	// check boost movements
+	void checkBoostStatus(sf::Time dt);
+
 private:
 	Type nType;
 	sf::Sprite nSprite;			// store sprite type
@@ -117,8 +126,9 @@ private:
 	Command nLaunchNormalCommand;
 	Command nLaunchSpecialCommand;
 	
-	// for attack cooldown
+	// normal attack cooldown
 	sf::Time nAttackCountdown;
+	sf::Time nCircularAttackCountdown;
 
 	bool nIsMarkedForRemoval;
 
@@ -129,6 +139,14 @@ private:
 	int nNormalAttackRateLevel;		// fire level
 	int nSpreadLevel;
 	int nSpecialAmount;			// amount for special attacks
+
+	// boosted movement state
+	bool nIsBoosted;
+	bool nIsBoostedBefore;
+	sf::Time nBoostCountdown;
+
+	// for moving characters manually
+	float nCharacterSpeed;
 
 	// current attack type
 	AttackType nAttackType;

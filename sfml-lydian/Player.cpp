@@ -6,12 +6,20 @@ using namespace std::placeholders;		// for std::bind
 
 #include <iostream>
 
-// struct with functions/ command to apply
+
 struct CharacterMover
 {
+	enum Direction
+	{
+		Right,
+		Up,
+		Left,
+		Down
+	};
+
 	// struct constructor, set velocity in constructor
-	CharacterMover(float vx, float vy)
-		: velocity(vx, vy)			
+	CharacterMover(Direction direction) :
+		direction(direction)
 	{
 
 	}
@@ -19,29 +27,56 @@ struct CharacterMover
 	// overload () operator/functor, pass in SceneNode type, eg.Character class to apply changes
 	// can use this struct as a FUNCTION/FUNCTOR
 	void operator() (Character& character, sf::Time) const
-	{	
+	{
 		// a derived function exists to downcast function command to Character type
 		// apply changes to passed in character
+		sf::Vector2f velocity;
+		float speed = character.getCharacterSpeed();
+
+		switch(direction)
+		{
+		case Right:
+			velocity = sf::Vector2f(+speed, 0.f);
+			break;
+		case Up:
+			velocity = sf::Vector2f(0.f, -speed);
+			break;
+		case Left:
+			velocity = sf::Vector2f(-speed, 0.f);
+			break;
+		case Down:
+			velocity = sf::Vector2f(0.f, +speed);
+			break;
+		}
+
 		character.setVelocity(character.getVelocity() + velocity);			// accelerate character
 	}
 
 
-	sf::Vector2f velocity;
+	Direction direction;
+};
+
+struct PlayerSpeedModifier
+{
+	PlayerSpeedModifier(float amount) : changeAmount(amount) {};
+
+	void operator() (Character& caracter, sf::Time const) {};
+
+	float changeAmount;
 };
 
 
 // constructor where all keybindings are set
-Player::Player() :
-	nPlayerSpeed(200.f)
+Player::Player()
 {
 	// set initial key bindings
-	nKeyBinding[sf::Keyboard::A] = MoveLeft;
-	nKeyBinding[sf::Keyboard::W] = MoveUp;
-	nKeyBinding[sf::Keyboard::D] = MoveRight;
-	nKeyBinding[sf::Keyboard::S] = MoveDown;
+	nKeyBinding[sf::Keyboard::Left] = MoveLeft;
+	nKeyBinding[sf::Keyboard::Up] = MoveUp;
+	nKeyBinding[sf::Keyboard::Right] = MoveRight;
+	nKeyBinding[sf::Keyboard::Down] = MoveDown;
 
 	nKeyBinding[sf::Keyboard::Space] = LaunchNormal;
-	nKeyBinding[sf::Keyboard::B] = LaunchSpecial;
+	nKeyBinding[sf::Keyboard::C] = LaunchSpecial;
 
 	nKeyBinding[sf::Keyboard::K] = AttackRight;
 	nKeyBinding[sf::Keyboard::I] = AttackUpRight;
@@ -53,6 +88,11 @@ Player::Player() :
 	nKeyBinding[sf::Keyboard::M] = AttackDownRight;
 
 	nKeyBinding[sf::Keyboard::F] = ChangeProjectile;
+
+	nKeyBinding[sf::Keyboard::Z] = ModifyPlayerSpeed;
+
+
+	nKeyBinding[sf::Keyboard::X] = BoostPlayerCharacter;
 
 	// map action to commands
 	initializeActions();
@@ -86,22 +126,6 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 // handle one time events
 void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 {
-	//if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)	// if key is pressed
-	//{
-	//	// construct command here
-	//	Command output;
-	//	output.category = Category::PlayerCharacter;
-	//	
-	//	std::cout << "Event detected\n";
-
-	//	// lambda expression to construct action
-	//	output.action = [](SceneNode& s, sf::Time)
-	//	{
-	//		std::cout << s.getPosition().x << ", " << s.getPosition().y << std::endl;	// output position
-	//	};
-	//	commands.push(output);			// push to command queue
-	//}
-
 	// handle one time events
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -156,10 +180,10 @@ void Player::initializeActions()
 {
 	// add commands here, add to actionbinding dict/map
 	// use functors and command struct template to add commands
-	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(-nPlayerSpeed, 0.f));
-	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(0.f, -nPlayerSpeed));
-	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(+nPlayerSpeed, 0.f));
-	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(0.f, +nPlayerSpeed));
+	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(CharacterMover::Left));
+	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(CharacterMover::Up));
+	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(CharacterMover::Right));
+	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(CharacterMover::Down));
 
 	// launching attacks
 	// action is launchnormal from character class
@@ -188,6 +212,11 @@ void Player::initializeActions()
 
 
 	nActionBinding[ChangeProjectile].action = derivedAction<Character>(std::bind(&Character::changeProjectile, _1));
+
+	nActionBinding[ModifyPlayerSpeed].action = derivedAction<Character>(std::bind(&Character::modifyCharacterSpeed, _1,
+		100.f));
+
+	nActionBinding[BoostPlayerCharacter].action = derivedAction<Character>(std::bind(&Character::boostCharacter, _1));
 }
 
 

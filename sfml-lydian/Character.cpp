@@ -33,13 +33,18 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nDirectionIndex(0),				// initial index at 0
 	nIsLaunchingNormal(false),		// set initial firing states to false
 	nIsLaunchingSpecial(false),
-	nNormalAttackRateLevel(5),	// attack speed here
+	nNormalAttackRateLevel(2),	// attack speed here
 	nSpreadLevel(1),
 	nSpecialAmount(2),
 	nAttackCountdown(sf::Time::Zero),
+	nCircularAttackCountdown(sf::Time::Zero),
 	nIsMarkedForRemoval(false),
 	nAttackType(NormalCircular),
 	nCurrentProjectileType(Projectile::AlliedSingle),
+	nCharacterSpeed(200.f),			// for player character struct mover
+	nIsBoosted(false),
+	nIsBoostedBefore(false),
+	nBoostCountdown(sf::Time::Zero),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	/* align to origin/center
@@ -93,10 +98,6 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 // creating attacks
 void Character::createNormalAttack(SceneNode& node, const TextureHolder& textures) const
 {
-	// check if ally or enemy
-//	Projectile::Type type = isAllied() ? nAttackType == NormalCircular ? Projectile::AlliedNormal : Projectile::AlliedSingle
-	//	: Projectile::EnemyNormal;
-
 	Projectile::Type type = nCurrentProjectileType;
 
 	switch (nAttackType)
@@ -248,13 +249,40 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 	// update movement
 	updateMovementPattern(dt);
 
+	// checkBoostStatus();
+	checkBoostStatus(dt);
+
 	// apply velocity, call virtual parent class function here
 	Entity::updateCurrent(dt, commands);		
 
 	// update text nodes
 	updateTexts();
 
-//	commands.push(nDropPowerupCommand);
+}
+
+void Character::boostCharacter()
+{
+	nIsBoosted = true;
+}
+
+void Character::checkBoostStatus(sf::Time dt)
+{
+	if (nIsBoosted && !nIsBoostedBefore && nBoostCountdown <= sf::Time::Zero)
+	{
+		nCharacterSpeed *= 2;
+		nBoostCountdown = sf::seconds(3.f);
+		nIsBoostedBefore = true;
+		nIsBoosted = false;
+	}
+	else if (nBoostCountdown <= sf::Time::Zero && nIsBoostedBefore)
+	{
+		nCharacterSpeed /= 2;
+		nIsBoostedBefore = false;
+	}
+	else if (nBoostCountdown > sf::Time::Zero)
+	{
+		nBoostCountdown -= dt;
+	}
 }
 
 
@@ -353,11 +381,15 @@ void Character::collectSpecialAttacks(unsigned int count)
 }
 
 // change velocity from entity
-void Character::increaseMovementSpeed()
+void Character::modifyCharacterSpeed(float amount)
 {
-	
+	nCharacterSpeed += amount;
 }
 
+float Character::getCharacterSpeed()
+{
+	return nCharacterSpeed;
+}
 
 // based on current attack type
 void Character::launchAttack()
@@ -460,23 +492,32 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 
 
 	// check from flag and cooldown must be 0
-	if (nIsLaunchingNormal && nAttackCountdown <= sf::Time::Zero)
+	if (nIsLaunchingNormal && nAttackCountdown <= sf::Time::Zero && nAttackType != NormalCircular)
 	{
 		// push the command
 		commands.push(nLaunchNormalCommand);
 
-//		std::cout << "Command pushed\n";
-		
-
 		// add to cooldown
 		nAttackCountdown += CharacterTable[nType].actionInterval / (nNormalAttackRateLevel + 1.f);
 		nIsLaunchingNormal = false;		// set flag back to false
+	}
+	else if (nIsLaunchingNormal && nCircularAttackCountdown <= sf::Time::Zero)
+	{
+		commands.push(nLaunchNormalCommand);
+		nCircularAttackCountdown = sf::seconds(1.0f);		// set cooldown to 2.5 seconds
+		nIsLaunchingNormal = false;
 	}
 	else if (nAttackCountdown > sf::Time::Zero)		// else, decrease countdown
 	{
 		nAttackCountdown -= dt;
 		nIsLaunchingNormal = false;
 	}
+	else if (nCircularAttackCountdown > sf::Time::Zero)
+	{
+		nCircularAttackCountdown -= dt;
+		nIsLaunchingNormal = false;
+	}
+	
 
 	// check for special attack
 	if (nIsLaunchingSpecial)

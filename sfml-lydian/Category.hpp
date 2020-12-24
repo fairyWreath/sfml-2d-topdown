@@ -22,7 +22,10 @@ namespace Category
 
 		// use bitwise left so types can be appended like this
 		Character = PlayerCharacter | SupportCharacter | EnemyCharacter,
-		Projectile = AlliedProjectile | EnemyProjectile
+		Projectile = AlliedProjectile | EnemyProjectile,
+
+		// entities =  for collision
+		Entities = Character | Projectile,
 	};
 }
 
