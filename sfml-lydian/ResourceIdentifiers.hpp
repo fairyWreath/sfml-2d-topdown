@@ -8,6 +8,7 @@ namespace sf
 {
 	class Texture;
 	class Font;
+	class Shader;
 }
 
 
@@ -85,6 +86,17 @@ namespace Fonts
 }
 
 
+namespace Shaders
+{
+	enum ID
+	{
+		BrightnessPass,
+		DownSamplePass,
+		GaussianBlurPass,
+		AddPass
+	};
+}
+
 // forward declaration of template class
 template <typename Resource, typename Identifier>
 class ResourceHolder;
@@ -94,5 +106,8 @@ typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;			// typedef fo
 
 // typedef for font resource holder
 typedef ResourceHolder<sf::Font, Fonts::ID> FontHolder;
+
+// for shader / bloom effect
+ typedef ResourceHolder<sf::Shader, Shaders::ID> ShaderHolder;
 
 #endif

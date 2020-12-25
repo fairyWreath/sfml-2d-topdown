@@ -10,12 +10,13 @@
 #include <limits>		// std::numeric_limits
 
 // world constructor
-World::World(sf::RenderWindow& window, FontHolder& fonts) :
-	nWindow(window),
-	nWorldView(window.getDefaultView()),		// default window view, view covers whole window
+World::World(sf::RenderTarget& outputTarget, FontHolder& fonts) :
+	nTarget(outputTarget),
+	nWorldView(outputTarget.getDefaultView()),		// default window view, view covers whole window
 	nTextures(),		// set these to empty first
 	nFonts(fonts),
-	nSceneGraph(),	
+	nSceneGraph(),
+	nSceneTexture(),
 	nSceneLayers(),
 	nActiveEnemies(),
 	nWorldBounds(				// floatrect type
@@ -32,6 +33,9 @@ World::World(sf::RenderWindow& window, FontHolder& fonts) :
 	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
 	nPlayerCharacter(nullptr)		// set nullptr to character
 {
+	// create the render texture here
+	nSceneTexture.create(nTarget.getSize().x, nTarget.getSize().y);
+
 	loadTextures();		// load textures from resource holder
 	buildScene();		// build scene graph
 
@@ -118,8 +122,26 @@ void World::buildScene()
 // drawing the scene graph, expensive operation
 void World::draw()
 {
-	nWindow.setView(nWorldView);			// configure view
-	nWindow.draw(nSceneGraph);			// use overidden SceneNode method to draw the whole scene graph
+	if (PostEffect::isSupported())
+	{
+		// draw here
+		nSceneTexture.clear();
+		nSceneTexture.setView(nWorldView);
+		nSceneTexture.draw(nSceneGraph);
+		nSceneTexture.display();
+		
+		// apply bloom effect to rendertexture and target
+		nBloomEffect.apply(nSceneTexture, nTarget);
+	}
+	else		// else draw from rendertarget
+ 	{
+		nTarget.setView(nWorldView);
+		nTarget.draw(nSceneGraph);
+	}
+	
+
+//	nWindow.setView(nWorldView);			// configure view
+//	nWindow.draw(nSceneGraph);			// use overidden SceneNode method to draw the whole scene graph
 }
 
 

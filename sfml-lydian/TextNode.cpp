@@ -9,7 +9,7 @@ TextNode::TextNode(const FontHolder& fonts, const std::string& text)
 	nText.setFont(fonts.get(Fonts::Main));		// load from resourceholder
 	nText.setCharacterSize(22);
 	nText.setString(text);
-	nText.setFillColor(sf::Color::Magenta);
+	nText.setFillColor(sf::Color::White);
 }
 
 void TextNode::setString(const std::string& text)

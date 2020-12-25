@@ -10,7 +10,7 @@
 #include "Character.hpp"
 #include "Powerup.hpp"
 #include "CommandQueue.hpp"
-
+#include "BloomEffect.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>			// view/viewports
@@ -28,7 +28,7 @@ namespace sf
 class World : private sf::NonCopyable
 {
 public:
-	explicit World(sf::RenderWindow& window, FontHolder& fonts);			// pass in render window in constructor
+	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts);			// pass in render window in constructor
 	void update(sf::Time dt);		// update scenes
 	void draw();					// draw sprites(expensive operation)
 
@@ -95,7 +95,11 @@ private:
 	};
 
 private:
-	sf::RenderWindow& nWindow;		// memory address of window, gained from game class later on
+//	sf::RenderWindow& nWindow;		// memory address of window, gained from game class later on
+	
+	sf::RenderTarget& nTarget;
+	sf::RenderTexture nSceneTexture;
+
 	sf::View nWorldView;			// world view
 
 	TextureHolder nTextures;		// texture holder template class to hold sprites/textures
@@ -121,6 +125,7 @@ private:
 	// command queue to execute commands
 	CommandQueue nCommandQueue;
 
+	BloomEffect nBloomEffect;
 };
 
 
