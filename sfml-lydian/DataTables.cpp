@@ -2,6 +2,7 @@
 #include "Character.hpp"
 #include "Projectile.hpp"
 #include "Powerup.hpp"
+#include "Particle.hpp"
 
 // for std::bind() placeholders
 using namespace std::placeholders;
@@ -105,6 +106,19 @@ std::vector<PowerupData> initializePowerupData()
 	
 	data[Powerup::AttackSpread].texture = Textures::AttackSpread;
 	data[Powerup::AttackSpread].action = std::bind(&Character::increaseSpread, _1);
+
+	return data;
+}
+
+
+// particles
+std::vector<ParticleData> initializeParticleData()
+{
+	std::vector<ParticleData> data(Particle::ParticleCount);
+
+	data[Particle::CyanHeartBeam].color = sf::Color(100, 212, 190);
+	data[Particle::CyanHeartBeam].lifetime = sf::seconds(3.f);
+
 
 	return data;
 }

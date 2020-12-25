@@ -20,6 +20,8 @@ namespace Category
 		AlliedProjectile = 1 << 6,
 		EnemyProjectile = 1 << 7,
 
+		ParticleSystem = 1 << 11,
+
 		// use bitwise left so types can be appended like this
 		Character = PlayerCharacter | SupportCharacter | EnemyCharacter,
 		Projectile = AlliedProjectile | EnemyProjectile,

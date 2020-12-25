@@ -17,9 +17,9 @@ public:
 
 	// check state
 	bool isEmpty() const;
-
-private:
 	std::queue<Command> nQueue;
+private:
+	
 };
 
 

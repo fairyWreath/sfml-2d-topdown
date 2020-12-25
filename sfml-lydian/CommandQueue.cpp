@@ -1,6 +1,5 @@
 #include "CommandQueue.hpp"
 
-
 // queue methods
 void CommandQueue::push(const Command& command)
 {

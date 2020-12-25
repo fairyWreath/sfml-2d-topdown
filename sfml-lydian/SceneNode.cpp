@@ -11,6 +11,20 @@
 namespace
 {
 	const std::vector<CollisionData> collisionTable = initializeCollisionData();
+
+	bool checkForCollision(unsigned int first, unsigned int second)
+	{
+		for (const auto& pair : collisionTable)
+		{
+			if (first == pair.collisionPair.first && second == pair.collisionPair.second)
+				return true;
+			else if (second == pair.collisionPair.first && first == pair.collisionPair.second)
+				return true;
+		}
+
+		// no match
+		return false;
+	}
 }
 
 SceneNode::SceneNode(Category::Type category) : 
@@ -95,7 +109,7 @@ void SceneNode::updateCurrent(sf::Time, CommandQueue&)
 
 void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
 {
-	for (const Ptr& child : nChildren)
+	for (Ptr& child : nChildren)
 	{
 		child->update(dt, commands);
 	}
@@ -129,8 +143,10 @@ sf::Vector2f SceneNode::getWorldPosition() const
 // get category for commands
 unsigned int SceneNode::getCategory() const
 {
-	return Category::SceneVoidLayer;			// return scene for SceneNode class 
+	return nDefaultCategory;			// return scene for SceneNode class 
 }
+
+int specialcount = 0;
 
 // execute command
 // use bitwise & operator to the check that the command's receiver is the same category
@@ -140,36 +156,27 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 	if (command.category & getCategory())
 		command.action(*this, dt);			// pass in SceneNode pointer to command
 
+	//if (command.category == Category::SceneVoidLayer)
+	//{
+	//	specialcount++;
+	//	std::cout << "create spcial push command count: " << specialcount <<std::endl;
+	//}
+
 	// traverse children and execute their commands
-	for (const Ptr& child : nChildren)
+	for (Ptr& child : nChildren)
 	{
 		child->onCommand(command, dt);
 	}
 }
 
 /* collisions */
-static bool checkForCollision(unsigned int first, unsigned int second)
-{
-	for (const auto& pair : collisionTable)
-	{
-		if (first == pair.collisionPair.first && second == pair.collisionPair.second)
-			return true;
-		else if (second == pair.collisionPair.first && first == pair.collisionPair.second)
-			return true;
-	}
-
-	// no match
-	return false;
-}
-
-
 // check collision between *this and its children with argument node
 void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs)
 {
+	// check for category first; check for collision takes the most frames
 	if (checkForCollision(this->getCategory(), node.getCategory()))
 	{
-		if (this != &node && collision(*this, node)
-			&& !isDestroyed() && !node.isDestroyed())
+		if (this != &node && !isDestroyed() && !node.isDestroyed() && collision(*this, node))
 		{
 			collisionPairs.insert(std::minmax(this, &node));			// minmax, returns pair with min as first
 		}

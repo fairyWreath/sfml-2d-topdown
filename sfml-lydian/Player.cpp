@@ -56,18 +56,9 @@ struct CharacterMover
 	Direction direction;
 };
 
-struct PlayerSpeedModifier
-{
-	PlayerSpeedModifier(float amount) : changeAmount(amount) {};
-
-	void operator() (Character& caracter, sf::Time const) {};
-
-	float changeAmount;
-};
-
-
 // constructor where all keybindings are set
-Player::Player()
+Player::Player() :
+	nCurrentMissionStatus(MissionRunning)
 {
 	// set initial key bindings
 	nKeyBinding[sf::Keyboard::Left] = MoveLeft;
@@ -76,23 +67,20 @@ Player::Player()
 	nKeyBinding[sf::Keyboard::Down] = MoveDown;
 
 	nKeyBinding[sf::Keyboard::Space] = LaunchNormal;
-	nKeyBinding[sf::Keyboard::C] = LaunchSpecial;
+	nKeyBinding[sf::Keyboard::Num1] = LaunchSpecial;
 
-	nKeyBinding[sf::Keyboard::K] = AttackRight;
-	nKeyBinding[sf::Keyboard::I] = AttackUpRight;
-	nKeyBinding[sf::Keyboard::U] = AttackUp;
-	nKeyBinding[sf::Keyboard::Y] = AttackUpLeft;
-	nKeyBinding[sf::Keyboard::H] = AttackLeft;
-	nKeyBinding[sf::Keyboard::B] = AttackDownLeft;
-	nKeyBinding[sf::Keyboard::N] = AttackDown;
-	nKeyBinding[sf::Keyboard::M] = AttackDownRight;
+	nKeyBinding[sf::Keyboard::D] = AttackRight;
+	nKeyBinding[sf::Keyboard::E] = AttackUpRight;
+	nKeyBinding[sf::Keyboard::W] = AttackUp;
+	nKeyBinding[sf::Keyboard::Q] = AttackUpLeft;
+	nKeyBinding[sf::Keyboard::A] = AttackLeft;
+	nKeyBinding[sf::Keyboard::Z] = AttackDownLeft;
+	nKeyBinding[sf::Keyboard::X] = AttackDown;
+	nKeyBinding[sf::Keyboard::C] = AttackDownRight;
 
-	nKeyBinding[sf::Keyboard::F] = ChangeProjectile;
-
-	nKeyBinding[sf::Keyboard::Z] = ModifyPlayerSpeed;
-
-
-	nKeyBinding[sf::Keyboard::X] = BoostPlayerCharacter;
+	nKeyBinding[sf::Keyboard::Num2] = ChangeProjectile;
+	nKeyBinding[sf::Keyboard::Num3] = ModifyPlayerSpeed;
+	nKeyBinding[sf::Keyboard::Num4] = BoostPlayerCharacter;
 
 	// map action to commands
 	initializeActions();
@@ -105,7 +93,7 @@ Player::Player()
 
 }
 
-
+int counts2 = 0;
 // handle realtime input, function is called every frame
 void Player::handleRealtimeInput(CommandQueue& commands)
 {
@@ -116,7 +104,8 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 		{
 			// push to command queue if match
 			commands.push(nActionBinding[pair.second]);			// python like access to std::map
-
+			counts2++;
+			//std::cout << "action pushed amount: " << counts2 << std::endl;
 			//std::cout << "Key detected, command pushed";
 		}
 	}
@@ -230,6 +219,17 @@ bool Player::isRealtimeAction(Action action)
 	case MoveRight:
 	case MoveDown:
 	case LaunchNormal:
+	case AttackRight:
+	case AttackUpRight:
+	case AttackUp:
+	case AttackUpLeft:
+	case AttackLeft:
+	case AttackDownLeft:
+	case AttackDown:
+	case AttackDownRight:
+	case ChangeProjectile:
+	case ModifyPlayerSpeed:
+	case BoostPlayerCharacter:
 		return true;
 	case LaunchSpecial:
 		return false;

@@ -53,6 +53,13 @@ namespace Textures
 		AttackRate,
 		MovementSpeed,
 
+		// particles
+		LightPinkBeam,
+		CirclePlasmaBeam,
+		BlueBeam,
+		PurpleBeam,
+		CyanHeartBeam,
+
 		// texture atlases
 		//Entities,
 		//TitleScreen,

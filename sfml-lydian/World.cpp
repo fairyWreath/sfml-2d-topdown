@@ -1,5 +1,5 @@
 #include "World.hpp"
-
+#include "ParticleNode.hpp"
 #include "Projectile.hpp"
 #include "Powerup.hpp"
 
@@ -58,6 +58,8 @@ void World::loadTextures()
 	nTextures.load(Textures::AlliedSingleBurst, "Media/Textures/Green-Plasma-Beam.png");
 	nTextures.load(Textures::AlliedSingleQuick, "Media/Textures/Slim-Blue-Beam-Small.png");
 
+	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
+
 }
 
 
@@ -68,7 +70,9 @@ void World::buildScene()
 	// add scenes to the scenelayer array
 	for (std::size_t i = 0; i < LayerCount; i++)
 	{
-		SceneNode::Ptr layer = std::make_unique<SceneNode>();			// initialize new scenenode
+		Category::Type category = (i == Void) ? Category::SceneVoidLayer : Category::None;
+
+		SceneNode::Ptr layer = std::make_unique<SceneNode>(category);			// initialize new scenenode
 		//  attach to SceneNode* array, with std::unique_ptr.get(), passing it to RAW C POINTER; the unique_ptr still POINTS/works
 		nSceneLayers[i] = layer.get();		
 
@@ -100,6 +104,12 @@ void World::buildScene()
 	// add unique_ptr of the character to 2nd scene layer
 	nSceneLayers[Void]->attachChild(std::move(main));
 	
+	// add particles
+	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
+	nSceneLayers[Void]->attachChild(std::move(cyanTrailNode));
+
+	
+
 	// add NPCS
 	addNPCs();
 }
@@ -130,8 +140,8 @@ void World::update(sf::Time dt)
 
 	// forward commands from queue to the scene graph
 	while (!nCommandQueue.isEmpty())			// while not empty
-	{
-	//	std::cout << "command popped\n";
+	{		
+		//std::cout << "queue size: " << nCommandQueue.nQueue.size() << std::endl;
 		nSceneGraph.onCommand(nCommandQueue.pop(), dt);			// pop form queue run command
 	}
 
@@ -272,7 +282,7 @@ void World::addNPC(Character::Type type, float relX, float relY)		// based on ns
 void World::addNPCs()
 {
 	
-	addNPC(Character::Izuko, -400.f, -100.f);
+	/*addNPC(Character::Izuko, -400.f, -100.f);
 	addNPC(Character::Izuko, -400.f, 50.f);
 	addNPC(Character::Izuko, -400.f, 200.f);
 	
@@ -285,7 +295,7 @@ void World::addNPCs()
 	addNPC(Character::Hitagi, 200.f, -400.f);
 	
 
-	// addNPC(Character::Shinobu, -200.f, 200.f);
+	 addNPC(Character::Shinobu, -200.f, 200.f);
 	 
 
 	 addNPC(Character::Yotsugi, -300.f, 300.f);
@@ -300,7 +310,7 @@ void World::addNPCs()
 	 addNPC(Character::Yotsugi, -300.f, 300.f);
 	 addNPC(Character::Yotsugi, 300.f, -300.f);
 	 addNPC(Character::Yotsugi, 300.f, 0.f);
-	 addNPC(Character::Yotsugi, 300.f, 300.f);
+	 addNPC(Character::Yotsugi, 300.f, 300.f);*/
 	   
 
 	// sort according to y values, lower enemis are checked first

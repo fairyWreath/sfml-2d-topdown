@@ -16,6 +16,8 @@ class SceneNode;
 
 struct Command
 {
+	typedef std::function<void(SceneNode&, sf::Time)> Action;
+
 	Command();			// constructor for command
 
 	/*		std::function, class template for treating functions as callback objects
@@ -23,15 +25,14 @@ struct Command
 	- parameters SceneNode& and sf::Time
 	- can used std::bind to bound function arguments to given values
 	*/
-	std::function<void(SceneNode&, sf::Time)> action;	
-
+	Action action;	
 	unsigned int category;				// recipient category of the command, based on Category enum
 };
 
 
 // function to downcasts to derived SceneNode classes
 template <typename GameObject, typename Function>
-std::function<void(SceneNode&, sf::Time)> derivedAction(Function fn)		// pass in function type
+Command::Action derivedAction(Function fn)		// pass in function type
 {
 	// lambda expression
 	return [=](SceneNode& node, sf::Time dt)

@@ -54,6 +54,13 @@ struct PowerupData
 	Textures::ID texture;
 };
 
+struct ParticleData
+{
+	sf::Color color;
+	sf::Time lifetime;
+};
+
+
 namespace CollisionPair
 {
 	enum Type
@@ -82,4 +89,5 @@ std::vector<CharacterData> initializeCharacterData();
 std::vector<ProjectileData> initializeProjectileData();
 std::vector<PowerupData> initializePowerupData();
 std::vector<CollisionData> initializeCollisionData();
+std::vector<ParticleData> initializeParticleData();
 #endif

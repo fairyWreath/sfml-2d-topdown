@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include <iostream>
+#include "EmitterNode.hpp"
 
 namespace
 {
@@ -75,6 +76,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nLaunchSpecialCommand.action = [this, &textures](SceneNode& node, sf::Time time)
 	{
 		// missiles are only a single projectile
+		std::cout << "action executed\n";
 		createProjectile(node, Projectile::SpecialHeart, 0.f, 0.5f, textures);
 	};
 
@@ -93,6 +95,11 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		nAttackType = SingleUp;
 		nCurrentProjectileType = Projectile::EnemyNormal;
 	}
+
+	std::cout << "created character\n";
+	//std::unique_ptr<EmitterNode> cyanTrail = std::make_unique<EmitterNode>(Particle::CyanHeartBeam);
+	//cyanTrail->setPosition(0.f, getBoundingRect().height / 2.f);	// set at tail
+	//attachChild(std::move(cyanTrail));
 }
 
 // creating attacks
@@ -140,7 +147,7 @@ void Character::createNormalAttack(SceneNode& node, const TextureHolder& texture
 	}
 }
 
-
+int counts = 0;
 // creating a single projectile
 void Character::createProjectile(SceneNode& node, Projectile::Type type, float xOffset, 
 	float yOffset, const TextureHolder& textures) const
@@ -162,6 +169,8 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	
 	// attach to scene graph
 	node.attachChild(std::move(projectile));
+	counts++;
+	std::cout << "child attached amount: " << counts << std::endl;
 }
 
 
@@ -188,6 +197,9 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	projectile->setRotation(90 - angleDeg);
 
 	node.attachChild(std::move(projectile));
+
+	counts++;
+	std::cout << "child attached amount: " << counts << std::endl;
 }
 
 
@@ -433,7 +445,7 @@ void Character::launchSpecial()
 
 	if (nSpecialAmount > 0)
 	{
-		//std::cout << "Launched special attack\n";
+		std::cout << "Launched special attack\n";
 
 		nIsLaunchingSpecial = true;
 		nSpecialAmount--;
@@ -482,6 +494,7 @@ void Character::checkPickupDrop(CommandQueue& commands)
 	}
 }
 
+int pushcount = 0;
 
 // code implementation of launching an attack
 void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
@@ -504,7 +517,7 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	else if (nIsLaunchingNormal && nCircularAttackCountdown <= sf::Time::Zero)
 	{
 		commands.push(nLaunchNormalCommand);
-		nCircularAttackCountdown = sf::seconds(1.0f);		// set cooldown to 2.5 seconds
+		nCircularAttackCountdown = sf::seconds(0.2f);		// set cooldown to 2.5 seconds
 		nIsLaunchingNormal = false;
 	}
 	else if (nAttackCountdown > sf::Time::Zero)		// else, decrease countdown
@@ -522,6 +535,8 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	// check for special attack
 	if (nIsLaunchingSpecial)
 	{
+		pushcount++;
+		std::cout << "launched special command push count: " << pushcount << std::endl;
 		commands.push(nLaunchSpecialCommand);
 		nIsLaunchingSpecial = false;
 	}
