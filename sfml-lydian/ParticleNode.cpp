@@ -43,7 +43,6 @@ ParticleNode::ParticleNode(Particle::Type type, const TextureHolder& textures) :
 	nVertexArray(sf::Quads),			// sf::Quads to initialize empty vertex
 	nNeedsVertexUpdate(true)
 {
-	std::cout << "particle created\n";
 }
 
 // add particle to particles deque
@@ -119,8 +118,8 @@ void ParticleNode::computeVertices() const
 		// first two arguments are target coordinates, the second to are texture coordinates
 		addVertex(position.x - half.x, position.y - half.y, 0.f, 0.f, color);		// top left
 		addVertex(position.x + half.x, position.y - half.y, size.x, 0.f, color);	// top right
-		addVertex(position.x - half.x, position.y + half.y, 0.f, size.y, color);	// bottom left
 		addVertex(position.x + half.x, position.y + half.y, size.x, size.y, color);	// bottom right
+		addVertex(position.x - half.x, position.y + half.y, 0.f, size.y, color);	// bottom left
 	}
 }
 

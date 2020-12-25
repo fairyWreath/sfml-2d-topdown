@@ -36,7 +36,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nIsLaunchingSpecial(false),
 	nNormalAttackRateLevel(2),	// attack speed here
 	nSpreadLevel(1),
-	nSpecialAmount(2),
+	nSpecialAmount(10),
 	nAttackCountdown(sf::Time::Zero),
 	nCircularAttackCountdown(sf::Time::Zero),
 	nIsMarkedForRemoval(false),
@@ -46,6 +46,8 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nIsBoosted(false),
 	nIsBoostedBefore(false),
 	nBoostCountdown(sf::Time::Zero),
+	nBoostCooldown(sf::seconds(3.f)),
+	nChangeProjectileCountdown(sf::Time::Zero),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	/* align to origin/center
@@ -76,7 +78,6 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nLaunchSpecialCommand.action = [this, &textures](SceneNode& node, sf::Time time)
 	{
 		// missiles are only a single projectile
-		std::cout << "action executed\n";
 		createProjectile(node, Projectile::SpecialHeart, 0.f, 0.5f, textures);
 	};
 
@@ -95,11 +96,6 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		nAttackType = SingleUp;
 		nCurrentProjectileType = Projectile::EnemyNormal;
 	}
-
-	std::cout << "created character\n";
-	//std::unique_ptr<EmitterNode> cyanTrail = std::make_unique<EmitterNode>(Particle::CyanHeartBeam);
-	//cyanTrail->setPosition(0.f, getBoundingRect().height / 2.f);	// set at tail
-	//attachChild(std::move(cyanTrail));
 }
 
 // creating attacks
@@ -147,7 +143,6 @@ void Character::createNormalAttack(SceneNode& node, const TextureHolder& texture
 	}
 }
 
-int counts = 0;
 // creating a single projectile
 void Character::createProjectile(SceneNode& node, Projectile::Type type, float xOffset, 
 	float yOffset, const TextureHolder& textures) const
@@ -155,8 +150,6 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 
 	// create projectile ptr
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
-
-//	std::cout << "created projectile\n";
 
 	// set offset and speed 
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
@@ -169,8 +162,6 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	
 	// attach to scene graph
 	node.attachChild(std::move(projectile));
-	counts++;
-	std::cout << "child attached amount: " << counts << std::endl;
 }
 
 
@@ -181,25 +172,15 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
 
 	float radians = -toRadian(angleDeg);
-	//std::cout << radians << std::endl;
 	float vx = projectile->getMaxSpeed() * std::cos(radians);
 	float vy = projectile->getMaxSpeed() * std::sin(radians);
 
 	sf::Vector2f velocity(vx, vy);
 	projectile->setPosition(getWorldPosition() + offset);
 	projectile->setVelocity(velocity);
-	
-	//std::cout << "created projectile\n";
-
-	/* sf::Transformable.setRotation()
-	-> set rotation in angles, clockwise from 12 o clock
-	*/
 	projectile->setRotation(90 - angleDeg);
 
 	node.attachChild(std::move(projectile));
-
-	counts++;
-	std::cout << "child attached amount: " << counts << std::endl;
 }
 
 
@@ -255,6 +236,9 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 		return;
 	}
 
+	// check projectile changes
+	checkProjectileChanges(dt);
+
 	// check if attacks are fired
 	checkProjectileLaunch(dt, commands);
 
@@ -279,21 +263,28 @@ void Character::boostCharacter()
 
 void Character::checkBoostStatus(sf::Time dt)
 {
-	if (nIsBoosted && !nIsBoostedBefore && nBoostCountdown <= sf::Time::Zero)
+	if (nIsBoosted && !nIsBoostedBefore && 
+		nBoostCountdown <= sf::Time::Zero && nBoostCooldown <= sf::Time::Zero)
 	{
 		nCharacterSpeed *= 2;
-		nBoostCountdown = sf::seconds(3.f);
+		nBoostCountdown = sf::seconds(1.5f);
+		nBoostCooldown = sf::seconds(3.5f);
 		nIsBoostedBefore = true;
 		nIsBoosted = false;
 	}
-	else if (nBoostCountdown <= sf::Time::Zero && nIsBoostedBefore)
+	else if (nIsBoostedBefore && nBoostCountdown <= sf::Time::Zero)
 	{
-		nCharacterSpeed /= 2;
+		nCharacterSpeed /= 2;		// reset speed to normal if duration ends
 		nIsBoostedBefore = false;
 	}
-	else if (nBoostCountdown > sf::Time::Zero)
+	else
 	{
-		nBoostCountdown -= dt;
+		if (nIsBoosted)				// reset boost state, when boost is pressed while on cooldown
+			nIsBoosted = false;			
+		if (nBoostCountdown > sf::Time::Zero)
+			nBoostCountdown -= dt;
+		if (nBoostCooldown > sf::Time::Zero)
+			nBoostCooldown -= dt;
 	}
 }
 
@@ -338,20 +329,12 @@ void Character::updateTexts()
 
 	// set rotation so text is always upright
 	nHealthDisplay->setRotation(-getRotation());
-
-//	std::cout << getRotation() << std::endl;
 }
 
 
 // get rect from world transform + sprite
 sf::FloatRect Character::getBoundingRect() const
 {
-	/*sf::FloatRect result = getWorldTransform().transformRect(nSprite.getGlobalBounds());
-
-	std::cout << result.height << "\n";
-
-	std::cout << "Aaaa\n";*/
-
 	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
 }
 
@@ -404,49 +387,24 @@ float Character::getCharacterSpeed()
 }
 
 // based on current attack type
-void Character::launchAttack()
-{
-	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
-	{
-		//		std::cout << "Flag set true\n";
-		nIsLaunchingNormal = true;		// set flag to true
-	}
-}
-
-// attack function, set flags to true
 void Character::launchNormal()
 {
-	// std::cout << "Launched normal attack\n";
-	nAttackType = NormalCircular;
-
-	// only attack if interval not 0
 	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
 	{
-//		std::cout << "Flag set true\n";
 		nIsLaunchingNormal = true;		// set flag to true
 	}
 }
 
-void Character::launchSingle(AttackType type)
+void Character::launchNormalWithType(AttackType type)
 {
 	nAttackType = type;
-
-	if (CharacterTable[nType].actionInterval != sf::Time::Zero)
-	{
-		//		std::cout << "Flag set true\n";
-		nIsLaunchingNormal = true;		// set flag to true
-	}
+	launchNormal();
 }
 
 void Character::launchSpecial()
 {
-	//std::cout << "Launched special attack\n";
-
-
 	if (nSpecialAmount > 0)
 	{
-		std::cout << "Launched special attack\n";
-
 		nIsLaunchingSpecial = true;
 		nSpecialAmount--;
 	}
@@ -456,29 +414,36 @@ void Character::launchSpecial()
 // change projectile type
 void Character::changeProjectile()
 {
-	// only for allied characters
-	if (isAllied())
-	{
-		std::vector<Projectile::Type> alliedTypes = {Projectile::AlliedSingle, Projectile::AlliedSingleBurst, 
-			Projectile::AlliedSingleQuick};
+	nIsProjectileChanged = true;
+}
 
+void Character::checkProjectileChanges(sf::Time dt)
+{
+	// only for allied characters
+	if (nIsProjectileChanged && nChangeProjectileCountdown <= sf::Time::Zero)
+	{
+		std::vector<Projectile::Type> alliedTypes = { Projectile::AlliedSingle, Projectile::AlliedSingleBurst,
+			Projectile::AlliedSingleQuick };
 
 		auto itr = std::find(alliedTypes.begin(), alliedTypes.end(), nCurrentProjectileType);
 
 		assert(itr != alliedTypes.end());
-//		std::cout << "proj changed\n";
+
 
 		itr = std::next(itr, 1);
 		if (itr == alliedTypes.end())
 			itr = alliedTypes.begin();
 
-	/*	if (*itr == Projectile::AlliedSingleBurst)
-			std::cout << "changed to burst\n";
-
-		if (*itr == Projectile::AlliedSingleQuick)
-			std::cout << "changed to quick\n";*/
-
 		nCurrentProjectileType = *itr;
+
+		nChangeProjectileCountdown = sf::seconds(0.5f);			// 0.5 seconds cooldown
+		nIsProjectileChanged = false;
+	}
+	else if (nChangeProjectileCountdown > sf::Time::Zero)
+	{
+		nChangeProjectileCountdown -= dt;
+		if (nIsProjectileChanged)
+			nIsProjectileChanged = false;
 	}
 }
 
@@ -494,14 +459,12 @@ void Character::checkPickupDrop(CommandQueue& commands)
 	}
 }
 
-int pushcount = 0;
-
 // code implementation of launching an attack
 void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
 	// enemy tries to fire all the time
 	if (!isAllied())
-		launchAttack();			// launch bsed on current attacktype
+		launchNormal();			// launch bsed on current attacktype
 
 
 	// check from flag and cooldown must be 0
@@ -514,29 +477,28 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		nAttackCountdown += CharacterTable[nType].actionInterval / (nNormalAttackRateLevel + 1.f);
 		nIsLaunchingNormal = false;		// set flag back to false
 	}
-	else if (nIsLaunchingNormal && nCircularAttackCountdown <= sf::Time::Zero)
+	else if (nIsLaunchingNormal && nCircularAttackCountdown <= sf::Time::Zero && nAttackType == NormalCircular)
 	{
 		commands.push(nLaunchNormalCommand);
-		nCircularAttackCountdown = sf::seconds(0.2f);		// set cooldown to 2.5 seconds
+		nCircularAttackCountdown = sf::seconds(0.5f);		// set cooldown to 2.5 seconds
 		nIsLaunchingNormal = false;
 	}
-	else if (nAttackCountdown > sf::Time::Zero)		// else, decrease countdown
+	else if (nAttackCountdown > sf::Time::Zero || nCircularAttackCountdown > sf::Time::Zero)
 	{
-		nAttackCountdown -= dt;
+		if (nAttackCountdown > sf::Time::Zero)		// else, decrease countdown
+		{
+			nAttackCountdown -= dt;
+		}
+		if (nCircularAttackCountdown > sf::Time::Zero)
+		{
+			nCircularAttackCountdown -= dt;
+		}
 		nIsLaunchingNormal = false;
 	}
-	else if (nCircularAttackCountdown > sf::Time::Zero)
-	{
-		nCircularAttackCountdown -= dt;
-		nIsLaunchingNormal = false;
-	}
-	
 
 	// check for special attack
 	if (nIsLaunchingSpecial)
 	{
-		pushcount++;
-		std::cout << "launched special command push count: " << pushcount << std::endl;
 		commands.push(nLaunchSpecialCommand);
 		nIsLaunchingSpecial = false;
 	}

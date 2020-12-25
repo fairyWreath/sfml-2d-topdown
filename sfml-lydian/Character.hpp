@@ -65,17 +65,13 @@ public:
 
 	// actual implementation not put here, since we need concept of how much time has elapsed
 	// simply marks flags to true
-	void launchNormal();
+	void launchNormalWithType(AttackType type);
 	void launchSpecial();
-
-	// singular attacks
-	void launchSingle(AttackType type);
 
 	// change projectile type
 	void changeProjectile();
 
-	// launch attack based on current type, used for bots
-	void launchAttack();
+
 
 	// get speed for player class
 	float getCharacterSpeed();
@@ -94,6 +90,8 @@ private:
 	// update movement based on direction
 	void updateMovementPattern(sf::Time dt);
 
+	// launch current nCurrenAttackType
+	void launchNormal();
 
 	void checkPickupDrop(CommandQueue& commands);
 	void checkProjectileLaunch(sf::Time dt, CommandQueue& commands);
@@ -114,6 +112,9 @@ private:
 
 	// update texts
 	void updateTexts();
+
+	// check projectile changes
+	void checkProjectileChanges(sf::Time dt);
 
 	// check boost movements
 	void checkBoostStatus(sf::Time dt);
@@ -143,7 +144,12 @@ private:
 	// boosted movement state
 	bool nIsBoosted;
 	bool nIsBoostedBefore;
-	sf::Time nBoostCountdown;
+	sf::Time nBoostCountdown;		// boost duration
+	sf::Time nBoostCooldown;		// boost cooldown
+
+	// change projectile
+	bool nIsProjectileChanged;
+	sf::Time nChangeProjectileCountdown;		// projectile countdown
 
 	// for moving characters manually
 	float nCharacterSpeed;

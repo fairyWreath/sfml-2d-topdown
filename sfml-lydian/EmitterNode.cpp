@@ -3,7 +3,7 @@
 #include "CommandQueue.hpp"
 #include "Command.hpp"
 
-#include <iostream>
+
 
 EmitterNode::EmitterNode(Particle::Type type) :
 	SceneNode(),
@@ -17,7 +17,6 @@ EmitterNode::EmitterNode(Particle::Type type) :
 
 void EmitterNode::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
-	std::cout << "update current reached\n";
 	// emit particles if the particle system has already been initialized
 	if (nParticleSystem)
 	{
@@ -31,7 +30,7 @@ void EmitterNode::updateCurrent(sf::Time dt, CommandQueue& commands)
 			if (container.getParticleType() == nType)
 				nParticleSystem = &container;
 		};
-		std::cout << "update current reached\n";
+
 		Command command;
 		command.category = Category::ParticleSystem;
 		command.action = derivedAction<ParticleNode>(finder);
@@ -49,8 +48,6 @@ void EmitterNode::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 void EmitterNode::emitParticles(sf::Time dt)
 {
-	std::cout << "emit particles called\n";
-
 	const float emissionRate = 30.f;
 	const sf::Time interval = sf::seconds(1.f) / emissionRate;
 

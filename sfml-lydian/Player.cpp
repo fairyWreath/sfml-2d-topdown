@@ -93,7 +93,6 @@ Player::Player() :
 
 }
 
-int counts2 = 0;
 // handle realtime input, function is called every frame
 void Player::handleRealtimeInput(CommandQueue& commands)
 {
@@ -104,9 +103,6 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 		{
 			// push to command queue if match
 			commands.push(nActionBinding[pair.second]);			// python like access to std::map
-			counts2++;
-			//std::cout << "action pushed amount: " << counts2 << std::endl;
-			//std::cout << "Key detected, command pushed";
 		}
 	}
 }
@@ -179,24 +175,25 @@ void Player::initializeActions()
 	/* std::bind
 	-> binds fixed parameters to function, with _1, _2 as prams/placeholder
 	*/
-	nActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormal, _1));
+	nActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+		Character::AttackType::NormalCircular));
 	nActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
 
-	nActionBinding[AttackRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1, 
+	nActionBinding[AttackRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1, 
 		Character::AttackType::SingleRight));
-	nActionBinding[AttackUpRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackUpRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUpRight));
-	nActionBinding[AttackUp].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackUp].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUp));
-	nActionBinding[AttackUpLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackUpLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUpLeft));
-	nActionBinding[AttackLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleLeft));
-	nActionBinding[AttackDownLeft].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackDownLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDownLeft));
-	nActionBinding[AttackDown].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackDown].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDown));
-	nActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchSingle, _1,
+	nActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDownRight));
 
 

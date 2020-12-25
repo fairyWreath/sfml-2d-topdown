@@ -17,7 +17,7 @@ namespace
 	const std::vector<ProjectileData> ProjectileTable = initializeProjectileData();
 }
 
-int count = 0;
+//int count = 0;
 
 Projectile::Projectile(Type type, const TextureHolder& textures) :
 	Entity(1),		// pass in 1 hitpoint
@@ -30,15 +30,14 @@ Projectile::Projectile(Type type, const TextureHolder& textures) :
 	// add particles for guided attacks
 	if (isGuided())
 	{
-		//std::cout << "is guided\n";
 		std::unique_ptr<EmitterNode> cyanTrail = std::make_unique<EmitterNode>(Particle::CyanHeartBeam);
 		cyanTrail->setPosition(0.f, getBoundingRect().height / 2.f);	// set at tail
 		attachChild(std::move(cyanTrail));		// attach to scene graph
 	}
-	count++;
-	std::cout << count << std::endl;
 
-	std::cout << "bottom reached\n";
+	/*count++;
+	std::cout << count << std::endl;
+	std::cout << "Projectile created\n";*/
 }
 
 
@@ -71,8 +70,6 @@ bool Projectile::isGuided() const
 // virtual functions to make scene graph
 void Projectile::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
-	//std::cout << "projectile current updated";
-
 	// for guided projectiles
 	if (isGuided())
 	{
@@ -99,10 +96,6 @@ void Projectile::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) 
 // bouding rect from forld transform and sprite
 sf::FloatRect Projectile::getBoundingRect() const
 {
-	//sf::FloatRect result = getWorldTransform().transformRect(nSprite.getGlobalBounds());
-
-	//std::cout << result.height << "\n";
-
 	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
 }
 
@@ -119,8 +112,6 @@ unsigned int Projectile::getCategory() const
 		return Category::AlliedProjectile;
 	case EnemyNormal:
 		return Category::EnemyProjectile;
-	default:		// unreachable
-		return Category::AlliedProjectile;
 	}
 }
 

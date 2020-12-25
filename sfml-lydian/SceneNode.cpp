@@ -6,8 +6,6 @@
 
 #include <algorithm>
 
-#include <iostream>
-
 namespace
 {
 	const std::vector<CollisionData> collisionTable = initializeCollisionData();
@@ -146,7 +144,6 @@ unsigned int SceneNode::getCategory() const
 	return nDefaultCategory;			// return scene for SceneNode class 
 }
 
-int specialcount = 0;
 
 // execute command
 // use bitwise & operator to the check that the command's receiver is the same category
@@ -155,12 +152,6 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 	// use bitwise & to check category
 	if (command.category & getCategory())
 		command.action(*this, dt);			// pass in SceneNode pointer to command
-
-	//if (command.category == Category::SceneVoidLayer)
-	//{
-	//	specialcount++;
-	//	std::cout << "create spcial push command count: " << specialcount <<std::endl;
-	//}
 
 	// traverse children and execute their commands
 	for (Ptr& child : nChildren)
@@ -183,7 +174,7 @@ void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPai
 	}
 
 	// compare to parameter node children
-	for (auto& child : nChildren)
+	for (const auto& child : nChildren)
 	{
 		child->checkNodeCollision(node, collisionPairs);
 	}
@@ -194,7 +185,7 @@ void SceneNode::checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& colli
 {
 	checkNodeCollision(sceneGraph, collisionPairs);
 
-	for (auto& child : sceneGraph.nChildren)
+	for (const auto& child : sceneGraph.nChildren)
 	{
 		checkSceneCollision(*child, collisionPairs);
 	}

@@ -52,7 +52,7 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Yotsugi].hitpoints = 300.f;
 	data[Character::Yotsugi].speed = 100.f;
 	data[Character::Yotsugi].texture = Textures::Yotsugi;
-	data[Character::Yotsugi].actionInterval = sf::seconds(3);
+	//data[Character::Yotsugi].actionInterval = sf::seconds(3);
 
 
 
@@ -117,7 +117,7 @@ std::vector<ParticleData> initializeParticleData()
 	std::vector<ParticleData> data(Particle::ParticleCount);
 
 	data[Particle::CyanHeartBeam].color = sf::Color(100, 212, 190);
-	data[Particle::CyanHeartBeam].lifetime = sf::seconds(3.f);
+	data[Particle::CyanHeartBeam].lifetime = sf::seconds(0.5f);
 
 
 	return data;
