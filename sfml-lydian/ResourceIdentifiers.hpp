@@ -60,6 +60,9 @@ namespace Textures
 		PurpleBeam,
 		CyanHeartBeam,
 
+		// animations
+		ExplosionAnimation,
+
 		// texture atlases
 		//Entities,
 		//TitleScreen,

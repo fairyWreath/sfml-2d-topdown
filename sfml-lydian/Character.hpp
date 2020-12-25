@@ -10,6 +10,7 @@
 #include "TextNode.hpp"
 #include "CommandQueue.hpp"
 #include "Projectile.hpp"
+#include "Animation.hpp"
 
 
 class Character : public Entity			// indirectly inherits SceneNode
@@ -49,7 +50,9 @@ public:
 
 	virtual sf::FloatRect getBoundingRect() const;
 		
-	// remove when destroyed
+	// remove when destroyed, override entitiy class
+	// force remove without explosions
+	virtual void remove();
 	virtual bool isMarkedForRemoval() const;
 
 	bool isAllied() const;
@@ -127,6 +130,11 @@ private:
 	Command nLaunchNormalCommand;
 	Command nLaunchSpecialCommand;
 	
+
+	// animations
+	Animation nExplosion;
+	bool nShowExplosion;
+
 	// normal attack cooldown
 	sf::Time nAttackCountdown;
 	sf::Time nCircularAttackCountdown;

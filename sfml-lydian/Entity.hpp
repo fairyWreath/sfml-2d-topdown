@@ -20,6 +20,8 @@ public:
 
 	// getting hitpoint values / status from outside
 	int getHitpoints() const;
+
+	virtual void remove();
 	virtual bool isDestroyed() const;
 
 	// set velocity

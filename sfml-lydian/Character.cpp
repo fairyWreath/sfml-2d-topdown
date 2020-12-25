@@ -48,8 +48,18 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nBoostCountdown(sf::Time::Zero),
 	nBoostCooldown(sf::seconds(3.f)),
 	nChangeProjectileCountdown(sf::Time::Zero),
+	nExplosion(textures.get(Textures::Explosion)),
+	nShowExplosion(true),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
+	// set up animation here
+	nExplosion.setFrameSize(sf::Vector2i(256, 256));
+	nExplosion.setNumFrames(16);
+	nExplosion.setDuration(sf::seconds(2));
+
+	centerOrigin(nExplosion);
+	centerOrigin(nSprite);
+
 	/* align to origin/center
 	- when first added, sprite is set to corner
 	- get 4-rect bounds an move sprite to center
@@ -207,7 +217,10 @@ float Character::getMaxSpeed() const
 // overidden draw function
 void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	target.draw(nSprite, states);			// draw from the character sprite
+	if (isDestroyed() && nShowExplosion)
+		target.draw(nExplosion, states);
+	else
+		target.draw(nSprite, states);			// draw from the character sprite
 }
 
 
@@ -227,12 +240,15 @@ unsigned int Character::getCategory() const
 // update for main loop
 void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
+	// update text nodes
+	updateTexts();
+
 	// if destroyed, possible drop pickup
-	if (isDestroyed())
+	if (isDestroyed() && nShowExplosion)
 	{
 		checkPickupDrop(commands);
-
-		nIsMarkedForRemoval = true;
+		nExplosion.update(dt);
+	//	nIsMarkedForRemoval = true;
 		return;
 	}
 
@@ -250,9 +266,6 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 	// apply velocity, call virtual parent class function here
 	Entity::updateCurrent(dt, commands);		
-
-	// update text nodes
-	updateTexts();
 
 }
 
@@ -338,10 +351,16 @@ sf::FloatRect Character::getBoundingRect() const
 	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
 }
 
+void Character::remove()
+{
+	Entity::remove();
+	nShowExplosion = false;
+}
+
 // public function, used to detect whetehr object is to be destroyed or no
 bool Character::isMarkedForRemoval() const
 {
-	return nIsMarkedForRemoval;
+	return isDestroyed() && (nExplosion.isFinished() || !nShowExplosion);
 }
 
 bool Character::isAllied()const

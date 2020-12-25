@@ -17,8 +17,6 @@ namespace
 	const std::vector<ProjectileData> ProjectileTable = initializeProjectileData();
 }
 
-//int count = 0;
-
 Projectile::Projectile(Type type, const TextureHolder& textures) :
 	Entity(1),		// pass in 1 hitpoint
 	nType(type),
@@ -34,10 +32,6 @@ Projectile::Projectile(Type type, const TextureHolder& textures) :
 		cyanTrail->setPosition(0.f, getBoundingRect().height / 2.f);	// set at tail
 		attachChild(std::move(cyanTrail));		// attach to scene graph
 	}
-
-	/*count++;
-	std::cout << count << std::endl;
-	std::cout << "Projectile created\n";*/
 }
 
 

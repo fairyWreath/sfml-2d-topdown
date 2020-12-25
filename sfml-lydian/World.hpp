@@ -78,7 +78,8 @@ private:
 	enum Layer					// scene layering
 	{
 		Background,					// highest layer, all children here are in 'one' layer class
-		Void,						// lowest layer
+		LowerVoid,						// lowest layer
+		UpperVoid,
 		LayerCount,
 	};
 

@@ -49,7 +49,7 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Hitagi].directions.push_back(Direction(-135, 200));		// -45 degrees, 200 units
 	data[Character::Hitagi].directions.push_back(Direction(-45, 100));		// 45 degrees, 100 units, back again
 
-	data[Character::Yotsugi].hitpoints = 300.f;
+	data[Character::Yotsugi].hitpoints = 100.f;
 	data[Character::Yotsugi].speed = 100.f;
 	data[Character::Yotsugi].texture = Textures::Yotsugi;
 	//data[Character::Yotsugi].actionInterval = sf::seconds(3);

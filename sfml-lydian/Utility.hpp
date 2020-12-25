@@ -15,6 +15,9 @@ namespace sf
 	class Text;
 }
 
+// forward declare animation class for centerOrigin overload
+class Animation;
+
 // convert to string
 template <typename Type>
 std::string toString(const Type& value);
@@ -27,6 +30,8 @@ std::string toString(sf::Keyboard::Key key);
 // center sfml objects in a window
 void centerOrigin(sf::Sprite& sprite);
 void centerOrigin(sf::Text& text);
+void centerOrigin(Animation& animation);
+
 
 // vector operations
 float length(sf::Vector2f vector);			// get modulus

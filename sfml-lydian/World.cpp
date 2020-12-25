@@ -60,6 +60,7 @@ void World::loadTextures()
 
 	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
 
+	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
 }
 
 
@@ -70,7 +71,7 @@ void World::buildScene()
 	// add scenes to the scenelayer array
 	for (std::size_t i = 0; i < LayerCount; i++)
 	{
-		Category::Type category = (i == Void) ? Category::SceneVoidLayer : Category::None;
+		Category::Type category = (i == LowerVoid) ? Category::SceneVoidLayer : Category::None;
 
 		SceneNode::Ptr layer = std::make_unique<SceneNode>(category);			// initialize new scenenode
 		//  attach to SceneNode* array, with std::unique_ptr.get(), passing it to RAW C POINTER; the unique_ptr still POINTS/works
@@ -102,11 +103,11 @@ void World::buildScene()
 	nPlayerCharacter->setPosition(nSpawnPosition);			// set to spawn position
 	nPlayerCharacter->setVelocity(40.f, nScrollSpeed);		// set velocity, 40 to right and 50 up (-50.f x)
 	// add unique_ptr of the character to 2nd scene layer
-	nSceneLayers[Void]->attachChild(std::move(main));
+	nSceneLayers[LowerVoid]->attachChild(std::move(main));
 	
 	// add particles
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
-	nSceneLayers[Void]->attachChild(std::move(cyanTrailNode));
+	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
 
 	
 
@@ -177,7 +178,7 @@ void World::destroyEntitiesOutsideView()
 	{
 			if (!getFieldBounds().intersects(entity.getBoundingRect()))
 			{
-				entity.destroy();
+				entity.remove();
 			}
 	});
 
@@ -249,7 +250,7 @@ void World::spawnNonPlayerCharacters()
 		// npc->setRotation(180.f);			// face down
 
 		// attach to layer
-		nSceneLayers[Void]->attachChild(std::move(npc));
+		nSceneLayers[LowerVoid]->attachChild(std::move(npc));
 		nNonPlayerSpawnPoints.pop_back();
 	}
 }
