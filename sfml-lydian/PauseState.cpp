@@ -34,7 +34,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 
 	// set up return button
 	auto returnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	returnButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 125);
+	returnButton->setPosition(0.5f * windowSize.x - 253.5f, 0.4f * windowSize.y + 125.f);
 	returnButton->setText("Return");
 	returnButton->setCallback([this]()
 		{
@@ -43,7 +43,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 		});
 
 	auto settingsButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	settingsButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 205);
+	settingsButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 205.f);
 	settingsButton->setText("Settings");
 	settingsButton->setCallback([this]()			// request state push is this class's(state) function, use this capture clause
 		{
@@ -52,7 +52,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 		});
 
 	auto mainMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	mainMenuButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 285);
+	mainMenuButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 285.f);
 	mainMenuButton->setText("Main Menu");
 	mainMenuButton->setCallback([this]()
 		{
@@ -64,6 +64,20 @@ PauseState::PauseState(StateStack& stack, Context context) :
 	nGUIContainer.pack(returnButton);
 	nGUIContainer.pack(settingsButton);
 	nGUIContainer.pack(mainMenuButton);
+
+
+	nPreviousMusic = context.musicPlayer->getCurrentMusic();
+	nPreviousMusicOffset = context.musicPlayer->getCurrentMusicOffset();
+	context.musicPlayer->play(Music::SecondaryTheme);		// play pause theme
+}
+
+PauseState::~PauseState()
+{
+	// getContext().musicPlayer->setPaused(false);
+	
+	// play when returning to game
+	getContext().musicPlayer->play(Music::MissionTheme);		// play pause theme
+	getContext().musicPlayer->setCurrentMusicOffset(nPreviousMusicOffset);
 }
 
 

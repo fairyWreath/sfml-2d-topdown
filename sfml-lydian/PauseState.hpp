@@ -5,6 +5,7 @@
 
 #include "State.hpp"
 #include "Container.hpp"
+#include "ResourceIdentifiers.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -15,6 +16,8 @@ class PauseState : public State
 public:
 	// constructor, pass in State class parameters
 	PauseState(StateStack& stack, Context context);
+	~PauseState();
+
 
 	// virtual function for State class to be overidden
 	virtual void draw();
@@ -27,7 +30,9 @@ private:
 	sf::Text nPausedText;
 	GUI::Container nGUIContainer;
 
-
+	// music objects
+	Music::ID nPreviousMusic;
+	sf::Time nPreviousMusicOffset;
 };
 
 #endif

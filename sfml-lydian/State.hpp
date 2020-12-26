@@ -5,6 +5,7 @@
 
 #include "ResourceIdentifiers.hpp"
 #include "StateIdentifiers.hpp"
+#include "MusicPlayer.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
@@ -32,13 +33,15 @@ public:
 	struct Context						
 	{
 		// constructor that receives resources, window and player class
-		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player);
+		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, 
+			MusicPlayer& music);
 	
 		// pointers that hold shared objects above
 		sf::RenderWindow* window;
 		TextureHolder* textures;
 		FontHolder* fonts;
 		Player* player;
+		MusicPlayer* musicPlayer;
 	};
 
 public:

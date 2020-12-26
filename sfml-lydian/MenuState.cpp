@@ -84,6 +84,16 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	nGUIContainer.pack(exitButton);
 
 	nGUIContainer.pack(titleLabel);
+
+	// handle music
+	// if previously playing music is NOT the tile theme, play the tile theme
+	if (context.musicPlayer->isMusicPlaying() && context.musicPlayer->getCurrentMusic() != Music::MainTheme)
+	{
+		context.musicPlayer->stop();					
+		context.musicPlayer->play(Music::MainTheme);
+	}
+	else if (!context.musicPlayer->isMusicPlaying())
+		context.musicPlayer->play(Music::MainTheme);
 }
 
 // override virtual functions for update, draw and handling events

@@ -30,8 +30,6 @@ Animation::Animation(const sf::Texture& texture) :
 // main logic implemented here
 void Animation::update(sf::Time dt)
 {
-	std::cout << "updated animation\n";
-
 	// get time per frame for the whole animation
 	sf::Time timePerFrame = nDuration / static_cast<float>(nNumFrames);
 	nElapsedTime += dt;
@@ -49,7 +47,6 @@ void Animation::update(sf::Time dt)
 	{
 		// add x
 		textureRect.left += textureRect.width;
-		std::cout << nCurrentFrame << std::endl;
 		// if x not in bounds, go to next 'row'
 		if (textureRect.left + textureRect.width > textureBounds.x)
 		{

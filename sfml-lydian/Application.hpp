@@ -11,6 +11,7 @@
 #include "ResourceIdentifiers.hpp"
 #include "Player.hpp"
 #include "StateStack.hpp"
+#include "MusicPlayer.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -46,7 +47,7 @@ private:
 	TextureHolder nTextures;
 	FontHolder nFonts;
 	Player nPlayer;		// player input handling is done inside Game::processInput
-
+	MusicPlayer nMusicPlayer;
 
 	// the state stack
 	StateStack nStateStack;

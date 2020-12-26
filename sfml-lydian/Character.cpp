@@ -337,7 +337,11 @@ void Character::updateMovementPattern(sf::Time dt)
 // update Textnodes
 void Character::updateTexts()
 {
-	nHealthDisplay->setString(toString(getHitpoints()) + " HP");
+	if (isDestroyed())
+		nHealthDisplay->setString("");			// set empty if destroyed
+	else
+		nHealthDisplay->setString(toString(getHitpoints()) + " HP");
+	
 	nHealthDisplay->setPosition(0.f, - 50.f);		// -50 y above character
 
 	// set rotation so text is always upright

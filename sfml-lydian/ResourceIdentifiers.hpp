@@ -97,6 +97,19 @@ namespace Shaders
 	};
 }
 
+// music
+namespace Music
+{
+	enum ID
+	{
+		None,
+		MainTheme,
+		SecondaryTheme,
+		MissionTheme,
+	};
+}
+
+
 // forward declaration of template class
 template <typename Resource, typename Identifier>
 class ResourceHolder;

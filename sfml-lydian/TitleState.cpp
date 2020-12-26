@@ -29,6 +29,8 @@ TitleState::TitleState(StateStack& stack, Context context) :
 	nText.setString("Press Any Key to Start");
 	centerOrigin(nText);
 	nText.setPosition(context.window->getView().getSize().x / 2.f, 500.f);
+
+	context.musicPlayer->play(Music::MainTheme);
 }
 
 // virtual functions of state to override

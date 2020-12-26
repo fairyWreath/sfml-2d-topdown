@@ -1,4 +1,5 @@
 #include "SceneNode.hpp"
+#include "SceneNode.hpp"
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 #include "Utility.hpp"
