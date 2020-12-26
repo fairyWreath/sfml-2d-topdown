@@ -5,7 +5,7 @@
 GameState::GameState(StateStack& stack, Context context) :
 	State(stack, context),			// constructor for PARENT class
 	// shared values are stored in the Context structure
-	nWorld(*context.window, *context.fonts),		// initalize world class with context window
+	nWorld(*context.window, *context.fonts, *context.soundPlayer),		// initalize world class with context window
 	nPlayer(*context.player)
 {
 	nPlayer.setMissionStatus(Player::MissionRunning);

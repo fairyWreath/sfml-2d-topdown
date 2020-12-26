@@ -30,7 +30,7 @@ SettingsState::SettingsState(StateStack& stack, Context context) :
 	updateLabels();			// update initial labels
 
 	// create button to go back, pop settingstate off the stack
-	auto backButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto backButton = std::make_shared<GUI::Button>(context);
 
 	// 386.5f x to centre button
 	backButton->setPosition(386.5f, 550.f);
@@ -135,7 +135,7 @@ void SettingsState::updateLabels()
 void SettingsState::addButtonLabel(Player::Action action, float x, float y, const std::string& text, Context context)
 {
 	// create button, in ths static array
-	nBindingButtons[action] = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	nBindingButtons[action] = std::make_shared<GUI::Button>(context);
 	nBindingButtons[action]->setPosition(x, y);
 	nBindingButtons[action]->setText(text);
 	nBindingButtons[action]->setToggle(true);			// button can be toggled

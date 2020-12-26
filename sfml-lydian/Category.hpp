@@ -22,6 +22,8 @@ namespace Category
 
 		ParticleSystem = 1 << 11,
 
+		SoundEffect = 1 << 12,
+
 		// use bitwise left so types can be appended like this
 		Character = PlayerCharacter | SupportCharacter | EnemyCharacter,
 		Projectile = AlliedProjectile | EnemyProjectile,

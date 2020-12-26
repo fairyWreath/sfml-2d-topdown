@@ -122,6 +122,9 @@ private:
 	// check boost movements
 	void checkBoostStatus(sf::Time dt);
 
+	// playing sounds
+	void playLocalSound(CommandQueue& commands, SoundEffect::ID effect);
+
 private:
 	Type nType;
 	sf::Sprite nSprite;			// store sprite type
@@ -134,6 +137,7 @@ private:
 	// animations
 	Animation nExplosion;
 	bool nShowExplosion;
+	bool nPlayedExplosionSound;
 
 	// normal attack cooldown
 	sf::Time nAttackCountdown;

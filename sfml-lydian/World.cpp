@@ -2,6 +2,7 @@
 #include "ParticleNode.hpp"
 #include "Projectile.hpp"
 #include "Powerup.hpp"
+#include "SoundNode.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -10,11 +11,12 @@
 #include <limits>		// std::numeric_limits
 
 // world constructor
-World::World(sf::RenderTarget& outputTarget, FontHolder& fonts) :
+World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds) :
 	nTarget(outputTarget),
 	nWorldView(outputTarget.getDefaultView()),		// default window view, view covers whole window
 	nTextures(),		// set these to empty first
 	nFonts(fonts),
+	nSounds(sounds),
 	nSceneGraph(),
 	nSceneTexture(),
 	nSceneLayers(),
@@ -113,7 +115,9 @@ void World::buildScene()
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
 
-	
+	// add sound node
+	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
+	nSceneGraph.attachChild(std::move(soundNode));
 
 	// add NPCS
 	addNPCs();
@@ -182,12 +186,17 @@ void World::update(sf::Time dt)
 
 	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
-
-
 	// keep player position within view bounds
 	adaptPlayerPosition();
+
+	updateSounds();
 }
 
+void World::updateSounds()
+{
+	nSounds.setListenerPosition(nPlayerCharacter->getWorldPosition());
+	nSounds.removeStoppedSounds();					// remove stopped sounds from the linked list
+}
 
 void World::destroyEntitiesOutsideView()
 {

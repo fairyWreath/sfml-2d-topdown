@@ -48,6 +48,7 @@ private:
 	FontHolder nFonts;
 	Player nPlayer;		// player input handling is done inside Game::processInput
 	MusicPlayer nMusicPlayer;
+	SoundPlayer nSoundPlayer;
 
 	// the state stack
 	StateStack nStateStack;

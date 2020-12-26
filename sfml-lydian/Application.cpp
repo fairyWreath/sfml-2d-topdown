@@ -23,7 +23,7 @@ Application::Application() :
 	nTextures(),
 	nFonts(),
 	nPlayer(),
-	nStateStack(State::Context(nWindow, nTextures, nFonts, nPlayer, nMusicPlayer)),		// create new state context here and pass it in
+	nStateStack(State::Context(nWindow, nTextures, nFonts, nPlayer, nMusicPlayer, nSoundPlayer)),		// create new state context here and pass it in
 	nStatisticsText(),
 	nStatisticsUpdateTime(),
 	nStatisticsNumFrames(0)

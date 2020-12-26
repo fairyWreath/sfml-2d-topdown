@@ -25,7 +25,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	/* create buttons (or other components) here		*/
 
 	// create button ptr, pass in context fonts and textures. the fonts/textures to be used already handled in the Button class
-	GUI::Button::Ptr playButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	GUI::Button::Ptr playButton = std::make_shared<GUI::Button>(context);
 	playButton->setPosition(400, 350);		// set position of the sf::Transformable here
 	playButton->setText("Play");
 	// use lambda function to set callback
@@ -39,7 +39,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 //	std::cout << "Passed button\n";
 
 	// settings button
-	GUI::Button::Ptr settingsButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	GUI::Button::Ptr settingsButton = std::make_shared<GUI::Button>(context);
 	settingsButton->setPosition(400, 430);		// set position of the sf::Transformable here
 	settingsButton->setText("Settings");
 	// use lambda function to set callback
@@ -50,7 +50,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 		});
 
 	// return to title menu
-	auto titleButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto titleButton = std::make_shared<GUI::Button>(context);
 	titleButton->setPosition(400, 510);
 	titleButton->setText("Return to Title");
 	titleButton->setCallback([this]()
@@ -61,7 +61,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 		});
 
 	// exit button
-	GUI::Button::Ptr exitButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	GUI::Button::Ptr exitButton = std::make_shared<GUI::Button>(context);
 	exitButton->setPosition(400, 590);
 	exitButton->setText("Exit");
 	exitButton->setCallback([this]() 

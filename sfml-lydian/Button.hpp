@@ -5,7 +5,7 @@
 
 #include "Component.hpp"
 #include "ResourceIdentifiers.hpp"
-#include "ResourceHolder.hpp"
+#include "State.hpp"
 
 // buttons have sprites for their backgrounds and a text label
 #include <SFML/Graphics/Sprite.hpp>
@@ -16,6 +16,8 @@
 #include <memory>
 #include <functional>			// std::function
 
+// forward declare SoundPlayer
+class SoundPlayer;
 
 namespace GUI
 {
@@ -28,7 +30,7 @@ public:
 
 public:
 	// constructor, passing in fonts and textures
-	Button(const FontHolder& fonts, const TextureHolder& textures);
+	Button(State::Context context);
 
 	// set std::function callback
 	void setCallback(Callback callback);
@@ -66,6 +68,8 @@ private:
 	sf::Text nText;
 	
 	bool nIsToggle;
+
+	SoundPlayer& nSounds;
 };
 
 

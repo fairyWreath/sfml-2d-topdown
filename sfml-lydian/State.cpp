@@ -2,12 +2,14 @@
 #include "StateStack.hpp"
 
 // constructor for Context structure
-State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, MusicPlayer& music) :
+State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, 
+	MusicPlayer& music, SoundPlayer& sound) :
 	window(&window),		// pass in ptr
 	textures(&textures),
 	fonts(&fonts),
 	player(&player),
-	musicPlayer(&music)
+	musicPlayer(&music),
+	soundPlayer(&sound)
 {
 }
 

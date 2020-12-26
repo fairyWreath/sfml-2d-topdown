@@ -1,7 +1,5 @@
 #include "MusicPlayer.hpp"
 
-#include <SFML/Audio/SoundSource.hpp>
-
 MusicPlayer::MusicPlayer()	:
 	nMusic(),
 	nFileNames(),
@@ -52,9 +50,9 @@ void MusicPlayer::setVolume(float volume)
 
 bool MusicPlayer::isMusicPlaying() const
 {
-	sf::SoundSource::Status status = nMusic.getStatus();
+	sf::Music::Status status = nMusic.getStatus();
 	
-	if (status == sf::SoundSource::Status::Playing)
+	if (status == sf::Music::Status::Playing)
 		return true;
 	else
 		return false;

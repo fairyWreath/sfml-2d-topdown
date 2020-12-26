@@ -9,6 +9,7 @@ namespace sf
 	class Texture;
 	class Font;
 	class Shader;
+	class SoundBuffer;
 }
 
 
@@ -109,10 +110,29 @@ namespace Music
 	};
 }
 
+namespace SoundEffect
+{
+	enum ID
+	{
+		AlliedSingleAttack,
+		AlliedCircularAttack,
+		EnemyAttack,
+		Explosion1,
+		Explosion2,
+		SpecialAttack,
+		CollectPowerup,
+		ButtonSelect,
+		ButtonActivate,
+	};
+}
+
 
 // forward declaration of template class
 template <typename Resource, typename Identifier>
 class ResourceHolder;
+
+typedef ResourceHolder<sf::SoundBuffer, SoundEffect::ID> SoundBufferHolder;
+
 
 // forward declarations used here
 typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;			// typedef for texture type

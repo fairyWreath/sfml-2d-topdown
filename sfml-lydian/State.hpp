@@ -6,6 +6,7 @@
 #include "ResourceIdentifiers.hpp"
 #include "StateIdentifiers.hpp"
 #include "MusicPlayer.hpp"
+#include "SoundPlayer.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
@@ -34,7 +35,7 @@ public:
 	{
 		// constructor that receives resources, window and player class
 		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, 
-			MusicPlayer& music);
+			MusicPlayer& music, SoundPlayer& sound);
 	
 		// pointers that hold shared objects above
 		sf::RenderWindow* window;
@@ -42,6 +43,7 @@ public:
 		FontHolder* fonts;
 		Player* player;
 		MusicPlayer* musicPlayer;
+		SoundPlayer* soundPlayer;
 	};
 
 public:

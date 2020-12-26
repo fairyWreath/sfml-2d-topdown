@@ -1,5 +1,7 @@
 #include "Button.hpp"
 #include "Utility.hpp"
+#include "SoundPlayer.hpp"
+#include "ResourceHolder.hpp"
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -8,15 +10,16 @@
 namespace GUI
 {
 
-Button::Button(const FontHolder& fonts, const TextureHolder& textures) :
+Button::Button(State::Context context) :
 	nCallback(),		// set callback to null
 	// initialize button textures from texture holder
-	nNormalTexture(textures.get(Textures::MainButtonNormal)),
-	nSelectedTexture(textures.get(Textures::MainButtonSelected)),
-	nPressedTexture(textures.get(Textures::MainButtonPressed)),
+	nNormalTexture(context.textures->get(Textures::MainButtonNormal)),
+	nSelectedTexture(context.textures->get(Textures::MainButtonSelected)),
+	nPressedTexture(context.textures->get(Textures::MainButtonPressed)),
 	nSprite(),
-	nText("", fonts.get(Fonts::Main), 26),		// set to empty string
-	nIsToggle(false)
+	nText("", context.fonts->get(Fonts::Main), 26),		// set to empty string
+	nIsToggle(false),
+	nSounds(*context.soundPlayer)
 {
 	// set intial(normal) texture
 	nSprite.setTexture(nNormalTexture);
@@ -60,6 +63,9 @@ void Button::select()
 	// selection handled in Component class
 	Component::select();		
 
+	// play sound
+	nSounds.play(SoundEffect::ButtonSelect);
+
 	// change sprite to selected
 	nSprite.setTexture(nSelectedTexture);
 }
@@ -77,6 +83,9 @@ void Button::deselect()
 void Button::activate()
 {	
 	Component::activate();		// call parent virtual deactivation
+
+	// play the sound
+	nSounds.play(SoundEffect::ButtonActivate);
 
 	// if toggled show button is pressed and 'toggled'
 	if (nIsToggle)

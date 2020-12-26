@@ -33,7 +33,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 	sf::Vector2f windowSize(context.window->getSize());
 
 	// set up return button
-	auto returnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto returnButton = std::make_shared<GUI::Button>(context);
 	returnButton->setPosition(0.5f * windowSize.x - 253.5f, 0.4f * windowSize.y + 125.f);
 	returnButton->setText("Return");
 	returnButton->setCallback([this]()
@@ -42,7 +42,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 			requestStackPop();
 		});
 
-	auto settingsButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto settingsButton = std::make_shared<GUI::Button>(context);
 	settingsButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 205.f);
 	settingsButton->setText("Settings");
 	settingsButton->setCallback([this]()			// request state push is this class's(state) function, use this capture clause
@@ -51,7 +51,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 			requestStackPush(States::Settings);
 		});
 
-	auto mainMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto mainMenuButton = std::make_shared<GUI::Button>(context);
 	mainMenuButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 285.f);
 	mainMenuButton->setText("Main Menu");
 	mainMenuButton->setCallback([this]()

@@ -11,6 +11,7 @@
 #include "Powerup.hpp"
 #include "CommandQueue.hpp"
 #include "BloomEffect.hpp"
+#include "SoundPlayer.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>			// view/viewports
@@ -28,7 +29,7 @@ namespace sf
 class World : private sf::NonCopyable
 {
 public:
-	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts);			// pass in render window in constructor
+	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds);			// pass in render window in constructor
 	void update(sf::Time dt);		// update scenes
 	void draw();					// draw sprites(expensive operation)
 
@@ -50,6 +51,8 @@ private:
 
 	// collisions
 	void handleCollisions();
+
+	void updateSounds();
 
 	// spawn all enemies
 	void spawnNonPlayerCharacters();
@@ -124,6 +127,8 @@ private:
 
 	// command queue to execute commands
 	CommandQueue nCommandQueue;
+
+	SoundPlayer& nSounds;
 
 	BloomEffect nBloomEffect;
 };

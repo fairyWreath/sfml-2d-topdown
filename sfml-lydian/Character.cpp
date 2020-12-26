@@ -12,12 +12,16 @@
 #include "Command.hpp"
 #include "CommandQueue.hpp"
 
+#include "SoundNode.hpp"
+
 #include "Powerup.hpp"
 
 #include <cmath>
 
 #include <iostream>
 #include "EmitterNode.hpp"
+
+using namespace std::placeholders;
 
 namespace
 {
@@ -50,6 +54,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nChangeProjectileCountdown(sf::Time::Zero),
 	nExplosion(textures.get(Textures::Explosion)),
 	nShowExplosion(true),
+	nPlayedExplosionSound(false),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	// set up animation here
@@ -248,7 +253,15 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 	{
 		checkPickupDrop(commands);
 		nExplosion.update(dt);
-	//	nIsMarkedForRemoval = true;
+		
+		// play the explosion sound
+		if (!nPlayedExplosionSound)
+		{
+			SoundEffect::ID soundEffect = (randomInt(2) == 0) ? SoundEffect::Explosion1 : SoundEffect::Explosion2;
+			playLocalSound(commands, soundEffect);
+			nPlayedExplosionSound = true;
+		}
+
 		return;
 	}
 
@@ -493,6 +506,9 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	// check from flag and cooldown must be 0
 	if (nIsLaunchingNormal && nAttackCountdown <= sf::Time::Zero && nAttackType != NormalCircular)
 	{
+		// play sound
+		playLocalSound(commands, isAllied() ? SoundEffect::AlliedSingleAttack : SoundEffect::EnemyAttack);
+
 		// push the command
 		commands.push(nLaunchNormalCommand);
 
@@ -502,6 +518,8 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	}
 	else if (nIsLaunchingNormal && nCircularAttackCountdown <= sf::Time::Zero && nAttackType == NormalCircular)
 	{
+		playLocalSound(commands, isAllied() ? SoundEffect::AlliedCircularAttack : SoundEffect::EnemyAttack);
+
 		commands.push(nLaunchNormalCommand);
 		nCircularAttackCountdown = sf::seconds(0.5f);		// set cooldown to 2.5 seconds
 		nIsLaunchingNormal = false;
@@ -522,12 +540,30 @@ void Character::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	// check for special attack
 	if (nIsLaunchingSpecial)
 	{
+		playLocalSound(commands, SoundEffect::SpecialAttack);
+
 		commands.push(nLaunchSpecialCommand);
 		nIsLaunchingSpecial = false;
 	}
 }
 
+// sounds
+void Character::playLocalSound(CommandQueue& commands, SoundEffect::ID effect)
+{
+	// get current position
+	sf::Vector2f worldPosition = getWorldPosition();
 
+	// create command to activate SoundNode.play
+	Command command;
+	command.category = Category::SoundEffect;			// only sound Effect nodes can activate this; only 1
+	command.action = derivedAction<SoundNode>(
+		[effect, worldPosition](SoundNode& node, sf::Time)		// capture clauses the effect itself and current pos
+		{
+	
+			node.playSound(effect, worldPosition);
+		});
+	commands.push(command);
+}
 
 
 
