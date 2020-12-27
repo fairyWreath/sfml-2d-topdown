@@ -39,9 +39,8 @@ SettingsState::SettingsState(StateStack& stack, Context context) :
 	backButton->setCallback(std::bind(&SettingsState::requestStackPop, this));
 
 	// settings label
-	auto settingsLabel = std::make_shared<GUI::Label>("Settings", *context.fonts);
+	auto settingsLabel = std::make_shared<GUI::Label>("Control Settings", *context.fonts);
 	settingsLabel->setPosition(80.f, 20.f);
-	settingsLabel->setColor(sf::Color::Cyan);
 	settingsLabel->setFont(context.fonts->get(Fonts::Title));		// delanova
 	settingsLabel->setSize(90);
 

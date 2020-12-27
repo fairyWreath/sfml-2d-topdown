@@ -12,7 +12,7 @@ Label::Label(const std::string& text, const FontHolder& fonts) :
 	nText(text, fonts.get(Fonts::Label), 30)			// set string, font and size to sf::Text, get font from fontholder
 {
 	// set initial text color
-	nText.setFillColor(sf::Color::Magenta);
+	nText.setFillColor(sf::Color(164, 231, 223));
 }
 
 

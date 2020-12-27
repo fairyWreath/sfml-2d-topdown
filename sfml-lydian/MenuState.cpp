@@ -26,7 +26,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 
 	// create button ptr, pass in context fonts and textures. the fonts/textures to be used already handled in the Button class
 	GUI::Button::Ptr playButton = std::make_shared<GUI::Button>(context);
-	playButton->setPosition(400, 350);		// set position of the sf::Transformable here
+	playButton->setPosition(400, 300);		// set position of the sf::Transformable here
 	playButton->setText("Play");
 	// use lambda function to set callback
 	playButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
@@ -40,18 +40,28 @@ MenuState::MenuState(StateStack& stack, Context context) :
 
 	// settings button
 	GUI::Button::Ptr settingsButton = std::make_shared<GUI::Button>(context);
-	settingsButton->setPosition(400, 430);		// set position of the sf::Transformable here
-	settingsButton->setText("Settings");
+	settingsButton->setPosition(400, 380);		// set position of the sf::Transformable here
+	settingsButton->setText("Controls");
 	// use lambda function to set callback
 	settingsButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
 		{
 			// push settings state to stack
+			requestStackPush(States::Settings);
+		});
+	
+	auto configButton = std::make_shared<GUI::Button>(context);
+	configButton->setPosition(400, 460);		// set position of the sf::Transformable here
+	configButton->setText("Config");
+	// use lambda function to set callback
+	configButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
+		{
+			// push config state to stack
 			requestStackPush(States::Config);
 		});
 
 	// return to title menu
 	auto titleButton = std::make_shared<GUI::Button>(context);
-	titleButton->setPosition(400, 510);
+	titleButton->setPosition(400, 540);
 	titleButton->setText("Return to Title");
 	titleButton->setCallback([this]()
 		{
@@ -62,7 +72,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 
 	// exit button
 	GUI::Button::Ptr exitButton = std::make_shared<GUI::Button>(context);
-	exitButton->setPosition(400, 590);
+	exitButton->setPosition(400, 620);
 	exitButton->setText("Exit");
 	exitButton->setCallback([this]() 
 		{
@@ -80,6 +90,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	// pack to container
 	nGUIContainer.pack(playButton);
 	nGUIContainer.pack(settingsButton);
+	nGUIContainer.pack(configButton);
 	nGUIContainer.pack(titleButton);
 	nGUIContainer.pack(exitButton);
 

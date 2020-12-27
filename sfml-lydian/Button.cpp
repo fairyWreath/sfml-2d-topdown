@@ -7,6 +7,8 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <iostream>
+
 namespace GUI
 {
 
@@ -17,15 +19,23 @@ Button::Button(State::Context context) :
 	nSelectedTexture(context.textures->get(Textures::MainButtonSelected)),
 	nPressedTexture(context.textures->get(Textures::MainButtonPressed)),
 	nSprite(),
-	nText("", context.fonts->get(Fonts::Main), 26),		// set to empty string
+	nText("", context.fonts->get(Fonts::Main), 30),		// set to empty string
 	nIsToggle(false),
-	nSounds(*context.soundPlayer)
+	nSounds(*context.soundPlayer),
+	nType(Sprite),
+	nShape(),
+	nNormalColor(),
+	nSelectedColor(),
+	nPressedColor()
 {
 	// set intial(normal) texture
 	nSprite.setTexture(nNormalTexture);
 
 	// change text color
-	nText.setFillColor(sf::Color::Magenta);
+	nText.setFillColor(sf::Color(255, 91, 165));
+
+
+
 
 	// set position of text based on sprite bounds
 	sf::FloatRect bounds = nSprite.getLocalBounds();
@@ -37,6 +47,12 @@ void Button::setCallback(Callback callback)
 {
 	nCallback = std::move(callback);
 }
+
+void Button::setType(ButtonType type)
+{
+	nType = type;
+}
+
 
 // change text
 void Button::setText(const std::string& text)
@@ -61,6 +77,29 @@ void Button::setTexture(const sf::Texture& texture, ButtonState state)
 	}
 }
 
+// for shapes
+void Button::setShape(std::unique_ptr<sf::CircleShape> shape)
+{
+	nShape = std::move(shape);
+	nShape->setPosition(getPosition());
+}
+
+void Button::setShapeColor(sf::Color& color, ButtonState state)
+{
+	switch (state)
+	{
+	case Normal:
+		nNormalColor = std::make_shared<sf::Color>(color);
+		nShape->setFillColor(*nNormalColor);
+		break;
+	case Selected:
+		nSelectedColor = std::make_shared<sf::Color>(color);
+		break;
+	case Pressed:
+		nPressedColor = std::make_shared<sf::Color>(color);
+		break;
+	}
+}
 
 // set toggle flag, for button pressing
 void Button::setToggle(bool flag)
@@ -83,8 +122,13 @@ void Button::select()
 	// play sound
 	nSounds.play(SoundEffect::ButtonSelect);
 
-	// change sprite to selected
-	nSprite.setTexture(nSelectedTexture);
+
+	if (nType == Sprite)
+		// change sprite to selected
+		nSprite.setTexture(nSelectedTexture);
+	else if (nType == Shape)
+		nShape->setFillColor(*nSelectedColor);
+
 }
 
 void Button::deselect()
@@ -92,8 +136,12 @@ void Button::deselect()
 	// deselection handled in Component class
 	Component::deselect();
 
-	// change sprite to normal
-	nSprite.setTexture(nNormalTexture);
+	if (nType == Sprite)
+		// change sprite to normal
+		nSprite.setTexture(nNormalTexture);
+	else if (nType == Shape)
+		nShape->setFillColor(*nNormalColor);
+
 }
 
 // activate and run callback
@@ -106,7 +154,12 @@ void Button::activate()
 
 	// if toggled show button is pressed and 'toggled'
 	if (nIsToggle)
-		nSprite.setTexture(nPressedTexture);
+	{
+		if (nType == Sprite)
+			nSprite.setTexture(nPressedTexture);
+		else if (nType == Shape)
+			nShape->setFillColor(*nPressedColor);
+	}
 
 	// run the std::function
 	if (nCallback)
@@ -127,9 +180,19 @@ void Button::deactivate()
 	{
 		// reset based on if the button is selected or no
 		if (isSelected())		// from component class
-			nSprite.setTexture(nSelectedTexture);
+		{
+			if (nType == Sprite)
+				nSprite.setTexture(nSelectedTexture);
+			else if (nType == Shape)
+				nShape->setFillColor(*nSelectedColor);
+		}
 		else
-			nSprite.setTexture(nNormalTexture);
+		{
+			if (nType == Sprite)
+				nSprite.setTexture(nNormalTexture);
+			else if (nType == Shape)
+				nShape->setFillColor(*nNormalColor);
+		}
 	}
 }
 
@@ -145,9 +208,19 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	// get absolute transform
 	states.transform *= getTransform();
 
-	// draw text and sprite
-	target.draw(nSprite, states);
-	target.draw(nText, states);
+	switch (nType)
+	{
+	case Sprite:
+		target.draw(nSprite, states);
+		target.draw(nText, states);
+		break;
+	case Text:
+		target.draw(nText, states);
+		break;
+	case Shape:
+		target.draw(*nShape);
+		break;
+	}
 }
 
 

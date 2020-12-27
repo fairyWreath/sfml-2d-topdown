@@ -4,6 +4,7 @@
 #include "ResourceHolder.hpp"
 #include "SoundPlayer.hpp"
 #include "MusicPlayer.hpp"
+#include "Label.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -20,37 +21,76 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 {
 	nBackgroundSprite.setTexture(context.textures->get(Textures::SettingsScreen));
 
-	// settings up the buttons
+
+	sf::Color normalColor(sf::Color(50, 198, 182));
+	sf::Color selectedColor(sf::Color(164, 231, 223));
+	normalColor.a = 205;
+	selectedColor.a = 205;
+
+	/* increase sounds */
 	auto increaseSoundButton = std::make_shared<GUI::Button>(context);
-	increaseSoundButton->setPosition(386.5f, 550.f);
-	increaseSoundButton->setText("Increase Sound");
+	increaseSoundButton->setType(GUI::Button::Shape);
+	increaseSoundButton->setPosition(820.f, 200.f);					// set position first
+
+	auto increaseSoundTriangle = std::make_unique<sf::CircleShape>(22, 3);
+	increaseSoundTriangle->setRotation(90.f);
+	increaseSoundButton->setShape(std::move(increaseSoundTriangle));
+	increaseSoundButton->setShapeColor(normalColor, GUI::Button::Normal);
+	increaseSoundButton->setShapeColor(selectedColor, GUI::Button::Selected);
+	increaseSoundButton->setShapeColor(selectedColor, GUI::Button::Pressed);
 	auto increaseSoundfn = [context]()
 	{
 		context.soundPlayer->modifyVolume(10.f);
 	};
 	increaseSoundButton->setCallback(increaseSoundfn);
 
+	/* decrease sounds */
 	auto decreaseSoundButton = std::make_shared<GUI::Button>(context);
-	decreaseSoundButton->setPosition(386.5f, 600.f);
-	decreaseSoundButton->setText("Decrease Sound");
+	decreaseSoundButton->setType(GUI::Button::Shape);
+	decreaseSoundButton->setPosition(335.f, 244.f);
+
+	auto decreaseSoundTriangle = std::make_unique<sf::CircleShape>(22, 3);
+	decreaseSoundTriangle->setRotation(-90.f);
+	decreaseSoundButton->setShape(std::move(decreaseSoundTriangle));
+	decreaseSoundButton->setShapeColor(normalColor, GUI::Button::Normal);
+	decreaseSoundButton->setShapeColor(selectedColor, GUI::Button::Selected);
+	decreaseSoundButton->setShapeColor(selectedColor, GUI::Button::Pressed);
 	auto decreaseSoundfn = [context]()
 	{
 		context.soundPlayer->modifyVolume(-10.f);
 	};
 	decreaseSoundButton->setCallback(decreaseSoundfn);
 
+
+	/* increase music */
 	auto increaseMusicButton = std::make_shared<GUI::Button>(context);
-	increaseMusicButton->setPosition(386.5f, 650.f);
-	increaseMusicButton->setText("Increase Music");
+	increaseMusicButton->setType(GUI::Button::Shape);
+	increaseMusicButton->setPosition(820.f, 270.f);
+
+	auto increaseMusicTriangle = std::make_unique<sf::CircleShape>(22, 3);
+	increaseMusicTriangle->setRotation(90.f);
+	increaseMusicButton->setShape(std::move(increaseMusicTriangle));
+	increaseMusicButton->setShapeColor(normalColor, GUI::Button::Normal);
+	increaseMusicButton->setShapeColor(selectedColor, GUI::Button::Selected);
+	increaseMusicButton->setShapeColor(selectedColor, GUI::Button::Pressed);
 	auto increaseMusicfn = [context]()
 	{
 		context.musicPlayer->modifyVolume(10.f);
 	};
 	increaseMusicButton->setCallback(increaseMusicfn);
 
+
+	/* decrease music */
 	auto decreaseMusicButton = std::make_shared<GUI::Button>(context);
-	decreaseMusicButton->setPosition(386.5f, 700.f);
-	decreaseMusicButton->setText("Decrease Music");
+	decreaseMusicButton->setType(GUI::Button::Shape);
+	decreaseMusicButton->setPosition(335.f, 314.f);
+	
+	auto decreaseMusicTriangle = std::make_unique<sf::CircleShape>(22, 3);
+	decreaseMusicTriangle->setRotation(-90.f);
+	decreaseMusicButton->setShape(std::move(decreaseMusicTriangle));
+	decreaseMusicButton->setShapeColor(normalColor, GUI::Button::Normal);
+	decreaseMusicButton->setShapeColor(selectedColor, GUI::Button::Selected);
+	decreaseMusicButton->setShapeColor(selectedColor, GUI::Button::Pressed);
 	auto decreaseMusicfn = [context]()
 	{
 		context.musicPlayer->modifyVolume(-10.f);
@@ -58,15 +98,36 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 	decreaseMusicButton->setCallback(decreaseMusicfn);
 
 	auto backButton = std::make_shared<GUI::Button>(context);
-	backButton->setPosition(0.f, 0.f);
+	backButton->setPosition(50.f, 600.f);
 	backButton->setText("Back");
 	backButton->setCallback(std::bind(&ConfigState::requestStackPop, this));
+
+	auto configLabel = std::make_shared<GUI::Label>("Config", *context.fonts);
+	configLabel->setPosition(80.f, 20.f);
+	configLabel->setColor(sf::Color(164, 231, 223));
+	configLabel->setFont(context.fonts->get(Fonts::Title));		// delanova
+	configLabel->setSize(120);
+
+	auto soundLabel = std::make_shared<GUI::Label>("Sound Effects", *context.fonts);
+	soundLabel->setPosition(50.f, 200.f);
+	soundLabel->setColor(sf::Color(255, 132, 188));
+	soundLabel->setSize(40);
+	
+
+	auto musicLabel = std::make_shared<GUI::Label>("Music", *context.fonts);
+	musicLabel->setPosition(50.f, 270.f);
+	musicLabel->setColor(sf::Color(255, 132, 188));
+	musicLabel->setSize(40);
 
 	nGUIContainer.pack(increaseSoundButton);
 	nGUIContainer.pack(decreaseSoundButton);
 	nGUIContainer.pack(increaseMusicButton);
 	nGUIContainer.pack(decreaseMusicButton);
 	nGUIContainer.pack(backButton);
+	nGUIContainer.pack(configLabel);
+	nGUIContainer.pack(soundLabel);
+	nGUIContainer.pack(musicLabel);
+
 
 	updateUI();
 }
@@ -75,7 +136,6 @@ void ConfigState::draw()
 {
 	// get window first
 	sf::RenderWindow& window = *getContext().window;
-
 
 	window.draw(nBackgroundSprite);
 	window.draw(nGUIContainer);
@@ -108,6 +168,8 @@ bool ConfigState::handleEvent(const sf::Event& event)
 	return false;
 }
 
+
+// update rectangles
 void ConfigState::updateUI()
 {
 	int totalAmount = 10;
@@ -129,7 +191,7 @@ void ConfigState::updateUI()
 
 		color.a = 210;
 		rectangle.setFillColor(color);
-		rectangle.setPosition(300.f + (40.f * i), 250.f);
+		rectangle.setPosition(380.f + (40.f * i), 200.f);
 
 		nSoundEffectRects.push_back(rectangle);
 	}
@@ -145,10 +207,12 @@ void ConfigState::updateUI()
 
 		color.a = 210;
 		rectangle.setFillColor(color);
-		rectangle.setPosition(300.f + (40.f * i), 320.f);
+		rectangle.setPosition(380.f + (40.f * i), 270.f);
 
 		nMusicRects.push_back(rectangle);
 	}
+
+
 }
 
 

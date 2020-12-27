@@ -10,6 +10,7 @@
 // buttons have sprites for their backgrounds and a text label
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 
 #include <vector>
 #include <string>
@@ -35,6 +36,13 @@ public:
 		Pressed			// activated
 	};
 
+	enum ButtonType
+	{
+		Sprite,
+		Shape,
+		Text
+	};
+
 public:
 	// constructor, passing in fonts and textures
 	Button(State::Context context);
@@ -48,8 +56,14 @@ public:
 	// button toggle
 	void setToggle(bool flag);
 
+	// change type
+	void setType(ButtonType type);
+
 	// overide default texture
 	void setTexture(const sf::Texture& texture, ButtonState state);
+
+	void setShape(std::unique_ptr<sf::CircleShape> shape);
+	void setShapeColor(sf::Color& color, ButtonState state);
 
 	// virtual override functions from Component class
 	virtual bool isSelectable() const;	
@@ -78,6 +92,17 @@ private:
 	sf::Text nText;
 	
 	bool nIsToggle;
+
+	ButtonType nType;
+
+	// for possible shapes
+	std::unique_ptr<sf::CircleShape> nShape;
+
+	// colors for shapes
+	std::shared_ptr<sf::Color> nNormalColor;
+	std::shared_ptr<sf::Color> nSelectedColor;
+	std::shared_ptr<sf::Color> nPressedColor;
+
 
 	SoundPlayer& nSounds;
 };
