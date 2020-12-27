@@ -16,7 +16,8 @@ namespace
 
 SoundPlayer::SoundPlayer() :
 	nSoundBuffers(),
-	nSounds()
+	nSounds(),
+	nVolume(100.f)
 {
 	// loading from the files
 	nSoundBuffers.load(SoundEffect::ButtonSelect, "Media/Sound/ButtonSelect.wav");
@@ -59,6 +60,7 @@ void SoundPlayer::play(SoundEffect::ID effect, sf::Vector2f position)
 	sound.setPosition(position.x, -position.y, 0.f);
 	sound.setAttenuation(Attenuation);
 	sound.setMinDistance(MinDistance3D);
+	sound.setVolume(nVolume);
 
 	sound.play();
 }
@@ -85,4 +87,15 @@ sf::Vector2f SoundPlayer::getListenerPosition() const
 {
 	sf::Vector3f position = sf::Listener::getPosition();
 	return sf::Vector2f(position.x, -position.y);
+}
+
+void SoundPlayer::modifyVolume(float amount)
+{
+	if ((nVolume + amount) >= 0.f && (nVolume + amount) <= 100.f)
+		nVolume += amount;
+}
+
+float SoundPlayer::getVolume() const
+{
+	return nVolume;
 }

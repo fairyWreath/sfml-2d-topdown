@@ -10,7 +10,6 @@
 #include "Label.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 #include <array>		// std::array, fixed sized stl array
 

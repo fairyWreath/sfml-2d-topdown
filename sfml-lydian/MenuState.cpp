@@ -46,7 +46,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	settingsButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
 		{
 			// push settings state to stack
-			requestStackPush(States::Settings);
+			requestStackPush(States::Config);
 		});
 
 	// return to title menu

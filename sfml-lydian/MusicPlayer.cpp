@@ -74,3 +74,18 @@ void MusicPlayer::setCurrentMusicOffset(sf::Time offset)
 {
 	nMusic.setPlayingOffset(offset);
 }
+
+void MusicPlayer::modifyVolume(float amount)
+{
+
+	if ((nVolume + amount) >= 0.f && (nVolume + amount) <= 100.f)
+	{
+		nVolume += amount;
+		nMusic.setVolume(nVolume);
+	}
+}
+
+float MusicPlayer::getVolume() const
+{
+	return nVolume;
+}

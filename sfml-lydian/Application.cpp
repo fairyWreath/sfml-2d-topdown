@@ -9,6 +9,7 @@
 #include "MenuState.hpp"
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
+#include "ConfigState.hpp"
 #include "GameEndState.hpp"
 
 
@@ -172,6 +173,7 @@ void Application::registerStates()
 	nStateStack.registerState<GameState>(States::Game);			
 	nStateStack.registerState<PauseState>(States::Pause);
 	nStateStack.registerState<SettingsState>(States::Settings);
+	nStateStack.registerState<ConfigState>(States::Config);
 	nStateStack.registerState<GameEndState>(States::GameEnd);
 }
 

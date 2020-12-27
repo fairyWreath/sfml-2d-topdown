@@ -45,6 +45,23 @@ void Button::setText(const std::string& text)
 	centerOrigin(nText);
 }
 
+void Button::setTexture(const sf::Texture& texture, ButtonState state)
+{
+	switch (state)
+	{
+	case Normal:
+		nNormalTexture = texture;
+		break;
+	case Selected:
+		nSelectedTexture = texture;
+		break;
+	case Pressed:
+		nPressedTexture = texture;
+		break;
+	}
+}
+
+
 // set toggle flag, for button pressing
 void Button::setToggle(bool flag)
 {

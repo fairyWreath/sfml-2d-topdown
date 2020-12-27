@@ -28,6 +28,13 @@ public:
 	typedef std::shared_ptr<Button> Ptr;			
 	typedef std::function<void()> Callback;				// button functions are all void()
 
+	enum ButtonState
+	{
+		Normal,
+		Selected,
+		Pressed			// activated
+	};
+
 public:
 	// constructor, passing in fonts and textures
 	Button(State::Context context);
@@ -40,6 +47,9 @@ public:
 
 	// button toggle
 	void setToggle(bool flag);
+
+	// overide default texture
+	void setTexture(const sf::Texture& texture, ButtonState state);
 
 	// virtual override functions from Component class
 	virtual bool isSelectable() const;	
@@ -58,10 +68,10 @@ private:
 private:
 	Callback nCallback;			// std::function
 
-	// texxtures, for memaddresses
-	const sf::Texture& nNormalTexture;			
-	const sf::Texture& nSelectedTexture;
-	const sf::Texture& nPressedTexture;
+	// textures, for memaddresses
+	sf::Texture& nNormalTexture;			
+	sf::Texture& nSelectedTexture;
+	sf::Texture& nPressedTexture;
 
 	// sfml members for display
 	sf::Sprite nSprite;

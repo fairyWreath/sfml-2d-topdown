@@ -30,6 +30,9 @@ public:
 
 	Music::ID getCurrentMusic() const;
 
+	void modifyVolume(float amount);
+	float getVolume() const;
+
 private:
 
 	// using sf::Music to represent currently played music

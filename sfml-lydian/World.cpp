@@ -153,7 +153,7 @@ void World::draw()
 void World::update(sf::Time dt)
 {
 	// repeat the tile here, along the x axis
-	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
+//	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
@@ -314,7 +314,7 @@ void World::addNPC(Character::Type type, float relX, float relY)		// based on ns
 void World::addNPCs()
 {
 	
-	/*addNPC(Character::Izuko, -400.f, -100.f);
+	addNPC(Character::Izuko, -400.f, -100.f);
 	addNPC(Character::Izuko, -400.f, 50.f);
 	addNPC(Character::Izuko, -400.f, 200.f);
 	
@@ -328,7 +328,7 @@ void World::addNPCs()
 	
 
 	addNPC(Character::Shinobu, -200.f, 200.f);
-	 */
+	 
 
 	addNPC(Character::Yotsugi, -300.f, 300.f);
 	addNPC(Character::Yotsugi, 0.f, 300.f);
