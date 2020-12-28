@@ -24,9 +24,9 @@ PauseState::PauseState(StateStack& stack, Context context) :
 	nPausedText.setFont(font);
 	nPausedText.setString("Game is Paused");
 	nPausedText.setCharacterSize(70);
-	nPausedText.setFillColor(sf::Color::Cyan);
+	nPausedText.setFillColor(sf::Color(164, 231, 223));
 	centerOrigin(nPausedText);
-	nPausedText.setPosition(0.5f * viewSize.x, 0.4f * viewSize.y);
+	nPausedText.setPosition(0.5f * viewSize.x, 0.4f * viewSize.y - 50.f);
 
 
 	// windowsize from texture, convert from Vector2u to Vector2f
@@ -34,7 +34,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 
 	// set up return button
 	auto returnButton = std::make_shared<GUI::Button>(context);
-	returnButton->setPosition(0.5f * windowSize.x - 253.5f, 0.4f * windowSize.y + 125.f);
+	returnButton->setPosition(0.5f * windowSize.x - 253.5f, 0.4f * windowSize.y + 60.f);
 	returnButton->setText("Return");
 	returnButton->setCallback([this]()
 		{
@@ -43,16 +43,25 @@ PauseState::PauseState(StateStack& stack, Context context) :
 		});
 
 	auto settingsButton = std::make_shared<GUI::Button>(context);
-	settingsButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 205.f);
-	settingsButton->setText("Settings");
+	settingsButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 140.f);
+	settingsButton->setText("Controls");
 	settingsButton->setCallback([this]()			// request state push is this class's(state) function, use this capture clause
 		{
 			// push settings state
 			requestStackPush(States::Settings);
 		});
 
+	auto configButton = std::make_shared<GUI::Button>(context);
+	configButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 220.f);
+	configButton->setText("Config");
+	configButton->setCallback([this]()			// request state push is this class's(state) function, use this capture clause
+		{
+			// push config state
+			requestStackPush(States::Config);
+		});
+
 	auto mainMenuButton = std::make_shared<GUI::Button>(context);
-	mainMenuButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 285.f);
+	mainMenuButton->setPosition(0.5f * windowSize.x - 253.5, 0.4f * windowSize.y + 300.f);
 	mainMenuButton->setText("Main Menu");
 	mainMenuButton->setCallback([this]()
 		{
@@ -63,6 +72,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 
 	nGUIContainer.pack(returnButton);
 	nGUIContainer.pack(settingsButton);
+	nGUIContainer.pack(configButton);
 	nGUIContainer.pack(mainMenuButton);
 
 

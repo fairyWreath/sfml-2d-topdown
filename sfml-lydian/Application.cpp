@@ -20,7 +20,7 @@ const sf::Time Application::TimePerFrame = sf::seconds(1.f / 60.f);
 
 // application class constructor, initialize members
 Application::Application() :
-	nWindow(sf::VideoMode(1280, 720), "Lydian", sf::Style::Close),		// sf::Style::Close means window has x button to close
+	nWindow(sf::VideoMode(1280, 720), "Easy Carefree Existence", sf::Style::Close),		// sf::Style::Close means window has x button to close
 	nTextures(),
 	nFonts(),
 	nPlayer(),
@@ -38,10 +38,10 @@ Application::Application() :
 	nFonts.load(Fonts::Label, "Media/Fonts/Overlock-Mod.ttf");
 	
 	nTextures.load(Textures::TitleScreen, "Media/Textures/Title-Screen.png");
-	nTextures.load(Textures::MenuScreen, "Media/Textures/road-night.png");
+	nTextures.load(Textures::MenuScreen, "Media/Textures/city-2-night.png");
 	nTextures.load(Textures::PauseScreen, "Media/Textures/Pause-Screen.png");
 	nTextures.load(Textures::SettingsScreen, "Media/Textures/Settings-Screen.png");
-	nTextures.load(Textures::GameEndScreen, "Media/Textures/city-2-night.png");
+	nTextures.load(Textures::GameEndScreen, "Media/Textures/road-night.png");
 
 	// load textures for buttons
 	nTextures.load(Textures::MainButtonNormal, "Media/Textures/bar_empty.png");

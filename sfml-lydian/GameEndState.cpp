@@ -16,12 +16,13 @@ GameEndState::GameEndState(StateStack& stack, Context context) :
 	auto endLabel = std::make_shared<GUI::Label>("Game Over", *context.fonts);
 	endLabel->setPosition(400.f, 100.f);
 	endLabel->setSize(120);
-	endLabel->setColor(sf::Color(164, 231, 223));
+
 	endLabel->setFont(context.fonts->get(Fonts::Title));		// set custom font
 
 	auto infoLabel = std::make_shared<GUI::Label>("You are Dead", *context.fonts);
 	if (context.player->getMissionStatus() == Player::MissionSuccess)
 		infoLabel->setText("Enjoy Life");
+	infoLabel->setColor(sf::Color(255, 132, 188));
 	infoLabel->setPosition(550.f, 270.f);
 
 
