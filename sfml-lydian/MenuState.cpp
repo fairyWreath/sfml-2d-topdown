@@ -19,9 +19,6 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	sf::Texture& texture = context.textures->get(Textures::MenuScreen);
 	nBackgroundSprite.setTexture(texture);
 
-
-	 //std::cout << "Passed menuscreen\n";
-
 	/* create buttons (or other components) here		*/
 
 	// create button ptr, pass in context fonts and textures. the fonts/textures to be used already handled in the Button class
@@ -36,23 +33,19 @@ MenuState::MenuState(StateStack& stack, Context context) :
 			requestStackPush(States::Game);
 		});
 
-//	std::cout << "Passed button\n";
 
 	// settings button
 	GUI::Button::Ptr settingsButton = std::make_shared<GUI::Button>(context);
-	settingsButton->setPosition(400, 380);		// set position of the sf::Transformable here
+	settingsButton->setPosition(400, 380);		
 	settingsButton->setText("Controls");
-	// use lambda function to set callback
 	settingsButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
 		{
-			// push settings state to stack
 			requestStackPush(States::Settings);
 		});
 	
 	auto configButton = std::make_shared<GUI::Button>(context);
 	configButton->setPosition(400, 460);		// set position of the sf::Transformable here
 	configButton->setText("Config");
-	// use lambda function to set callback
 	configButton->setCallback([this]()		// capture clause MenuState ptr, no parameters
 		{
 			// push config state to stack

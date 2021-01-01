@@ -45,8 +45,8 @@ public:
 
 public:
 	// constructor, passing in fonts and textures
-	Button(State::Context context);
-	Button(State::Context context, ButtonType type);
+	Button(State::Context context, ButtonType type = Sprite);
+//	Button(State::Context context, ButtonType type);
 
 	// set std::function callback
 	void setCallback(Callback callback);
@@ -77,7 +77,6 @@ public:
 	virtual void handleEvent(const sf::Event& event);
 
 private:
-	// window draw function
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	void updateApperance(ButtonState state);
@@ -85,20 +84,16 @@ private:
 	bool checkMouseLocation();
 
 private:
-	Callback nCallback;			// std::function
+	Callback nCallback;			
 	ButtonType nType;
 
-	// textures, for memaddresses
-	sf::Texture& nNormalTexture;			
-	sf::Texture& nSelectedTexture;
-	sf::Texture& nPressedTexture;
+	std::shared_ptr<sf::Texture> nNormalTexture;
+	std::shared_ptr<sf::Texture> nSelectedTexture;
+	std::shared_ptr<sf::Texture> nPressedTexture;
 
-	// sfml members for display
-	sf::Sprite nSprite;
-	sf::Text nText;
 	
-	bool nIsToggle;	
-
+	std::unique_ptr<sf::Sprite> nSprite;
+	std::unique_ptr<sf::Text> nText;
 
 	std::unique_ptr<sf::CircleShape> nShape;
 
@@ -106,8 +101,8 @@ private:
 	std::shared_ptr<sf::Color> nSelectedColor;
 	std::shared_ptr<sf::Color> nPressedColor;
 
+	bool nIsToggle;
 	sf::RenderWindow& nWindow;
-
 
 	SoundPlayer& nSounds;
 };

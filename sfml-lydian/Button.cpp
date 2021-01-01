@@ -13,39 +13,8 @@
 namespace GUI
 {
 
-Button::Button(State::Context context) :
-	nCallback(),		// set callback to null
-	// initialize button textures from texture holder
-	nNormalTexture(context.textures->get(Textures::MainButtonNormal)),
-	nSelectedTexture(context.textures->get(Textures::MainButtonSelected)),
-	nPressedTexture(context.textures->get(Textures::MainButtonPressed)),
-	nSprite(),
-	nText("", context.fonts->get(Fonts::Main), 30),		// set to empty string
-	nIsToggle(false),
-	nSounds(*context.soundPlayer),
-	nType(Sprite),
-	nShape(),
-	nNormalColor(),
-	nSelectedColor(),
-	nPressedColor(),
-	nWindow(*context.window)
-{
-	// set intial(normal) texture
-	nSprite.setTexture(nNormalTexture);
-	// change text color
-	nText.setFillColor(sf::Color(255, 91, 165));
-	// set position of text based on sprite bounds
-	sf::FloatRect bounds = nSprite.getLocalBounds();
-	nText.setPosition(bounds.width / 2.f, bounds.height / 2.f);
-}
-
 Button::Button(State::Context context, ButtonType type) :
 	nCallback(),	
-	nNormalTexture(context.textures->get(Textures::MainButtonNormal)),
-	nSelectedTexture(context.textures->get(Textures::MainButtonSelected)),
-	nPressedTexture(context.textures->get(Textures::MainButtonPressed)),
-	nSprite(),
-	nText("", context.fonts->get(Fonts::Main), 30),		
 	nIsToggle(false),
 	nSounds(*context.soundPlayer),
 	nType(type),
@@ -55,10 +24,37 @@ Button::Button(State::Context context, ButtonType type) :
 	nPressedColor(),
 	nWindow(*context.window)
 {
-	nSprite.setTexture(nNormalTexture);
-	nText.setFillColor(sf::Color(255, 91, 165));
-	sf::FloatRect bounds = nSprite.getLocalBounds();
-	nText.setPosition(bounds.width / 2.f, bounds.height / 2.f);
+	switch (nType)
+	{
+	
+	case Sprite:
+	{
+		nNormalTexture = std::make_shared<sf::Texture>(context.textures->get(Textures::MainButtonNormal));
+		nSelectedTexture = std::make_shared<sf::Texture>(context.textures->get(Textures::MainButtonSelected));
+		nPressedTexture = std::make_shared<sf::Texture>(context.textures->get(Textures::MainButtonPressed));
+
+		nSprite = std::make_unique<sf::Sprite>();
+		nSprite->setTexture(*nNormalTexture);
+
+		nText = std::make_unique<sf::Text>("", context.fonts->get(Fonts::Main), 30);
+		nText->setFillColor(sf::Color(255, 91, 165));
+		sf::FloatRect bounds = nSprite->getLocalBounds();
+		nText->setPosition(bounds.width / 2.f, bounds.height / 2.f);
+		break;
+	}
+	
+	case Text:
+	{
+		nText = std::make_unique<sf::Text>("", context.fonts->get(Fonts::Main), 30);
+		nText->setFillColor(sf::Color(255, 91, 165));
+		break;
+	}
+
+	case Shape:
+		return;				// handled at setShape
+
+
+	}
 }
 
 
@@ -77,22 +73,26 @@ void Button::setType(ButtonType type)
 // change text
 void Button::setText(const std::string& text)
 {
-	nText.setString(text);
-	centerOrigin(nText);
+	assert(nType == Sprite || nType == Text);
+
+	nText->setString(text);
+	centerOrigin(*nText);
 }
 
 void Button::setTexture(const sf::Texture& texture, ButtonState state)
 {
+	assert(nType == Sprite);
+
 	switch (state)
 	{
 	case Normal:
-		nNormalTexture = texture;
+		nNormalTexture = std::make_shared<sf::Texture>(texture);
 		break;
 	case Selected:
-		nSelectedTexture = texture;
+		nSelectedTexture = std::make_shared<sf::Texture>(texture);
 		break;
 	case Pressed:
-		nPressedTexture = texture;
+		nPressedTexture = std::make_shared<sf::Texture>(texture);
 		break;
 	}
 }
@@ -100,12 +100,16 @@ void Button::setTexture(const sf::Texture& texture, ButtonState state)
 // for shapes
 void Button::setShape(std::unique_ptr<sf::CircleShape> shape)
 {
+	assert(nType == Shape);
+
 	nShape = std::move(shape);
 	nShape->setPosition(getPosition());
 }
 
 void Button::setShapeColor(sf::Color& color, ButtonState state)
 {
+	assert(nType == Shape);
+
 	switch (state)
 	{
 	case Normal:
@@ -225,13 +229,13 @@ void Button::updateApperance(ButtonState state)
 		switch (state)
 		{
 		case GUI::Button::Normal:
-			nSprite.setTexture(nNormalTexture);
+			nSprite->setTexture(*nNormalTexture);
 			break;
 		case GUI::Button::Selected:
-			nSprite.setTexture(nSelectedTexture);
+			nSprite->setTexture(*nSelectedTexture);
 			break;
 		case GUI::Button::Pressed:
-			nSprite.setTexture(nPressedTexture);
+			nSprite->setTexture(*nPressedTexture);
 			break;
 		}
 	}
@@ -254,7 +258,7 @@ void Button::updateApperance(ButtonState state)
 		if (nType == Shape)
 			nShape->setFillColor(colorToSet);
 		else if (nType == Text)
-			nText.setFillColor(colorToSet);
+			nText->setFillColor(colorToSet);
 	}
 }
 
@@ -268,11 +272,11 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	switch (nType)
 	{
 	case Sprite:
-		target.draw(nSprite, states);
-		target.draw(nText, states);
+		target.draw(*nSprite, states);
+		target.draw(*nText, states);
 		break;
 	case Text:
-		target.draw(nText, states);
+		target.draw(*nText, states);
 		break;
 	case Shape:
 		target.draw(*nShape, states);
@@ -280,6 +284,7 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
+// check if mouse is within button bounds
 bool Button::checkMouseLocation()
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(nWindow);
@@ -289,13 +294,13 @@ bool Button::checkMouseLocation()
 	switch (nType)
 	{
 	case Sprite:
-		buttonBounds = getTransform().transformRect(nSprite.getGlobalBounds());
+		buttonBounds = getTransform().transformRect(nSprite->getGlobalBounds());
 		break;
 	case Shape:
 		buttonBounds = getTransform().transformRect(nShape->getGlobalBounds());
 		break;
 	case Text:
-		buttonBounds = getTransform().transformRect(nText.getGlobalBounds());
+		buttonBounds = getTransform().transformRect(nText->getGlobalBounds());
 		break;
 	}
 

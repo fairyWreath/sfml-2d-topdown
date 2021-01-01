@@ -2,7 +2,6 @@
 #define TILEMAP_HPP
 
 #include "SceneNode.hpp"
-#include "Tile.hpp"
 #include "TileNode.hpp"
 
 #include <array>
