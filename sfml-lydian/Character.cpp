@@ -15,11 +15,12 @@
 #include "SoundNode.hpp"
 
 #include "Powerup.hpp"
+#include "EmitterNode.hpp"
 
 #include <cmath>
 
 #include <iostream>
-#include "EmitterNode.hpp"
+
 
 using namespace std::placeholders;
 
@@ -77,6 +78,7 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	std::unique_ptr<TextNode> healthDisplay = std::make_unique<TextNode>(fonts, "");
 	nHealthDisplay = healthDisplay.get();			// get raw C pointer
 	attachChild(std::move(healthDisplay));			// attach to scene graph
+
 
 	updateTexts();
 

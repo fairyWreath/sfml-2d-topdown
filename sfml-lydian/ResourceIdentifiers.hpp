@@ -73,8 +73,22 @@ namespace Textures
 		Explosion,
 		Particle,
 		EndLine
+
+
+		// tilesets
+
 	};
 }
+
+
+namespace Tiles
+{
+	enum ID
+	{
+
+	};
+}
+
 
 namespace Fonts
 {

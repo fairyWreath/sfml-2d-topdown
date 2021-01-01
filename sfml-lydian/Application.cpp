@@ -16,11 +16,11 @@
 #include <iostream>		// for debugging
 
 // set time per frame
-const sf::Time Application::TimePerFrame = sf::seconds(1.f / 60.f);
+const sf::Time Application::TimePerFrame = sf::seconds(1.f / 120.f);
 
 // application class constructor, initialize members
 Application::Application() :
-	nWindow(sf::VideoMode(1280, 720), "Easy Carefree Existence", sf::Style::Close),		// sf::Style::Close means window has x button to close
+	nWindow(sf::VideoMode(1280,720), "Easy Carefree Existence", sf::Style::Close),		// sf::Style::Close means window has x button to close
 	nTextures(),
 	nFonts(),
 	nPlayer(),
@@ -50,7 +50,7 @@ Application::Application() :
 
 	// set misc statistics text
 	nStatisticsText.setFont(nFonts.get(Fonts::Main));
-	nStatisticsText.setFillColor(sf::Color::Magenta);
+	nStatisticsText.setFillColor(sf::Color::White);
 	nStatisticsText.setPosition(5.f, 5.f);			// set top right corner
 	nStatisticsText.setCharacterSize(15);			// set char size to 10
 
@@ -59,6 +59,10 @@ Application::Application() :
 
 	// push title state to stack
 	nStateStack.pushState(States::Title);
+
+
+
+
 	
 }
 
@@ -71,7 +75,7 @@ void Application::run()
 	// main game loop
 	while (nWindow.isOpen())
 	{
-		sf::Time elapsedTime = clock.restart();			// restart frames clock
+		sf::Time elapsedTime = clock.restart();			// restart frames clock, returns elapsed time since clock as restarted
 		timeSinceLastUpdate += elapsedTime;				// add to master time
 
 		// if time is more, apply changes
@@ -90,10 +94,9 @@ void Application::run()
 				nWindow.close();
 		}
 
-		// update statstics here 
-		updateStatistics(elapsedTime);
-
 		render();			// render changes
+			
+		updateStatistics(elapsedTime);
 	}
 
 }

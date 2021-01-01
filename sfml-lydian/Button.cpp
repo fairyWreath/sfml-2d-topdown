@@ -6,6 +6,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 #include <iostream>
 
@@ -26,21 +27,40 @@ Button::Button(State::Context context) :
 	nShape(),
 	nNormalColor(),
 	nSelectedColor(),
-	nPressedColor()
+	nPressedColor(),
+	nWindow(*context.window)
 {
 	// set intial(normal) texture
 	nSprite.setTexture(nNormalTexture);
-
 	// change text color
 	nText.setFillColor(sf::Color(255, 91, 165));
-
-
-
-
 	// set position of text based on sprite bounds
 	sf::FloatRect bounds = nSprite.getLocalBounds();
 	nText.setPosition(bounds.width / 2.f, bounds.height / 2.f);
 }
+
+Button::Button(State::Context context, ButtonType type) :
+	nCallback(),	
+	nNormalTexture(context.textures->get(Textures::MainButtonNormal)),
+	nSelectedTexture(context.textures->get(Textures::MainButtonSelected)),
+	nPressedTexture(context.textures->get(Textures::MainButtonPressed)),
+	nSprite(),
+	nText("", context.fonts->get(Fonts::Main), 30),		
+	nIsToggle(false),
+	nSounds(*context.soundPlayer),
+	nType(type),
+	nShape(),
+	nNormalColor(),
+	nSelectedColor(),
+	nPressedColor(),
+	nWindow(*context.window)
+{
+	nSprite.setTexture(nNormalTexture);
+	nText.setFillColor(sf::Color(255, 91, 165));
+	sf::FloatRect bounds = nSprite.getLocalBounds();
+	nText.setPosition(bounds.width / 2.f, bounds.height / 2.f);
+}
+
 
 // set std::function callback, with std::move
 void Button::setCallback(Callback callback)
@@ -122,25 +142,14 @@ void Button::select()
 	// play sound
 	nSounds.play(SoundEffect::ButtonSelect);
 
-
-	if (nType == Sprite)
-		// change sprite to selected
-		nSprite.setTexture(nSelectedTexture);
-	else if (nType == Shape)
-		nShape->setFillColor(*nSelectedColor);
-
+	updateApperance(Selected);
 }
 
 void Button::deselect()
 {
-	// deselection handled in Component class
 	Component::deselect();
-
-	if (nType == Sprite)
-		// change sprite to normal
-		nSprite.setTexture(nNormalTexture);
-	else if (nType == Shape)
-		nShape->setFillColor(*nNormalColor);
+	
+	updateApperance(Normal);
 
 }
 
@@ -155,10 +164,7 @@ void Button::activate()
 	// if toggled show button is pressed and 'toggled'
 	if (nIsToggle)
 	{
-		if (nType == Sprite)
-			nSprite.setTexture(nPressedTexture);
-		else if (nType == Shape)
-			nShape->setFillColor(*nPressedColor);
+		updateApperance(Pressed);
 	}
 
 	// run the std::function
@@ -181,26 +187,77 @@ void Button::deactivate()
 		// reset based on if the button is selected or no
 		if (isSelected())		// from component class
 		{
-			if (nType == Sprite)
-				nSprite.setTexture(nSelectedTexture);
-			else if (nType == Shape)
-				nShape->setFillColor(*nSelectedColor);
+			updateApperance(Selected);
 		}
 		else
 		{
-			if (nType == Sprite)
-				nSprite.setTexture(nNormalTexture);
-			else if (nType == Shape)
-				nShape->setFillColor(*nNormalColor);
+			updateApperance(Normal);
 		}
 	}
 }
 
 
 // events handled in activation/callbacks
-void Button::handleEvent(const sf::Event&)
+void Button::handleEvent(const sf::Event& event)
 {
+	if (checkMouseLocation() && !isSelected())
+	{
+		select();
+	}
+	else if (isSelected())
+	{
+		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+		{
+			activate();
+		}
+		
+		else if (!checkMouseLocation())
+		{
+			deselect();
+		}
+	}
 }
+
+void Button::updateApperance(ButtonState state)
+{
+	if (nType == Sprite)
+	{
+		switch (state)
+		{
+		case GUI::Button::Normal:
+			nSprite.setTexture(nNormalTexture);
+			break;
+		case GUI::Button::Selected:
+			nSprite.setTexture(nSelectedTexture);
+			break;
+		case GUI::Button::Pressed:
+			nSprite.setTexture(nPressedTexture);
+			break;
+		}
+	}
+	else
+	{
+		sf::Color colorToSet;
+		switch (state)
+		{
+		case Normal:
+			colorToSet = *nNormalColor;
+			break;
+		case Selected:
+			colorToSet = *nSelectedColor;
+			break;
+		case Pressed:
+			colorToSet = *nPressedColor;
+			break;
+		}
+
+		if (nType == Shape)
+			nShape->setFillColor(colorToSet);
+		else if (nType == Text)
+			nText.setFillColor(colorToSet);
+	}
+}
+
 
 // allow window to draw
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -218,9 +275,36 @@ void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(nText, states);
 		break;
 	case Shape:
-		target.draw(*nShape);
+		target.draw(*nShape, states);
 		break;
 	}
+}
+
+bool Button::checkMouseLocation()
+{
+	sf::Vector2i mousePosition = sf::Mouse::getPosition(nWindow);
+	
+	sf::FloatRect buttonBounds;
+
+	switch (nType)
+	{
+	case Sprite:
+		buttonBounds = getTransform().transformRect(nSprite.getGlobalBounds());
+		break;
+	case Shape:
+		buttonBounds = getTransform().transformRect(nShape->getGlobalBounds());
+		break;
+	case Text:
+		buttonBounds = getTransform().transformRect(nText.getGlobalBounds());
+		break;
+	}
+
+	if (buttonBounds.contains(static_cast<sf::Vector2f>(mousePosition)))
+	{
+		return true;
+	}
+	else
+		return false;
 }
 
 

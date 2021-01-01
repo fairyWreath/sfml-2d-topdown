@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+#include <iostream>
+
 namespace
 {
 	const std::vector<CollisionData> collisionTable = initializeCollisionData();
@@ -82,6 +84,7 @@ void SceneNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 {
 	// do nothing by default, to be overidden
 }
+
 
 void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) const
 {

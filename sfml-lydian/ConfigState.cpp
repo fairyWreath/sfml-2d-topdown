@@ -30,11 +30,12 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 	/* increase sounds */
 	auto increaseSoundButton = std::make_shared<GUI::Button>(context);
 	increaseSoundButton->setType(GUI::Button::Shape);
-	increaseSoundButton->setPosition(820.f, 200.f);					// set position first
+					// set position first
 
 	auto increaseSoundTriangle = std::make_unique<sf::CircleShape>(22, 3);
 	increaseSoundTriangle->setRotation(90.f);
 	increaseSoundButton->setShape(std::move(increaseSoundTriangle));
+	increaseSoundButton->setPosition(820.f, 200.f);
 	increaseSoundButton->setShapeColor(normalColor, GUI::Button::Normal);
 	increaseSoundButton->setShapeColor(selectedColor, GUI::Button::Selected);
 	increaseSoundButton->setShapeColor(selectedColor, GUI::Button::Pressed);
@@ -47,11 +48,11 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 	/* decrease sounds */
 	auto decreaseSoundButton = std::make_shared<GUI::Button>(context);
 	decreaseSoundButton->setType(GUI::Button::Shape);
-	decreaseSoundButton->setPosition(335.f, 244.f);
 
 	auto decreaseSoundTriangle = std::make_unique<sf::CircleShape>(22, 3);
 	decreaseSoundTriangle->setRotation(-90.f);
 	decreaseSoundButton->setShape(std::move(decreaseSoundTriangle));
+	decreaseSoundButton->setPosition(335.f, 244.f);
 	decreaseSoundButton->setShapeColor(normalColor, GUI::Button::Normal);
 	decreaseSoundButton->setShapeColor(selectedColor, GUI::Button::Selected);
 	decreaseSoundButton->setShapeColor(selectedColor, GUI::Button::Pressed);
@@ -65,11 +66,11 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 	/* increase music */
 	auto increaseMusicButton = std::make_shared<GUI::Button>(context);
 	increaseMusicButton->setType(GUI::Button::Shape);
-	increaseMusicButton->setPosition(820.f, 270.f);
 
 	auto increaseMusicTriangle = std::make_unique<sf::CircleShape>(22, 3);
 	increaseMusicTriangle->setRotation(90.f);
 	increaseMusicButton->setShape(std::move(increaseMusicTriangle));
+	increaseMusicButton->setPosition(820.f, 270.f);
 	increaseMusicButton->setShapeColor(normalColor, GUI::Button::Normal);
 	increaseMusicButton->setShapeColor(selectedColor, GUI::Button::Selected);
 	increaseMusicButton->setShapeColor(selectedColor, GUI::Button::Pressed);
@@ -83,11 +84,11 @@ ConfigState::ConfigState(StateStack& stack, Context context) :
 	/* decrease music */
 	auto decreaseMusicButton = std::make_shared<GUI::Button>(context);
 	decreaseMusicButton->setType(GUI::Button::Shape);
-	decreaseMusicButton->setPosition(335.f, 314.f);
 	
 	auto decreaseMusicTriangle = std::make_unique<sf::CircleShape>(22, 3);
 	decreaseMusicTriangle->setRotation(-90.f);
 	decreaseMusicButton->setShape(std::move(decreaseMusicTriangle));
+	decreaseMusicButton->setPosition(335.f, 314.f);
 	decreaseMusicButton->setShapeColor(normalColor, GUI::Button::Normal);
 	decreaseMusicButton->setShapeColor(selectedColor, GUI::Button::Selected);
 	decreaseMusicButton->setShapeColor(selectedColor, GUI::Button::Pressed);

@@ -4,6 +4,8 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <iostream>
+
 namespace GUI
 {
 
@@ -19,8 +21,8 @@ void Container::pack(Component::Ptr component)
 	nChildren.push_back(component);			// insert to component
 
 	// if a child is currently selected and if new added component is selected, add it
-	if (!hasSelection() && component->isSelectable())
-		select(nChildren.size() - 1);
+//	if (!hasSelection() && component->isSelectable())
+//		select(nChildren.size() - 1);
 }
 
 // container classes cannot be selected
@@ -32,50 +34,54 @@ bool Container::isSelectable() const
 // handling events of components inside the container
 void Container::handleEvent(const sf::Event& event)
 {
+	for (auto& child : nChildren)
+	{
+		child->handleEvent(event);
+	}
+
 	// if a child is already selected and it is active, let it handle the event
-	if (hasSelection() && nChildren[nSelectedChild]->isActive())
-	{
-		nChildren[nSelectedChild]->handleEvent(event);
-	}
+	//if (hasSelection() && nChildren[nSelectedChild]->isActive())
+	//{
+	//	nChildren[nSelectedChild]->handleEvent(event);
+	//}
+	//// if none is currently selected, navitage components with keyboard
+	//else if (event.type == sf::Event::KeyReleased)	
+	//{
+	//	// w or uparrow
+	//	if (event.key.code == sf::Keyboard::W	
+	//		|| event.key.code == sf::Keyboard::Up)
+	//	{
+	//		selectPrevious();			// select previous component
+	//	}
 
-	// if none is currently selected, navitage components with keyboard
-	else if (event.type == sf::Event::KeyReleased)	
-	{
-		// w or uparrow
-		if (event.key.code == sf::Keyboard::W	
-			|| event.key.code == sf::Keyboard::Up)
-		{
-			selectPrevious();			// select previous component
-		}
+	//	// s or down
+	//	else if (event.key.code == sf::Keyboard::S
+	//		|| event.key.code == sf::Keyboard::Down)
+	//	{
+	//		selectNext();			// select previous component
+	//	}
 
-		// s or down
-		else if (event.key.code == sf::Keyboard::S
-			|| event.key.code == sf::Keyboard::Down)
-		{
-			selectNext();			// select previous component
-		}
+	//	// additional left or right mimicking up or down
+	//	else if (event.key.code == sf::Keyboard::D
+	//		|| event.key.code == sf::Keyboard::Right)
+	//	{
+	//		selectNext();			// select previous component
+	//	}
+	//	else if (event.key.code == sf::Keyboard::A
+	//		|| event.key.code == sf::Keyboard::Left)
+	//	{
+	//		selectPrevious();			// select previous component
+	//	}
 
-		// additional left or right mimicking up or down
-		else if (event.key.code == sf::Keyboard::D
-			|| event.key.code == sf::Keyboard::Right)
-		{
-			selectNext();			// select previous component
-		}
-		else if (event.key.code == sf::Keyboard::A
-			|| event.key.code == sf::Keyboard::Left)
-		{
-			selectPrevious();			// select previous component
-		}
+	//	// space or enter to activate the selected component
+	//	else if (event.key.code == sf::Keyboard::Return
+	//		|| event.key.code == sf::Keyboard::Space)
+	//	{
+	//		if (hasSelection())
+	//			nChildren[nSelectedChild]->activate();
+	//	}
 
-		// space or enter to activate the selected component
-		else if (event.key.code == sf::Keyboard::Return
-			|| event.key.code == sf::Keyboard::Space)
-		{
-			if (hasSelection())
-				nChildren[nSelectedChild]->activate();
-		}
-
-	}
+	//}
 }
 
 

@@ -4,12 +4,12 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
-TextNode::TextNode(const FontHolder& fonts, const std::string& text)
+TextNode::TextNode(const FontHolder& fonts, const std::string& text) 
 {
 	nText.setFont(fonts.get(Fonts::Main));		// load from resourceholder
 	nText.setCharacterSize(22);
 	nText.setString(text);
-	nText.setFillColor(sf::Color::Magenta);
+	nText.setFillColor(sf::Color::Cyan);
 }
 
 void TextNode::setString(const std::string& text)

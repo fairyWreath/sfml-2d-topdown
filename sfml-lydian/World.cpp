@@ -25,20 +25,23 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 		0.f,	// left x position
 		0.f,	// top y position
 		nWorldView.getSize().x,	  // view/entire window width
-		2000.f				//  height, for tile repeating
+		nWorldView.getSize().y				//  height, for tile repeating
 	),
 	nSpawnPosition(
 		nWorldView.getSize().x  / 2.f,			// middle x 
-		nWorldBounds.height - nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
+		nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
 	),
 	nNonPlayerSpawnPoints(),
 	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
-	nPlayerCharacter(nullptr)		// set nullptr to character
+	nPlayerCharacter(nullptr),
+	nTileMap(nullptr)
 {
 	// create the render texture here
 	nSceneTexture.create(nTarget.getSize().x, nTarget.getSize().y);
 
 	loadTextures();		// load textures from resource holder
+
+	buildMap();
 	buildScene();		// build scene graph
 
 	nWorldView.setCenter(nSpawnPosition);		// move view to correct start position
@@ -69,18 +72,35 @@ void World::loadTextures()
 	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
 }
 
+void World::buildMap()
+{
+	std::unique_ptr<TileMap> map = std::make_unique<TileMap>();
+	
+	for (unsigned i = 0; i < 16 ; i++)
+	{
+		for (unsigned j = 0; j < 9; j++)
+		{
+			map->addTile(i, j, 0);
+		}
+	}
+
+	nSceneLayers[Map] = map.get();
+	nTileMap = map.get();
+
+	nSceneGraph.attachChild(std::move(map));
+}
+
 
 // building the scene from the scenegraph
 void World::buildScene()
 {
-	// first initialize different scene layers based on layercount
-	// add scenes to the scenelayer array
 	for (std::size_t i = 0; i < LayerCount; i++)
 	{
+		if (i == Map) continue;
+
 		Category::Type category = (i == LowerVoid) ? Category::SceneVoidLayer : Category::None;
 
-		SceneNode::Ptr layer = std::make_unique<SceneNode>(category);			// initialize new scenenode
-		//  attach to SceneNode* array, with std::unique_ptr.get(), passing it to RAW C POINTER; the unique_ptr still POINTS/works
+		SceneNode::Ptr layer = std::make_unique<SceneNode>(category);
 		nSceneLayers[i] = layer.get();		
 
 		nSceneGraph.attachChild(std::move(layer));			// attach to scene graph children directly below the root node
@@ -98,9 +118,9 @@ void World::buildScene()
 
 	// add bacgkround sprite to the scene, with SpriteNode class
 	// pass in texture and texturerect to SpriteNode constructor
-	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture, textureRect);	
-	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
-	nSceneLayers[Background]->attachChild(std::move(backgroundSprite));		// move the ptr and attach it to background layer 
+//	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture, textureRect);	
+//	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
+//	nSceneLayers[Background]->attachChild(std::move(backgroundSprite));		// move the ptr and attach it to background layer 
 
 	// add the user character
 	// pass in character type and texture holder
@@ -115,12 +135,14 @@ void World::buildScene()
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
 
+
+	
+
 	// add sound node
 	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
 	nSceneGraph.attachChild(std::move(soundNode));
-
 	// add NPCS
-	addNPCs();
+//	addNPCs();
 }
 
 // drawing the scene graph, expensive operation
@@ -143,16 +165,13 @@ void World::draw()
 		nTarget.draw(nSceneGraph);
 	}
 	
-
-//	nWindow.setView(nWorldView);			// configure view
-//	nWindow.draw(nSceneGraph);			// use overidden SceneNode method to draw the whole scene graph
 }
 
 
 // updating the scene graph
 void World::update(sf::Time dt)
 {
-	// repeat the tile here, along the x axis
+//	 repeat the tile here, along the x axis
 //	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
@@ -210,6 +229,7 @@ void World::destroyEntitiesOutsideView()
 			if (!getFieldBounds().intersects(entity.getBoundingRect()))
 			{
 				entity.remove();
+			//	std::cout << "Entity destroyed\n";
 			}
 	});
 

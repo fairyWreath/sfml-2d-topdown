@@ -46,6 +46,7 @@ public:
 public:
 	// constructor, passing in fonts and textures
 	Button(State::Context context);
+	Button(State::Context context, ButtonType type);
 
 	// set std::function callback
 	void setCallback(Callback callback);
@@ -79,8 +80,13 @@ private:
 	// window draw function
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+	void updateApperance(ButtonState state);
+
+	bool checkMouseLocation();
+
 private:
 	Callback nCallback;			// std::function
+	ButtonType nType;
 
 	// textures, for memaddresses
 	sf::Texture& nNormalTexture;			
@@ -91,17 +97,16 @@ private:
 	sf::Sprite nSprite;
 	sf::Text nText;
 	
-	bool nIsToggle;
+	bool nIsToggle;	
 
-	ButtonType nType;
 
-	// for possible shapes
 	std::unique_ptr<sf::CircleShape> nShape;
 
-	// colors for shapes
 	std::shared_ptr<sf::Color> nNormalColor;
 	std::shared_ptr<sf::Color> nSelectedColor;
 	std::shared_ptr<sf::Color> nPressedColor;
+
+	sf::RenderWindow& nWindow;
 
 
 	SoundPlayer& nSounds;

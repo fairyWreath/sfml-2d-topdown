@@ -12,6 +12,7 @@
 #include "CommandQueue.hpp"
 #include "BloomEffect.hpp"
 #include "SoundPlayer.hpp"
+#include "TileMap.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>			// view/viewports
@@ -44,8 +45,11 @@ private:
 	void loadTextures();		// load textures/sprites from resourceholder
 	void buildScene();			// draw the scenes
 
-	void adaptPlayerVelocity();			// adapt player velocity for eg.diagonal movements
 
+	// build tile map
+	void buildMap();
+
+	void adaptPlayerVelocity();			// adapt player velocity for eg.diagonal movements
 	void adaptPlayerPosition();			// keep player within screen bounds
 
 
@@ -62,10 +66,6 @@ private:
 	void addNPCs();		// add a lot at once, hard coded
 
 
-	// adding powerups
-	void addPowerup(Powerup::Type type, float relX, float relY);
-	void addPowerups();
-
 	// destroy entities outside the view
 	void destroyEntitiesOutsideView();
 
@@ -80,9 +80,9 @@ private:
 private:
 	enum Layer					// scene layering
 	{
-		Background,					// highest layer, all children here are in 'one' layer class
+		Background,				
+		Map,
 		LowerVoid,						// lowest layer
-		UpperVoid,
 		LayerCount,
 	};
 
@@ -109,7 +109,6 @@ private:
 	FontHolder& nFonts;
 	SceneNode nSceneGraph;			// root node of the scene graph
 
-
 	// std::array allows value semantics, which allow copies, assignments, passing or returning objects from functions
 	std::array<SceneNode*, LayerCount> nSceneLayers;		// fixed array size <typename, size_t> for scene layering
 
@@ -118,6 +117,8 @@ private:
 
 	float nScrollSpeed;					// scroll speed of moving tyle
 	Character* nPlayerCharacter;		// pointer to player character
+
+	TileMap* nTileMap;
 
 	// enemy spawn points
 	std::vector<SpawnPoint> nNonPlayerSpawnPoints;

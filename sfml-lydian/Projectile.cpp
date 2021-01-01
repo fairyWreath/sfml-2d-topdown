@@ -17,6 +17,7 @@ namespace
 	const std::vector<ProjectileData> ProjectileTable = initializeProjectileData();
 }
 
+
 Projectile::Projectile(Type type, const TextureHolder& textures) :
 	Entity(1),		// pass in 1 hitpoint
 	nType(type),

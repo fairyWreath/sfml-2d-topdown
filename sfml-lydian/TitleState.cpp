@@ -68,7 +68,7 @@ bool TitleState::update(sf::Time dt)
 bool TitleState::handleEvent(const sf::Event& event)
 {
 	// "press any button to start"
-	if (event.type == sf::Event::KeyPressed)
+	if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
 	{
 		// navigating between stacks
 		requestStackPop();			// pop the current state, the title state from the stack
