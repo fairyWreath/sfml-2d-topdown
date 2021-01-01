@@ -9,8 +9,6 @@ GameState::GameState(StateStack& stack, Context context) :
 	nPlayer(*context.player)
 {
 	nPlayer.setMissionStatus(Player::MissionRunning);
-	
-	// set musoc
 	context.musicPlayer->play(Music::MissionTheme);
 }
 

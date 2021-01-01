@@ -4,8 +4,10 @@
 
 Entity::Entity(int hitpoints) :
 	nVelocity(),
-	nHitpoints(hitpoints)
+	nHitpoints(hitpoints),
+	nMovementComponent()
 {
+	initializeMovementComponent();
 }
 
 // functions for modifying hp
@@ -29,15 +31,6 @@ void Entity::destroy()
 
 bool Entity::isDestroyed() const
 {
-	//if (nHitpoints <= 0)
-	//{
-	//	std::cout << "health is less\n";
-	//}
-	//else
-	//{
-	//	std::cout << "health is more\n";
-	//}
-
 	return nHitpoints <= 0;
 }
 
@@ -81,13 +74,22 @@ void Entity::accelerate(float vx, float vy)
 void Entity::updateCurrent(sf::Time dt, CommandQueue&)
 {
 	// longer time(dt) leads to a bigger step
-	/* transformable move method
-	- move(offset) is a shortcut for setPosition(getPosition() + offset)
-	*/
-	move(nVelocity * dt.asSeconds());
+	
+	//move(nVelocity * dt.asSeconds());
+	nMovementComponent->update(dt);
 }
 
 void Entity::remove()
 {
 	destroy();
+}
+
+void Entity::initializeMovementComponent()
+{
+	nMovementComponent = std::make_unique<MovementComponent>(*this);
+}
+
+MovementComponent* Entity::getMovementComponent() const
+{
+	return nMovementComponent.get();
 }

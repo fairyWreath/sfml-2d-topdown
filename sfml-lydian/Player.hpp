@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-// player class to handle all ioputs/events
+// player input component
 
 #include <SFML/Window/Event.hpp>		// sf::Event
 

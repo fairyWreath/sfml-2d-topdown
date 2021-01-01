@@ -16,7 +16,6 @@ class GameState : public State
 public:
 	GameState(StateStack& stack, Context context);			// parameters of State
 
-	// virtual IMPORTANT functions to be used in Applicatino class, inherited from State class
 	virtual void draw();
 	virtual bool update(sf::Time dt);
 	virtual bool handleEvent(const sf::Event& event);

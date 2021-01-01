@@ -4,12 +4,14 @@
 #include <SFML/Graphics.hpp>
 
 #include "SceneNode.hpp"
+#include "MovementComponent.hpp"
+
+
 
 // base class for entities: game elements
 class Entity : public SceneNode			// inhertits from scene node
 {
 public:
-
 	// add hitpoints
 	explicit Entity(int hitpoints);
 	
@@ -35,11 +37,17 @@ public:
 	void accelerate(sf::Vector2f velocity);
 	void accelerate(float vx, float vy);
 
+	MovementComponent* getMovementComponent() const;
+
 protected:
 	// velocity movement is done here, to be accessed by child class
 	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);			// override SceneNode update
 
-	// update for children classes
+	virtual void initializeMovementComponent();
+
+protected:
+	std::unique_ptr<MovementComponent> nMovementComponent;
+
 
 private:
 	// store hitpoint

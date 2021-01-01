@@ -6,56 +6,6 @@ using namespace std::placeholders;		// for std::bind
 
 #include <iostream>
 
-
-struct CharacterMover
-{
-	enum Direction
-	{
-		Right,
-		Up,
-		Left,
-		Down
-	};
-
-	// struct constructor, set velocity in constructor
-	CharacterMover(Direction direction) :
-		direction(direction)
-	{
-
-	}
-
-	// overload () operator/functor, pass in SceneNode type, eg.Character class to apply changes
-	// can use this struct as a FUNCTION/FUNCTOR
-	void operator() (Character& character, sf::Time) const
-	{
-		// a derived function exists to downcast function command to Character type
-		// apply changes to passed in character
-		sf::Vector2f velocity;
-		float speed = character.getCharacterSpeed();
-
-		switch(direction)
-		{
-		case Right:
-			velocity = sf::Vector2f(+speed, 0.f);
-			break;
-		case Up:
-			velocity = sf::Vector2f(0.f, -speed);
-			break;
-		case Left:
-			velocity = sf::Vector2f(-speed, 0.f);
-			break;
-		case Down:
-			velocity = sf::Vector2f(0.f, +speed);
-			break;
-		}
-
-		character.setVelocity(character.getVelocity() + velocity);			// accelerate character
-	}
-
-
-	Direction direction;
-};
-
 // constructor where all keybindings are set
 Player::Player() :
 	nCurrentMissionStatus(MissionRunning)
@@ -160,15 +110,38 @@ sf::Keyboard::Key Player::getAssignedKey(Action action) const
 }
 
 
+// functor
+struct CharacterMover
+{
+	CharacterMover(MovementComponent::Direction direction) : direction(direction) { }
+
+	void operator() (Character& character, sf::Time) const
+	{
+		float speed = character.getCharacterSpeed();
+		MovementComponent* component = character.getMovementComponent();
+		component->moveToDirection(speed, direction);
+	}
+
+	MovementComponent::Direction direction;
+};
+
+
 // adding commands/action bindings
 void Player::initializeActions()
 {
-	// add commands here, add to actionbinding dict/map
-	// use functors and command struct template to add commands
-	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(CharacterMover::Left));
-	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(CharacterMover::Up));
-	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(CharacterMover::Right));
-	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(CharacterMover::Down));
+	//nActionBinding[MoveLeft].action = derivedAction<Character>(
+	//	std::bind([&](Character& character)
+	//		{
+	//			float speed = character.getCharacterSpeed();
+	//			MovementComponent* component = character.getMovementComponent();
+	//			component->moveToDirection(speed, MovementComponent::Direction::Left);
+	//		}, _1));
+
+
+	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(MovementComponent::Left));
+	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(MovementComponent::Up));
+	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(MovementComponent::Right));
+	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(MovementComponent::Down));
 
 	// launching attacks
 	// action is launchnormal from character class
