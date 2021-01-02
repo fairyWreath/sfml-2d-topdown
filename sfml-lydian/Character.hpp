@@ -24,6 +24,9 @@ public:
 		Izuko,
 		Hitagi,
 		Yotsugi,
+
+		Elesa,
+
 		TypeCount
 	};
 
@@ -129,11 +132,12 @@ private:
 	Type nType;
 	sf::Sprite nSprite;			// store sprite type
 
+	Animation nCharacterAnimation;
+
 	// actual command code
 	Command nLaunchNormalCommand;
 	Command nLaunchSpecialCommand;
 	
-
 	// animations
 	Animation nExplosion;
 	bool nShowExplosion;

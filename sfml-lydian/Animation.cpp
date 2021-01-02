@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include <iostream>
+#include <cassert>
 
 Animation::Animation() :
 	nSprite(),
@@ -12,7 +13,8 @@ Animation::Animation() :
 	nCurrentFrame(0),
 	nDuration(sf::Time::Zero),
 	nElapsedTime(sf::Time::Zero),
-	nRepeat(false)
+	nRepeat(false),
+	nIsSubAnimationPlaying(false)
 {
 }
 
@@ -27,51 +29,142 @@ Animation::Animation(const sf::Texture& texture) :
 {
 }
 
+Animation::SubAnimation::SubAnimation(int key, size_t startingFrame, size_t endingFrame) :
+	key(key),
+	startingFrame(startingFrame),
+	endingFrame(endingFrame)
+{
+}
+
+Animation::SubAnimation::SubAnimation()
+{
+
+}
+
+void Animation::addSubAnimation(size_t startingFrame, size_t endingFrame, int key)
+{
+	nSubAnimations.insert({key, SubAnimation(key, startingFrame, endingFrame)});
+}
+
+
+void Animation::playSubAnimation(int key)
+{
+	assert(nSubAnimations.find(key) != nSubAnimations.end());
+
+	nCurrentSubAnimationKey = key;
+	nIsSubAnimationPlaying = true;
+	
+	// set current frame to first subanimation frame
+	nCurrentFrame = nSubAnimations[key].startingFrame;
+}
+
 // main logic implemented here
 void Animation::update(sf::Time dt)
 {
 	// get time per frame for the whole animation
 	sf::Time timePerFrame = nDuration / static_cast<float>(nNumFrames);
+
+	if (nIsSubAnimationPlaying)
+	{
+		timePerFrame = nDuration / static_cast<float>(nSubAnimations[nCurrentSubAnimationKey].endingFrame
+			- nSubAnimations[nCurrentSubAnimationKey].startingFrame - 1);
+	}
+	
 	nElapsedTime += dt;
 
 	// get bounds and rect from texture
 	sf::Vector2i textureBounds(nSprite.getTexture()->getSize());		// x and y size of the sprite
 	sf::IntRect textureRect = nSprite.getTextureRect();
 
-	// if at beginning, start at the top left of the sprite
-	if (nCurrentFrame == 0)
-		textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
-
-	// move the rect inside the sprite
-	while (nElapsedTime >= timePerFrame && (nCurrentFrame <= nNumFrames || nRepeat))
+	if (!nIsSubAnimationPlaying) 
 	{
-		// add x
-		textureRect.left += textureRect.width;
-		// if x not in bounds, go to next 'row'
-		if (textureRect.left + textureRect.width > textureBounds.x)
-		{
-			textureRect.left = 0;
-			textureRect.top += textureRect.height;	// go to next y
-		}
+		// if at beginning, start at the top left of the sprite
+		if (nCurrentFrame == 0)
+			textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
 
-		nElapsedTime -= timePerFrame;		// reset elapsed time
 
-		// if repeat, if at end of frames, go back to first
-		if (nRepeat)
+		// move the rect inside the sprite
+		while (nElapsedTime >= timePerFrame && (nCurrentFrame <= nNumFrames || nRepeat))
 		{
-			nCurrentFrame = (nCurrentFrame + 1) % nNumFrames;
 
-			// reset if at first
-			if (nCurrentFrame == 0)
-				textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
-		}
-		else
-		{
-			// add normally if not repeated
-			nCurrentFrame++;
+			// add x
+			textureRect.left += textureRect.width;
+			// if x not in bounds, go to next 'row'
+			if (textureRect.left + textureRect.width > textureBounds.x)
+			{
+				textureRect.left = 0;
+				textureRect.top += textureRect.height;	// go to next y
+			}
+
+			nElapsedTime -= timePerFrame;		// reset elapsed time
+
+			// if repeat, if at end of frames, go back to first
+			if (nRepeat)
+			{
+				nCurrentFrame = (nCurrentFrame + 1) % nNumFrames;
+
+				// reset if at first
+				if (nCurrentFrame == 0)
+					textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
+			}
+			else
+			{
+				// add normally if not repeated
+				nCurrentFrame++;
+			}
 		}
 	}
+	else if (nIsSubAnimationPlaying)
+	{
+		if (nCurrentFrame == nSubAnimations[nCurrentSubAnimationKey].startingFrame)
+		{
+			textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
 
+			int column = static_cast<int>( (nCurrentFrame - 1) % (textureBounds.x / textureRect.width));
+			int row = static_cast<int>((nCurrentFrame - 1) / (textureBounds.x / textureRect.width));
+
+			textureRect.left += textureRect.width * column;
+			textureRect.top += textureRect.height * row;
+		}
+
+		while (nElapsedTime >= timePerFrame && (nCurrentFrame <= nSubAnimations[nCurrentSubAnimationKey].endingFrame || nRepeat))
+		{
+			textureRect.left += textureRect.width;
+			if (textureRect.left + textureRect.width > textureBounds.x)
+			{
+				textureRect.left = 0;
+				textureRect.top += textureRect.height;
+			}
+
+			nElapsedTime -= timePerFrame;		
+
+			if (nRepeat)
+			{
+				nCurrentFrame = (nCurrentFrame + 1);
+				if (nCurrentFrame > nSubAnimations[nCurrentSubAnimationKey].endingFrame)
+					nCurrentFrame = nSubAnimations[nCurrentSubAnimationKey].startingFrame;
+
+				if (nCurrentFrame == nSubAnimations[nCurrentSubAnimationKey].startingFrame)
+				{
+					textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
+
+					int column = static_cast<int>((nCurrentFrame - 1) % (textureBounds.x / textureRect.width));
+					int row = static_cast<int>((nCurrentFrame - 1) / (textureBounds.x / textureRect.width));
+
+					textureRect.left += textureRect.width * column;
+					textureRect.top += textureRect.height * row;
+				}
+			}
+			else
+			{
+				nCurrentFrame++;
+
+			//	if (nCurrentFrame > nSubAnimations[nCurrentSubAnimationKey].endingFrame)
+			//		nIsSubAnimationPlaying = false;
+			}
+		}
+	}
+//	std::cout << "Out of loop\n";
 	// set the rect
 	nSprite.setTextureRect(textureRect);
 }
@@ -97,6 +190,7 @@ sf::FloatRect Animation::getGlobalBounds() const
 void Animation::restart()
 {
 	nCurrentFrame = 0;
+	nIsSubAnimationPlaying = false;
 }
 
 bool Animation::isFinished() const

@@ -64,6 +64,7 @@ void World::loadTextures()
 	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
 	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");
 
+	nTextures.load(Textures::Elesa, "Media/Characters/BW081.png");
 
 	nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
 	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
@@ -125,7 +126,7 @@ void World::buildScene()
 
 	// add the user character
 	// pass in character type and texture holder
-	std::unique_ptr<Character> main = std::make_unique<Character>(Character::DarkMagician, nTextures, nFonts);
+	std::unique_ptr<Character> main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
 	nPlayerCharacter = main.get();			// get RAW  C pointer from unique_ptr
 	nPlayerCharacter->setPosition(nSpawnPosition);			// set to spawn position
 	nPlayerCharacter->setVelocity(40.f, nScrollSpeed);		// set velocity, 40 to right and 50 up (-50.f x)
@@ -143,7 +144,7 @@ void World::buildScene()
 	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
 	nSceneGraph.attachChild(std::move(soundNode));
 	// add NPCS
-	addNPCs();
+//	addNPCs();
 }
 
 

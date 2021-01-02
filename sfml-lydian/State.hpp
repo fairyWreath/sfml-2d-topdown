@@ -7,6 +7,7 @@
 #include "StateIdentifiers.hpp"
 #include "MusicPlayer.hpp"
 #include "SoundPlayer.hpp"
+#include "TileMap.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>

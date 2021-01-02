@@ -72,7 +72,11 @@ namespace Textures
 		//Buttons,
 		Explosion,
 		Particle,
-		EndLine
+		EndLine,
+
+
+		// character animation sheets
+		Elesa,
 
 
 		// tilesets

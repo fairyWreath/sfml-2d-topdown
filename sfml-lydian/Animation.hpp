@@ -8,6 +8,8 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Time.hpp>
 
+#include <map>
+
 class Animation : public sf::Drawable, public sf::Transformable
 {
 public:
@@ -38,11 +40,29 @@ public:
 	// logic done here
 	void update(sf::Time dt);
 
+	void addSubAnimation(size_t startingFrame, size_t endingFrame, int key);
+	void playSubAnimation(int key);
+
 private:
 	// for window.draw
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+	struct SubAnimation
+	{
+		SubAnimation();
+		SubAnimation(int key, size_t startingFrame, size_t endingFrame);
+			
+		int key;
+		std::size_t startingFrame;
+		std::size_t endingFrame;
+	};
+
 private:
+	
+	std::map<int, SubAnimation> nSubAnimations;
+	int nCurrentSubAnimationKey;
+	bool nIsSubAnimationPlaying;
+
 	sf::Sprite nSprite;		// sprite for the 'current' animation
 	sf::Vector2i nFrameSize;
 	std::size_t nNumFrames;

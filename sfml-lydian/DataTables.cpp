@@ -54,6 +54,11 @@ std::vector<CharacterData> initializeCharacterData()
 	data[Character::Yotsugi].texture = Textures::Yotsugi;
 	//data[Character::Yotsugi].actionInterval = sf::seconds(3);
 
+	data[Character::Elesa].hitpoints = 250;
+	data[Character::Elesa].speed = 200.f;
+	data[Character::Elesa].texture = Textures::Elesa;
+	data[Character::Elesa].textureRect = sf::IntRect(0, 0, 68, 70);
+	data[Character::Elesa].actionInterval = sf::seconds(1);
 
 
 	return data;

@@ -43,7 +43,6 @@ void TileMap::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) con
 
 void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z)
 {
-
 	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
 	{
 		if (z <= nPtrMap[x][y].size())

@@ -3,17 +3,12 @@
 
 #include "Character.hpp"
 #include "ResourceHolder.hpp"
-#include "Category.hpp"			// return category for commands
-
+#include "Category.hpp"			
 #include "Utility.hpp"
-
 #include "DataTables.hpp"
-
 #include "Command.hpp"
 #include "CommandQueue.hpp"
-
 #include "SoundNode.hpp"
-
 #include "Powerup.hpp"
 #include "EmitterNode.hpp"
 
@@ -54,15 +49,32 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nBoostCooldown(sf::seconds(3.f)),
 	nChangeProjectileCountdown(sf::Time::Zero),
 	nExplosion(textures.get(Textures::Explosion)),
+	nCharacterAnimation(textures.get(CharacterTable[type].texture)),
 	nShowExplosion(true),
 	nPlayedExplosionSound(false),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
+	if (nType == Elesa)
+	{
+		nSprite.setTexture(textures.get(CharacterTable[type].texture));
+		nSprite.setTextureRect(CharacterTable[type].textureRect);
+	}
+
+	// set up character animation
+	nCharacterAnimation.setFrameSize(sf::Vector2i(68, 70));
+	nCharacterAnimation.setNumFrames(16);
+	nCharacterAnimation.setDuration(sf::seconds(0.5));
+	nCharacterAnimation.setRepeating(true);  
+
+	nCharacterAnimation.addSubAnimation(5, 8, 1);
+	nCharacterAnimation.playSubAnimation(1);
+
 	// set up animation here
 	nExplosion.setFrameSize(sf::Vector2i(256, 256));
 	nExplosion.setNumFrames(16);
 	nExplosion.setDuration(sf::seconds(2));
 
+	centerOrigin(nCharacterAnimation);
 	centerOrigin(nExplosion);
 	centerOrigin(nSprite);
 
@@ -227,7 +239,8 @@ void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 	if (isDestroyed() && nShowExplosion)
 		target.draw(nExplosion, states);
 	else
-		target.draw(nSprite, states);			// draw from the character sprite
+		target.draw(nCharacterAnimation, states);
+	//	target.draw(nSprite, states);			// draw from the character sprite
 }
 
 
@@ -236,7 +249,8 @@ unsigned int Character::getCategory() const
 {
 	switch (nType)
 	{
-	case (DarkMagician):					// if matches main character
+	case Elesa:
+	case DarkMagician:					// if matches main character
 		return Category::PlayerCharacter;
 	default:
 		return Category::EnemyCharacter;
@@ -266,6 +280,8 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 
 		return;
 	}
+
+	nCharacterAnimation.update(dt);
 
 	// check projectile changes
 	checkProjectileChanges(dt);
@@ -386,6 +402,7 @@ bool Character::isAllied()const
 {
 	switch (nType)
 	{
+	case Character::Elesa:
 	case Character::DarkMagician:
 		return true;
 	default:

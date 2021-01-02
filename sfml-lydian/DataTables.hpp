@@ -8,6 +8,7 @@
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
 
 #include <vector>
 #include <functional>
@@ -31,6 +32,9 @@ struct CharacterData
 	float speed;
 	Textures::ID texture;
 	sf::Time actionInterval;			// inteval to eg., shoot projectiles
+
+	// texture rect
+	sf::IntRect textureRect;
 
 	// storing directions
 	std::vector<Direction> directions;
