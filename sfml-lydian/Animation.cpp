@@ -1,4 +1,5 @@
 #include "Animation.hpp"
+#include "Utility.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -7,7 +8,7 @@
 #include <cassert>
 
 Animation::Animation() :
-	nSprite(),
+	nSprite(new sf::Sprite()),
 	nFrameSize(),
 	nNumFrames(0),
 	nCurrentFrame(0),
@@ -15,12 +16,15 @@ Animation::Animation() :
 	nElapsedTime(sf::Time::Zero),
 	nRepeat(false),
 	nIsSubAnimationPlaying(false),
-	nIsPaused(false)
+	nIsPaused(false),
+	nIsStill(false),
+	nIsPlaying(true),
+	nIsSpriteOwned(true)
 {
 }
 
 Animation::Animation(const sf::Texture& texture) :
-	nSprite(texture),
+	nSprite(new sf::Sprite(texture)),
 	nFrameSize(),
 	nNumFrames(0),
 	nCurrentFrame(0),
@@ -28,9 +32,38 @@ Animation::Animation(const sf::Texture& texture) :
 	nElapsedTime(sf::Time::Zero),
 	nRepeat(false),
 	nIsSubAnimationPlaying(false),
-	nIsPaused(false)
+	nIsPaused(false),
+	nIsStill(false),
+	nIsPlaying(true),
+	nIsSpriteOwned(true)
 {
 }
+
+Animation::Animation(const sf::Texture& texture, sf::Sprite& sprite) :
+	nSprite(&sprite),
+	nFrameSize(),
+	nNumFrames(0),
+	nCurrentFrame(0),
+	nDuration(sf::Time::Zero),
+	nElapsedTime(sf::Time::Zero),
+	nRepeat(false),
+	nIsSubAnimationPlaying(false),
+	nIsPaused(false),
+	nIsStill(false),
+	nIsPlaying(true),
+	nIsSpriteOwned(false)
+{
+	nSprite->setTextureRect(sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y));
+	centerOrigin(*nSprite);
+}
+
+Animation::~Animation()
+{
+	// crashes when inserted into std::map when new sprite is created
+	if (nIsSpriteOwned)
+		free(nSprite);
+}
+
 
 Animation::SubAnimation::SubAnimation(int key, size_t startingFrame, size_t endingFrame) :
 	key(key),
@@ -46,6 +79,8 @@ Animation::SubAnimation::SubAnimation()
 
 void Animation::addSubAnimation(size_t startingFrame, size_t endingFrame, int key)
 {
+	assert(nSubAnimations.find(key) == nSubAnimations.end());
+
 	nSubAnimations.insert({key, SubAnimation(key, startingFrame, endingFrame)});
 }
 
@@ -54,6 +89,9 @@ void Animation::playSubAnimation(int key)
 {
 	assert(nSubAnimations.find(key) != nSubAnimations.end());
 
+	if (nIsStill) nIsStill = false;
+
+	nIsPlaying = true;
 	nCurrentSubAnimationKey = key;
 	nIsSubAnimationPlaying = true;
 	
@@ -64,7 +102,7 @@ void Animation::playSubAnimation(int key)
 // main logic implemented here
 void Animation::update(sf::Time dt)
 {
-	if (isPaused()) return;
+	if (isPaused() || nIsStill) return;
 
 	// get time per frame for the whole animation
 	sf::Time timePerFrame = nDuration / static_cast<float>(nNumFrames);
@@ -72,14 +110,16 @@ void Animation::update(sf::Time dt)
 	if (nIsSubAnimationPlaying)
 	{
 		timePerFrame = nDuration / static_cast<float>(nSubAnimations[nCurrentSubAnimationKey].endingFrame
-			- nSubAnimations[nCurrentSubAnimationKey].startingFrame - 1);
+			- nSubAnimations[nCurrentSubAnimationKey].startingFrame + 1);
 	}
 	
 	nElapsedTime += dt;
 
+//	std::cout << "TIMEPERFRAME: " << timePerFrame.asSeconds() << std::endl;
+
 	// get bounds and rect from texture
-	sf::Vector2i textureBounds(nSprite.getTexture()->getSize());		// x and y size of the sprite
-	sf::IntRect textureRect = nSprite.getTextureRect();
+	sf::Vector2i textureBounds(nSprite->getTexture()->getSize());		// x and y size of the sprite
+	sf::IntRect textureRect = nSprite->getTextureRect();
 
 	if (!nIsSubAnimationPlaying) 
 	{
@@ -162,8 +202,10 @@ void Animation::update(sf::Time dt)
 			}
 			else
 				nCurrentFrame++;
-
 		}
+
+		if (nCurrentFrame > nSubAnimations[nCurrentSubAnimationKey].endingFrame)
+			nIsPlaying = false;
 	}
 
 
@@ -171,19 +213,53 @@ void Animation::update(sf::Time dt)
 	if (nCurrentFrame > nNumFrames)
 	{
 		textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
+		nIsPlaying = false;
 	}
+
 
 //	std::cout << "Current Frame: " << nCurrentFrame << std::endl;
 //	std::cout << "Current Texture Rect: " << textureRect.left << "  " << textureRect.top << std::endl;
 
-	nSprite.setTextureRect(textureRect);
+	nSprite->setTextureRect(textureRect);
 }
+
+void Animation::addStillFrame(int key, size_t frame)
+{
+	assert(nStillFrames.find(key) == nStillFrames.end());
+
+	nStillFrames.insert({ key, frame });
+}
+
+void Animation::setStillFrame(int key)
+{
+	assert(nStillFrames.find(key) != nStillFrames.end());
+
+	if (!nIsStill)	nIsStill = true;
+	
+	nIsPlaying = false;
+
+	if (nCurrentFrame == nStillFrames[key]) return;
+
+	nCurrentFrame = nStillFrames[key];
+
+	sf::Vector2i textureBounds(nSprite->getTexture()->getSize());
+	sf::IntRect textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
+
+	int column = static_cast<int>((nCurrentFrame - 1) % (textureBounds.x / textureRect.width));
+	int row = static_cast<int>((nCurrentFrame - 1) / (textureBounds.x / textureRect.width));
+
+	textureRect.left += textureRect.width * column;
+	textureRect.top += textureRect.height * row;
+	
+	nSprite->setTextureRect(textureRect);
+}
+
 
 
 void Animation::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	target.draw(nSprite, states);
+	target.draw(*nSprite, states);
 }
 
 // local bounds within the texture
@@ -201,6 +277,9 @@ void Animation::restart()
 {
 	nCurrentFrame = 0;
 	nIsSubAnimationPlaying = false;
+	nIsStill = false;
+	nIsPaused = false;
+	nIsPlaying = true;
 }
 
 bool Animation::isFinished() const
@@ -211,12 +290,12 @@ bool Animation::isFinished() const
 
 void Animation::setTexture(const sf::Texture& texture)
 {
-	nSprite.setTexture(texture);
+	nSprite->setTexture(texture);
 }
 
 const sf::Texture* Animation::getTexture() const
 {
-	return nSprite.getTexture();			// sf::Sprite getTexture() method
+	return nSprite->getTexture();			// sf::Sprite getTexture() method
 }
 
 void Animation::setFrameSize(sf::Vector2i frameSize)
@@ -224,7 +303,7 @@ void Animation::setFrameSize(sf::Vector2i frameSize)
 	nFrameSize = frameSize;
 
 	// initialize to frame 1 at start
-	nSprite.setTextureRect(sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y));
+	nSprite->setTextureRect(sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y));
 }
 
 sf::Vector2i Animation::getFrameSize() const
@@ -276,4 +355,9 @@ void Animation::resume()
 bool Animation::isPaused() const
 {
 	return nIsPaused;
+}
+
+bool Animation::isPlaying() const
+{
+	return nIsPlaying;
 }

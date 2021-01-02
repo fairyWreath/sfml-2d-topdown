@@ -49,39 +49,18 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nBoostCooldown(sf::seconds(3.f)),
 	nChangeProjectileCountdown(sf::Time::Zero),
 	nExplosion(textures.get(Textures::Explosion)),
-	nCharacterAnimation(textures.get(CharacterTable[type].texture)),
 	nShowExplosion(true),
 	nPlayedExplosionSound(false),
 	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
-	if (nType == Elesa)
-	{
-		nSprite.setTexture(textures.get(CharacterTable[type].texture));
-		nSprite.setTextureRect(CharacterTable[type].textureRect);
-	}
-
-	// set up character animation
-	nCharacterAnimation.setFrameSize(sf::Vector2i(68, 72));
-	nCharacterAnimation.setNumFrames(16);
-	nCharacterAnimation.setDuration(sf::seconds(0.5));
-	nCharacterAnimation.setRepeating(true);  
-
-	nCharacterAnimation.addSubAnimation(13, 16, 1);
-	nCharacterAnimation.playSubAnimation(1);
-
 	// set up animation here
 	nExplosion.setFrameSize(sf::Vector2i(256, 256));
 	nExplosion.setNumFrames(16);
 	nExplosion.setDuration(sf::seconds(2));
 
-	centerOrigin(nCharacterAnimation);
 	centerOrigin(nExplosion);
-	centerOrigin(nSprite);
+//	centerOrigin(nSprite);
 
-	/* align to origin/center
-	- when first added, sprite is set to corner
-	- get 4-rect bounds an move sprite to center
-	*/
 	sf::FloatRect bounds = nSprite.getLocalBounds();
 	nSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);		// divide by 2 to set to center
 
@@ -90,7 +69,6 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	std::unique_ptr<TextNode> healthDisplay = std::make_unique<TextNode>(fonts, "");
 	nHealthDisplay = healthDisplay.get();			// get raw C pointer
 	attachChild(std::move(healthDisplay));			// attach to scene graph
-
 
 	updateTexts();
 
@@ -134,24 +112,42 @@ void Character::initializeAnimationComponent()
 	switch (nType)
 	{
 	case Elesa:
-	default:
 	{
-		Animation movementAnimation(*nSprite.getTexture());
+		//  if only inserted texture crashed when map copies
+		Animation movementAnimation(*nSprite.getTexture(), nSprite);
 		movementAnimation.setFrameSize(sf::Vector2i(68, 72));
 		movementAnimation.setNumFrames(16);
-		movementAnimation.setDuration(sf::seconds(0.5));
 		movementAnimation.setRepeating(true);
+
+		// set duration based on character speed
+		// 20.f per stride
+		// 4 strides per animation
+		float stridesPerSecond = nCharacterSpeed / 35.f;
+		sf::Time animationTime = sf::seconds(4.f / stridesPerSecond);
+		movementAnimation.setDuration(animationTime);
+
 
 		movementAnimation.addSubAnimation(1, 4, 1);
 		movementAnimation.addSubAnimation(5, 8, 2);
 		movementAnimation.addSubAnimation(9, 12, 3);
 		movementAnimation.addSubAnimation(13, 16, 4);
 
+		movementAnimation.addStillFrame(1, 1);
+		movementAnimation.addStillFrame(2, 5);
+		movementAnimation.addStillFrame(3, 9);
+		movementAnimation.addStillFrame(4, 13);
+
+
+
 		nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent());
 		nAnimationComponent->addAnimation(1, movementAnimation);
-	//	nAnimationComponent->setAnimation(1);
-		nAnimationComponent->setSubAnimation(1, 1);
+		nAnimationComponent->setAnimation(1);
+	//	nAnimationComponent->setSubAnimation(1, 1);
+
+		break;
 	}
+	default:
+		break;
 	}
 }
 
@@ -162,9 +158,10 @@ void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 		target.draw(nExplosion, states);
 	else
 	{
-		nAnimationComponent->draw(target, states);
-		//	target.draw(nCharacterAnimation, states);
-			//	target.draw(nSprite, states);			// draw from the character sprite
+		if (nType == Elesa)
+			nAnimationComponent->draw(target, states);
+		else 
+			target.draw(nSprite, states);
 	}
 }
 
@@ -191,8 +188,8 @@ void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
 		return;
 	}
 
-	nAnimationComponent->update(dt);
-//	nCharacterAnimation.update(dt);
+	if (nType == Elesa)
+		nAnimationComponent->update(dt);
 
 	// check projectile changes
 	checkProjectileChanges(dt);

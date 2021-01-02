@@ -8,7 +8,8 @@ MovementComponent::MovementComponent(Entity& entity) :
 	nEntity(&entity),
 	nIsOnDirectedMovement(false),
 	nMovementSpeed(200.f),
-	nCurrentState(STATIONARY)
+	nCurrentState(STATIONARY),
+	nPreviousState(STATIONARY)
 {
 	
 }
@@ -33,9 +34,6 @@ void MovementComponent::update(sf::Time dt)
 
 	updateState();
 
-	//std::cout << "Current x: " << nEntity->getWorldPosition().x << std::endl;
-	//std::cout << "Current y: " << nEntity->getWorldPosition().y << std::endl;
-
 	nEntity->move(nEntity->getVelocity() * dt.asSeconds());
 }
 
@@ -45,19 +43,19 @@ void MovementComponent::moveToDirection(float speed, Direction direction)
 	{
 	case Right:
 		nEntity->accelerate(sf::Vector2f(+speed, 0.f));
-		nCurrentState = MOVING_RIGHT;
+		nPreviousState = MOVING_RIGHT;
 		break;
 	case Up:
 		nEntity->accelerate(sf::Vector2f(0.f, -speed));
-		nCurrentState = MOVING_UP;
+		nPreviousState = MOVING_UP;
 		break;
 	case Left:
 		nEntity->accelerate(sf::Vector2f(-speed, 0.f));
-		nCurrentState = MOVING_LEFT;
+		nPreviousState = MOVING_LEFT;
 		break;
 	case Down:
 		nEntity->accelerate(sf::Vector2f(0.f, +speed));
-		nCurrentState = MOVING_DOWN;
+		nPreviousState = MOVING_DOWN;
 		break;
 	}
 
@@ -71,25 +69,30 @@ void MovementComponent::updateState()
 
 	if (velocity.x == 0.f && velocity.y == 0.f)
 		nCurrentState = STATIONARY;
+	else if (velocity.x > 0.f && velocity.y == 0.f)
+		nCurrentState = MOVING_RIGHT;
+	else if (velocity.x == 0.f && velocity.y < 0.f)
+		nCurrentState = MOVING_UP;
+	else if (velocity.x < 0.f && velocity.y == 0.f)
+		nCurrentState = MOVING_LEFT;
+	else if (velocity.x == 0.f && velocity.y > 0.f)
+		nCurrentState = MOVING_DOWN;
+	else 
+		nCurrentState = MOVING_DIRECTED;
+
+//	std::cout << "Current State: " << nCurrentState << std::endl;
 }
 
 
 void MovementComponent::moveToLocation(float x, float y)
 {
 	nDirectedDestination = sf::Vector2f(x, y);
-
-	std::cout << "Destination X: " << nDirectedDestination.x << std::endl;
-	std::cout << "Destination y: " << nDirectedDestination.y << std::endl;
-
-
-	std::cout << "Entity category: " << nEntity->getCategory() << std::endl;
-
 	nDirectedDirection = unitVector(nDirectedDestination - nEntity->getWorldPosition());
 
 	if (!nIsOnDirectedMovement)
 		nIsOnDirectedMovement = true;
 
-	std::cout << "Heading angle: " << getDirectedAngle() << std::endl;
+	nPreviousState = MOVING_DIRECTED;
 }
 
 float MovementComponent::getDirectedAngle() const
@@ -113,6 +116,11 @@ sf::Vector2f MovementComponent::getVelocity() const
 MovementComponent::State MovementComponent::getCurrentState() const
 {
 	return nCurrentState;
+}
+
+MovementComponent::State MovementComponent::getPreviousState() const
+{
+	return nPreviousState;
 }
 
 

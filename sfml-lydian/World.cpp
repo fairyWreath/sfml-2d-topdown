@@ -26,13 +26,14 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 		0.f,	// left x position
 		0.f,	// top y position
 		nWorldView.getSize().x,	  // view/entire window width
-		nWorldView.getSize().y				//  height, for tile repeating
-	//	4000.f
+	//	nWorldView.getSize().y				//  height, for tile repeating
+		4000.f
 	),
 	nSpawnPosition(
 		nWorldView.getSize().x  / 2.f,			// middle x 
-		nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
+	//	nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
 		//nWorldBounds.height - nWorldView.getSize().y / 2.f
+		360.f
 	),
 	nNonPlayerSpawnPoints(),
 	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
@@ -144,7 +145,7 @@ void World::buildScene()
 	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
 	nSceneGraph.attachChild(std::move(soundNode));
 	// add NPCS
-//	addNPCs();
+	addNPCs();
 }
 
 

@@ -14,6 +14,8 @@ public:
 	AnimationComponent(MovementComponent& movementComponent);
 
 	virtual void addAnimation(int key, Animation animation);
+	virtual void addAnimationWithoutCenter(int key, Animation animation);
+
 	virtual void setAnimation(int key);
 	virtual void setSubAnimation(int animationKey, int subAnimationKey);
 

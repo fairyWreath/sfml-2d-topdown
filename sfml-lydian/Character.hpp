@@ -135,8 +135,6 @@ private:
 	Type nType;
 	sf::Sprite nSprite;			// store sprite type
 
-	Animation nCharacterAnimation;
-
 	// actual command code
 	Command nLaunchNormalCommand;
 	Command nLaunchSpecialCommand;
@@ -170,26 +168,18 @@ private:
 	bool nIsProjectileChanged;
 	sf::Time nChangeProjectileCountdown;		// projectile countdown
 
-	// for moving characters manually
 	float nCharacterSpeed;
 
-	// current attack type
 	AttackType nAttackType;
 
-	// current projectile type
 	Projectile::Type nCurrentProjectileType;
-
-	// command to drop current powerups from dead enemies
 	Command nDropPowerupCommand;
 
 	// for movements
-	float nTravelledDistance;		// distance already travelled in a direction
-	std::size_t nDirectionIndex;	// index to know which direction, index for direction vector
+	float nTravelledDistance;		
+	std::size_t nDirectionIndex;	
 
-	// pointers to display text
 	TextNode* nHealthDisplay;
-
-	// display amount of special atacks
 	TextNode* nSpecialAttackDisplay;
 };
 

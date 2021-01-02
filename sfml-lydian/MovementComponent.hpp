@@ -24,7 +24,7 @@ public:
 		MOVING_UP,
 		MOVING_LEFT,
 		MOVING_DOWN,
-		MOVINDG_DIRECTED
+		MOVING_DIRECTED			// with angle
 	};
 
 public:
@@ -40,6 +40,7 @@ public:
 
 	sf::Vector2f getVelocity() const;
 	State getCurrentState() const;
+	State getPreviousState() const;
 
 	// get angle of directed movement
 	float getDirectedAngle() const;
@@ -48,9 +49,10 @@ private:
 	void updateState();
 
 private:
-	Entity* nEntity;
 
+	Entity* nEntity;
 	State nCurrentState;
+	State nPreviousState;
 
 	bool nIsOnDirectedMovement;
 	sf::Vector2f nDirectedDestination;

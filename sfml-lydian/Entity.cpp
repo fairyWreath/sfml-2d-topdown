@@ -16,7 +16,7 @@ void Entity::initializeMovementComponent()
 
 void Entity::initializeAnimationComponent()
 {
-	nAnimationComponent = std::make_unique<AnimationComponent>(*nMovementComponent);
+	// let character class handle animations
 }
 
 
