@@ -83,7 +83,7 @@ bool SettingsState::handleEvent(const sf::Event& event)
 			if (event.type == sf::Event::KeyReleased)
 			{
 				// assignkeybinding in player class, based on key.code
-				getContext().player->assignKey(static_cast<Player::Action>(action), event.key.code);
+				getContext().player->assignKey(static_cast<Player::KeyboardAction>(action), event.key.code);
 				nBindingButtons[action]->deactivate();		// deactivate the button
 			}
 			break;
@@ -122,7 +122,7 @@ void SettingsState::updateLabels()
 	for (std::size_t i = 0; i < SETTINGS_COUNT; i++)
 	{
 		// get the key, changing i size_t type to enum Action type
-		sf::Keyboard::Key key = player.getAssignedKey(static_cast<Player::Action>(i));
+		sf::Keyboard::Key key = player.getAssignedKey(static_cast<Player::KeyboardAction>(i));
 		
 		// set key to string and change label
 		nBindingLabels[i]->setText(toString(key));
@@ -131,7 +131,7 @@ void SettingsState::updateLabels()
 
 
 // add button and label based on given action parameter, y param for position, string param for button text
-void SettingsState::addButtonLabel(Player::Action action, float x, float y, const std::string& text, Context context)
+void SettingsState::addButtonLabel(Player::KeyboardAction action, float x, float y, const std::string& text, Context context)
 {
 	// create button, in ths static array
 	nBindingButtons[action] = std::make_shared<GUI::Button>(context);

@@ -23,8 +23,8 @@ Application::Application() :
 	nWindow(sf::VideoMode(1280,720), "Easy Carefree Existence", sf::Style::Close),		// sf::Style::Close means window has x button to close
 	nTextures(),
 	nFonts(),
-	nPlayer(),
 	nStateStack(State::Context(nWindow, nTextures, nFonts, nPlayer, nMusicPlayer, nSoundPlayer)),		// create new state context here and pass it in
+	nPlayer(nWindow),
 	nStatisticsText(),
 	nStatisticsUpdateTime(),
 	nStatisticsNumFrames(0)
@@ -58,12 +58,7 @@ Application::Application() :
 	registerStates();
 
 	// push title state to stack
-	nStateStack.pushState(States::Title);
-
-
-
-
-	
+	nStateStack.pushState(States::Title);	
 }
 
 // main function to run game

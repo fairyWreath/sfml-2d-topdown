@@ -10,6 +10,7 @@
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/View.hpp>
 
 #include <memory>
 
@@ -44,6 +45,8 @@ public:
 		Player* player;
 		MusicPlayer* musicPlayer;
 		SoundPlayer* soundPlayer;
+
+		TileMap* tileMap;
 	};
 
 public:

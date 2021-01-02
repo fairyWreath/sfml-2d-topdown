@@ -7,8 +7,10 @@ using namespace std::placeholders;		// for std::bind
 #include <iostream>
 
 // constructor where all keybindings are set
-Player::Player() :
-	nCurrentMissionStatus(MissionRunning)
+Player::Player(sf::RenderWindow& window) :
+	nWindow(window),
+	nCurrentMissionStatus(MissionRunning),
+	nWorldView(nullptr)
 {
 	// set initial key bindings
 	nKeyBinding[sf::Keyboard::Left] = MoveLeft;
@@ -32,15 +34,15 @@ Player::Player() :
 	nKeyBinding[sf::Keyboard::Num3] = ModifyPlayerSpeed;
 	nKeyBinding[sf::Keyboard::Num4] = BoostPlayerCharacter;
 
-	// map action to commands
+	nMouseBinding[sf::Mouse::Button::Right] = MoveToLocation;
+
 	initializeActions();
 
 	// set all commands in cations to character category
-	for (auto& pair : nActionBinding)
+	for (auto& pair : nKeyboardActionBinding)
 	{
 		pair.second.category = Category::PlayerCharacter;
 	}
-
 }
 
 // handle realtime input, function is called every frame
@@ -49,14 +51,32 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 	// iteratate through keybindings, check if they are being pressed and is a realtime input
 	for (const auto& pair : nKeyBinding)		// iterate through map
 	{
-		if (sf::Keyboard::isKeyPressed(pair.first) && isRealtimeAction(pair.second))
+		if (sf::Keyboard::isKeyPressed(pair.first) && isRealtimeKeyboardAction(pair.second))
 		{
 			// push to command queue if match
-			commands.push(nActionBinding[pair.second]);			// python like access to std::map
+			commands.push(nKeyboardActionBinding[pair.second]);			// python like access to std::map
 		}
 	}
 }
 
+struct DirectedCharacterMover
+{
+	DirectedCharacterMover(sf::Vector2f destination) : destination(destination) { }
+
+	void operator() (Character& character, sf::Time) const
+	{
+		MovementComponent* component = character.getMovementComponent();
+		component->moveToLocation(destination.x, destination.y);
+	}
+
+	sf::Vector2f destination;
+};
+
+
+void Player::setWorldView(sf::View& view)
+{
+	nWorldView = &view;
+}
 
 // handle one time events
 void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
@@ -68,15 +88,31 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 		auto found = nKeyBinding.find(event.key.code);
 
 		// if found and action is event-based
-		if (found != nKeyBinding.end() && !isRealtimeAction(found->second))
-			commands.push(nActionBinding[found->second]);
+		if (found != nKeyBinding.end() && !isRealtimeKeyboardAction(found->second))
+			commands.push(nKeyboardActionBinding[found->second]);
 	}
 
+	// for mouse events
+	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
+	{
+		assert(nWorldView != nullptr);
+
+		sf::Vector2i mousePosition = sf::Mouse::getPosition(nWindow);
+		
+		/* set view again for window before getting coords */
+		nWindow.setView(*nWorldView);
+		sf::Vector2f worldPosition = nWindow.mapPixelToCoords(mousePosition);
+
+		Command command;
+		command.category = Category::PlayerCharacter;
+		command.action = derivedAction<Character>(DirectedCharacterMover(worldPosition));
+		commands.push(command);
+	}
 }
 
 
 // bind key to action
-void Player::assignKey(Action action, sf::Keyboard::Key key)
+void Player::assignKey(KeyboardAction action, sf::Keyboard::Key key)
 {
 	// remove keys that are already mapped to that action
 	for (auto itr = nKeyBinding.begin(); itr != nKeyBinding.end();)
@@ -96,7 +132,7 @@ void Player::assignKey(Action action, sf::Keyboard::Key key)
 }
 
 // get key from action
-sf::Keyboard::Key Player::getAssignedKey(Action action) const
+sf::Keyboard::Key Player::getAssignedKey(KeyboardAction action) const
 {
 	// search in keybinding
 	for (const auto& pair : nKeyBinding)
@@ -138,49 +174,49 @@ void Player::initializeActions()
 	//		}, _1));
 
 
-	nActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(MovementComponent::Left));
-	nActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(MovementComponent::Up));
-	nActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(MovementComponent::Right));
-	nActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(MovementComponent::Down));
+	nKeyboardActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(MovementComponent::Left));
+	nKeyboardActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(MovementComponent::Up));
+	nKeyboardActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(MovementComponent::Right));
+	nKeyboardActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(MovementComponent::Down));
 
 	// launching attacks
 	// action is launchnormal from character class
 	/* std::bind
 	-> binds fixed parameters to function, with _1, _2 as prams/placeholder
 	*/
-	nActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::NormalCircular));
-	nActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
+	nKeyboardActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
 
-	nActionBinding[AttackRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1, 
+	nKeyboardActionBinding[AttackRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleRight));
-	nActionBinding[AttackUpRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackUpRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUpRight));
-	nActionBinding[AttackUp].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackUp].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUp));
-	nActionBinding[AttackUpLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackUpLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleUpLeft));
-	nActionBinding[AttackLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleLeft));
-	nActionBinding[AttackDownLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackDownLeft].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDownLeft));
-	nActionBinding[AttackDown].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackDown].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDown));
-	nActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	nKeyboardActionBinding[AttackDownRight].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::SingleDownRight));
 
 
-	nActionBinding[ChangeProjectile].action = derivedAction<Character>(std::bind(&Character::changeProjectile, _1));
+	nKeyboardActionBinding[ChangeProjectile].action = derivedAction<Character>(std::bind(&Character::changeProjectile, _1));
 
-	nActionBinding[ModifyPlayerSpeed].action = derivedAction<Character>(std::bind(&Character::modifyCharacterSpeed, _1,
+	nKeyboardActionBinding[ModifyPlayerSpeed].action = derivedAction<Character>(std::bind(&Character::modifyCharacterSpeed, _1,
 		100.f));
 
-	nActionBinding[BoostPlayerCharacter].action = derivedAction<Character>(std::bind(&Character::boostCharacter, _1));
+	nKeyboardActionBinding[BoostPlayerCharacter].action = derivedAction<Character>(std::bind(&Character::boostCharacter, _1));
 }
 
 
 // get info on action for realtime or event
-bool Player::isRealtimeAction(Action action)
+bool Player::isRealtimeKeyboardAction(KeyboardAction action)
 {
 	switch (action)
 	{

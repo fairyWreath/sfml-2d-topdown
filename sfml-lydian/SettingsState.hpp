@@ -29,7 +29,7 @@ private:
 	void updateLabels();
 
 	// add button, with parameters for text and player action(keybindings), y for position
-	void addButtonLabel(Player::Action action, float x, float y, const std::string& text, Context context);
+	void addButtonLabel(Player::KeyboardAction action, float x, float y, const std::string& text, Context context);
 
 private:
 	sf::Sprite nBackgroundSprite;
@@ -37,8 +37,8 @@ private:
 
 	// fixed arrays for label and bindings, based on Player class action count
 	// std::array<typename ,size>
-	std::array<GUI::Button::Ptr, Player::ActionCount> nBindingButtons;
-	std::array<GUI::Label::Ptr, Player::ActionCount> nBindingLabels;
+	std::array<GUI::Button::Ptr, Player::KeyboardActionCount> nBindingButtons;
+	std::array<GUI::Label::Ptr, Player::KeyboardActionCount> nBindingLabels;
 
 };
 

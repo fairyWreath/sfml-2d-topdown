@@ -3,6 +3,7 @@
 #include "Projectile.hpp"
 #include "Powerup.hpp"
 #include "SoundNode.hpp"
+#include "Player.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -11,7 +12,7 @@
 #include <limits>		// std::numeric_limits
 
 // world constructor
-World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds) :
+World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds, Player& player) :
 	nTarget(outputTarget),
 	nWorldView(outputTarget.getDefaultView()),		// default window view, view covers whole window
 	nTextures(),		// set these to empty first
@@ -26,15 +27,18 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 		0.f,	// top y position
 		nWorldView.getSize().x,	  // view/entire window width
 		nWorldView.getSize().y				//  height, for tile repeating
+	//	4000.f
 	),
 	nSpawnPosition(
 		nWorldView.getSize().x  / 2.f,			// middle x 
 		nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
+		//nWorldBounds.height - nWorldView.getSize().y / 2.f
 	),
 	nNonPlayerSpawnPoints(),
 	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
 	nPlayerCharacter(nullptr),
-	nTileMap(nullptr)
+	nTileMap(nullptr),
+	nPlayer(&player)
 {
 	// create the render texture here
 	nSceneTexture.create(nTarget.getSize().x, nTarget.getSize().y);
@@ -45,6 +49,7 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 	buildScene();		// build scene graph
 
 	nWorldView.setCenter(nSpawnPosition);		// move view to correct start position
+	nPlayer->setWorldView(nWorldView);
 }
 
 
@@ -112,12 +117,8 @@ void World::buildScene()
 	sf::IntRect textureRect(nWorldBounds);				// texture rect with int coordinates, converted from worldbounds
 
 
-
-
 	texture.setRepeated(true);				// repeate texture tile
 
-	// add bacgkround sprite to the scene, with SpriteNode class
-	// pass in texture and texturerect to SpriteNode constructor
 //	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture, textureRect);	
 //	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
 //	nSceneLayers[Background]->attachChild(std::move(backgroundSprite));		// move the ptr and attach it to background layer 
@@ -142,8 +143,9 @@ void World::buildScene()
 	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
 	nSceneGraph.attachChild(std::move(soundNode));
 	// add NPCS
-//	addNPCs();
+	addNPCs();
 }
+
 
 // drawing the scene graph, expensive operation
 void World::draw()
@@ -155,11 +157,16 @@ void World::draw()
 		nSceneTexture.setView(nWorldView);
 		nSceneTexture.draw(nSceneGraph);
 		nSceneTexture.display();
-		
+
+		/* set view here to prevent flickering */
+		nSceneTexture.setView(nSceneTexture.getDefaultView());
+
 		// apply bloom effect to rendertexture and target
 		nBloomEffect.apply(nSceneTexture, nTarget);
+
+		nSceneTexture.setView(nSceneTexture.getDefaultView());
 	}
-	else		// else draw from rendertarget
+	else		
  	{
 		nTarget.setView(nWorldView);
 		nTarget.draw(nSceneGraph);
@@ -334,20 +341,20 @@ void World::addNPC(Character::Type type, float relX, float relY)		// based on ns
 void World::addNPCs()
 {
 	
-	addNPC(Character::Izuko, -400.f, -100.f);
-	addNPC(Character::Izuko, -400.f, 50.f);
-	addNPC(Character::Izuko, -400.f, 200.f);
-	
-	addNPC(Character::Shinobu, -400.f, -200.f);
-	addNPC(Character::Shinobu, -400.f, 0.f);
-	addNPC(Character::Shinobu, -400.f, 200.f);
+	//addNPC(Character::Izuko, -400.f, -100.f);
+	//addNPC(Character::Izuko, -400.f, 50.f);
+	//addNPC(Character::Izuko, -400.f, 200.f);
+	//
+	//addNPC(Character::Shinobu, -400.f, -200.f);
+	//addNPC(Character::Shinobu, -400.f, 0.f);
+	//addNPC(Character::Shinobu, -400.f, 200.f);
 
-	addNPC(Character::Hitagi, -200.f, -400.f);
-	addNPC(Character::Hitagi, 0.f, -400.f);
-	addNPC(Character::Hitagi, 200.f, -400.f);
-	
+	//addNPC(Character::Hitagi, -200.f, -400.f);
+	//addNPC(Character::Hitagi, 0.f, -400.f);
+	//addNPC(Character::Hitagi, 200.f, -400.f);
+	//
 
-	addNPC(Character::Shinobu, -200.f, 200.f);
+	//addNPC(Character::Shinobu, -200.f, 200.f);
 	 
 
 	addNPC(Character::Yotsugi, -300.f, 300.f);

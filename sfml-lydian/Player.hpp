@@ -4,6 +4,8 @@
 // player input component
 
 #include <SFML/Window/Event.hpp>		// sf::Event
+#include <SFML/Graphics/RenderWindow.hpp>
+
 
 #include "Command.hpp"
 
@@ -17,7 +19,7 @@ class Player
 {
 public:
 	// enum to represent action associated with movements, for assigning keys
-	enum Action
+	enum KeyboardAction
 	{
 		MoveLeft,
 		MoveUp,
@@ -36,12 +38,17 @@ public:
 		AttackDownRight,
 
 		ChangeProjectile,
-
 		ModifyPlayerSpeed,
-
 		BoostPlayerCharacter,
 
-		ActionCount
+		KeyboardActionCount
+	};
+
+	enum MouseAction
+	{
+		MoveToLocation,
+
+		MouseActionCount
 	};
 
 	enum MissionStatus
@@ -52,18 +59,20 @@ public:
 	};
 
 public:
-	Player();				// keybindings are set in constructor
+	Player(sf::RenderWindow& window);				// keybindings are set in constructor
 
 	/* for key bindings */
-	void assignKey(Action action, sf::Keyboard::Key key);		// assign action to key
+	void assignKey(KeyboardAction action, sf::Keyboard::Key key);		// assign action to key
 
-	sf::Keyboard::Key getAssignedKey(Action action) const;				// get key from action
+	sf::Keyboard::Key getAssignedKey(KeyboardAction action) const;				// get key from action
 
 	// hanlde on time events, pass in event and queue
 	void handleEvent(const sf::Event& event, CommandQueue& commands);
 
 	// handle realtime states, only pass in queue
 	void handleRealtimeInput(CommandQueue& commands);	
+
+	void setWorldView(sf::View& view);
 
 	// set/get missions
 	void setMissionStatus(MissionStatus status);
@@ -75,15 +84,21 @@ private:
 
 
 	// hardcoding actions for handleRealtime Input
-	static bool isRealtimeAction(Action action);			// check if action is real time or event driven
+	static bool isRealtimeKeyboardAction(KeyboardAction action);			// check if action is real time or event driven
 
 private:
 
-	std::map<sf::Keyboard::Key, Action> nKeyBinding;		// key to action map
-	std::map<Action, Command> nActionBinding;				// action to command map
+	std::map<sf::Keyboard::Key, KeyboardAction> nKeyBinding;		// key to action map
+	std::map<KeyboardAction, Command> nKeyboardActionBinding;				// action to command map
 
+	std::map<sf::Mouse::Button, MouseAction> nMouseBinding;
+	std::map<MouseAction, Command> nMouseActionBinding;
 
 	MissionStatus nCurrentMissionStatus;
+
+	sf::RenderWindow& nWindow;
+
+	sf::View* nWorldView;
 };
 
 

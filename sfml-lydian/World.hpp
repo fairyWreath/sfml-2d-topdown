@@ -13,6 +13,7 @@
 #include "BloomEffect.hpp"
 #include "SoundPlayer.hpp"
 #include "TileMap.hpp"
+#include "State.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>			// view/viewports
@@ -30,9 +31,10 @@ namespace sf
 class World : private sf::NonCopyable
 {
 public:
-	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds);			// pass in render window in constructor
-	void update(sf::Time dt);		// update scenes
-	void draw();					// draw sprites(expensive operation)
+	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds, Player& player);			
+	
+	void update(sf::Time dt);		
+	void draw();				
 
 	// acess commandqueue memory address for writing
 	CommandQueue& getCommandQueue();
@@ -130,8 +132,9 @@ private:
 	CommandQueue nCommandQueue;
 
 	SoundPlayer& nSounds;
-
 	BloomEffect nBloomEffect;
+
+	Player* nPlayer;
 };
 
 
