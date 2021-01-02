@@ -7,7 +7,8 @@
 MovementComponent::MovementComponent(Entity& entity) :
 	nEntity(&entity),
 	nIsOnDirectedMovement(false),
-	nMovementSpeed(200.f)
+	nMovementSpeed(200.f),
+	nCurrentState(STATIONARY)
 {
 	
 }
@@ -30,6 +31,7 @@ void MovementComponent::update(sf::Time dt)
 		}
 	}
 
+	updateState();
 
 	//std::cout << "Current x: " << nEntity->getWorldPosition().x << std::endl;
 	//std::cout << "Current y: " << nEntity->getWorldPosition().y << std::endl;
@@ -43,20 +45,32 @@ void MovementComponent::moveToDirection(float speed, Direction direction)
 	{
 	case Right:
 		nEntity->accelerate(sf::Vector2f(+speed, 0.f));
+		nCurrentState = MOVING_RIGHT;
 		break;
 	case Up:
 		nEntity->accelerate(sf::Vector2f(0.f, -speed));
+		nCurrentState = MOVING_UP;
 		break;
 	case Left:
 		nEntity->accelerate(sf::Vector2f(-speed, 0.f));
+		nCurrentState = MOVING_LEFT;
 		break;
 	case Down:
 		nEntity->accelerate(sf::Vector2f(0.f, +speed));
+		nCurrentState = MOVING_DOWN;
 		break;
 	}
 
 	if (nIsOnDirectedMovement)
 		nIsOnDirectedMovement = false;
+}
+
+void MovementComponent::updateState()
+{
+	sf::Vector2f velocity = nEntity->getVelocity();
+
+	if (velocity.x == 0.f && velocity.y == 0.f)
+		nCurrentState = STATIONARY;
 }
 
 
@@ -68,15 +82,37 @@ void MovementComponent::moveToLocation(float x, float y)
 	std::cout << "Destination y: " << nDirectedDestination.y << std::endl;
 
 
+	std::cout << "Entity category: " << nEntity->getCategory() << std::endl;
+
 	nDirectedDirection = unitVector(nDirectedDestination - nEntity->getWorldPosition());
 
 	if (!nIsOnDirectedMovement)
 		nIsOnDirectedMovement = true;
+
+	std::cout << "Heading angle: " << getDirectedAngle() << std::endl;
 }
 
+float MovementComponent::getDirectedAngle() const
+{
+	assert(nIsOnDirectedMovement);
+
+	return toDegree(atan2(nDirectedDirection.y * -1.f, nDirectedDirection.x));
+}
 
 void MovementComponent::setMovementSpeed(float speed)
 {
 	nMovementSpeed = speed;
 }
+
+
+sf::Vector2f MovementComponent::getVelocity() const
+{
+	return nEntity->getVelocity();
+}
+
+MovementComponent::State MovementComponent::getCurrentState() const
+{
+	return nCurrentState;
+}
+
 

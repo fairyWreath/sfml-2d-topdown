@@ -4,11 +4,21 @@
 
 Entity::Entity(int hitpoints) :
 	nVelocity(),
-	nHitpoints(hitpoints),
-	nMovementComponent()
+	nHitpoints(hitpoints)
 {
 	initializeMovementComponent();
 }
+
+void Entity::initializeMovementComponent()
+{
+	nMovementComponent = std::make_unique<MovementComponent>(*this);
+}
+
+void Entity::initializeAnimationComponent()
+{
+	nAnimationComponent = std::make_unique<AnimationComponent>(*nMovementComponent);
+}
+
 
 // functions for modifying hp
 void Entity::damage(int amount)
@@ -70,7 +80,6 @@ void Entity::accelerate(float vx, float vy)
 	nVelocity.y += vy;
 }
 
-
 void Entity::updateCurrent(sf::Time dt, CommandQueue&)
 {
 	// longer time(dt) leads to a bigger step
@@ -84,9 +93,9 @@ void Entity::remove()
 	destroy();
 }
 
-void Entity::initializeMovementComponent()
+AnimationComponent* Entity::getAnimationComponent() const
 {
-	nMovementComponent = std::make_unique<MovementComponent>(*this);
+	return nAnimationComponent.get();
 }
 
 MovementComponent* Entity::getMovementComponent() const

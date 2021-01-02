@@ -14,7 +14,8 @@ Animation::Animation() :
 	nDuration(sf::Time::Zero),
 	nElapsedTime(sf::Time::Zero),
 	nRepeat(false),
-	nIsSubAnimationPlaying(false)
+	nIsSubAnimationPlaying(false),
+	nIsPaused(false)
 {
 }
 
@@ -25,7 +26,9 @@ Animation::Animation(const sf::Texture& texture) :
 	nCurrentFrame(0),
 	nDuration(sf::Time::Zero),
 	nElapsedTime(sf::Time::Zero),
-	nRepeat(false)
+	nRepeat(false),
+	nIsSubAnimationPlaying(false),
+	nIsPaused(false)
 {
 }
 
@@ -61,6 +64,8 @@ void Animation::playSubAnimation(int key)
 // main logic implemented here
 void Animation::update(sf::Time dt)
 {
+	if (isPaused()) return;
+
 	// get time per frame for the whole animation
 	sf::Time timePerFrame = nDuration / static_cast<float>(nNumFrames);
 
@@ -156,16 +161,21 @@ void Animation::update(sf::Time dt)
 				}
 			}
 			else
-			{
 				nCurrentFrame++;
 
-			//	if (nCurrentFrame > nSubAnimations[nCurrentSubAnimationKey].endingFrame)
-			//		nIsSubAnimationPlaying = false;
-			}
 		}
 	}
-//	std::cout << "Out of loop\n";
-	// set the rect
+
+
+	/* return to previous rect, if number of frames goes over the limit */
+	if (nCurrentFrame > nNumFrames)
+	{
+		textureRect = sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y);
+	}
+
+//	std::cout << "Current Frame: " << nCurrentFrame << std::endl;
+//	std::cout << "Current Texture Rect: " << textureRect.left << "  " << textureRect.top << std::endl;
+
 	nSprite.setTextureRect(textureRect);
 }
 
@@ -212,6 +222,9 @@ const sf::Texture* Animation::getTexture() const
 void Animation::setFrameSize(sf::Vector2i frameSize)
 {
 	nFrameSize = frameSize;
+
+	// initialize to frame 1 at start
+	nSprite.setTextureRect(sf::IntRect(0, 0, nFrameSize.x, nFrameSize.y));
 }
 
 sf::Vector2i Animation::getFrameSize() const
@@ -250,3 +263,17 @@ bool Animation::isRepeating() const
 }
 
 
+void Animation::pause()
+{
+	nIsPaused = true;
+}
+
+void Animation::resume()
+{
+	nIsPaused = false;
+}
+
+bool Animation::isPaused() const
+{
+	return nIsPaused;
+}

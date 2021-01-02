@@ -9,7 +9,7 @@
 TileNode::TileNode(float gridSize) 
 {
 	nGrid.setSize(sf::Vector2f(gridSize, gridSize));
-	nGrid.setFillColor(sf::Color::Magenta);
+	nGrid.setFillColor(sf::Color::Green);
 	nGrid.setOutlineColor(sf::Color::Cyan);
 	nGrid.setOutlineThickness(2.f);
 }

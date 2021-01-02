@@ -34,6 +34,10 @@ public:
 	void restart();
 	bool isFinished() const;
 
+	void pause();
+	void resume();
+	bool isPaused() const;
+
 	sf::FloatRect getLocalBounds() const;			// to centerOrigin
 	sf::FloatRect getGlobalBounds() const;
 
@@ -42,11 +46,14 @@ public:
 
 	void addSubAnimation(size_t startingFrame, size_t endingFrame, int key);
 	void playSubAnimation(int key);
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+	void setExternalSprite(sf::Sprite&);
+
+
 
 private:
 	// for window.draw
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
 	struct SubAnimation
 	{
 		SubAnimation();
@@ -58,10 +65,13 @@ private:
 	};
 
 private:
-	
+	std::map<int, size_t> nStillFrames;
+
 	std::map<int, SubAnimation> nSubAnimations;
 	int nCurrentSubAnimationKey;
 	bool nIsSubAnimationPlaying;
+
+	bool nIsPaused;
 
 	sf::Sprite nSprite;		// sprite for the 'current' animation
 	sf::Vector2i nFrameSize;

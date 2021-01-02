@@ -11,6 +11,7 @@
 #include "CommandQueue.hpp"
 #include "Projectile.hpp"
 #include "Animation.hpp"
+#include "AnimationComponent.hpp"
 
 
 class Character : public Entity			// indirectly inherits SceneNode
@@ -24,16 +25,13 @@ public:
 		Izuko,
 		Hitagi,
 		Yotsugi,
-
 		Elesa,
-
 		TypeCount
 	};
 
 	enum AttackType
 	{
 		NormalCircular,
-
 		SingleRight,
 		SingleUpRight,
 		SingleUp,
@@ -128,7 +126,12 @@ private:
 	// playing sounds
 	void playLocalSound(CommandQueue& commands, SoundEffect::ID effect);
 
+
+protected:
+	virtual void initializeAnimationComponent();
+
 private:
+
 	Type nType;
 	sf::Sprite nSprite;			// store sprite type
 

@@ -61,12 +61,12 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	}
 
 	// set up character animation
-	nCharacterAnimation.setFrameSize(sf::Vector2i(68, 70));
+	nCharacterAnimation.setFrameSize(sf::Vector2i(68, 72));
 	nCharacterAnimation.setNumFrames(16);
 	nCharacterAnimation.setDuration(sf::seconds(0.5));
 	nCharacterAnimation.setRepeating(true);  
 
-	nCharacterAnimation.addSubAnimation(5, 8, 1);
+	nCharacterAnimation.addSubAnimation(13, 16, 1);
 	nCharacterAnimation.playSubAnimation(1);
 
 	// set up animation here
@@ -125,6 +125,90 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		nAttackType = SingleUp;
 		nCurrentProjectileType = Projectile::EnemyNormal;
 	}
+
+	initializeAnimationComponent();
+}
+
+void Character::initializeAnimationComponent()
+{
+	switch (nType)
+	{
+	case Elesa:
+	default:
+	{
+		Animation movementAnimation(*nSprite.getTexture());
+		movementAnimation.setFrameSize(sf::Vector2i(68, 72));
+		movementAnimation.setNumFrames(16);
+		movementAnimation.setDuration(sf::seconds(0.5));
+		movementAnimation.setRepeating(true);
+
+		movementAnimation.addSubAnimation(1, 4, 1);
+		movementAnimation.addSubAnimation(5, 8, 2);
+		movementAnimation.addSubAnimation(9, 12, 3);
+		movementAnimation.addSubAnimation(13, 16, 4);
+
+		nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent());
+		nAnimationComponent->addAnimation(1, movementAnimation);
+	//	nAnimationComponent->setAnimation(1);
+		nAnimationComponent->setSubAnimation(1, 1);
+	}
+	}
+}
+
+// overidden draw function
+void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	if (isDestroyed() && nShowExplosion)
+		target.draw(nExplosion, states);
+	else
+	{
+		nAnimationComponent->draw(target, states);
+		//	target.draw(nCharacterAnimation, states);
+			//	target.draw(nSprite, states);			// draw from the character sprite
+	}
+}
+
+// update for main loop
+void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
+{
+	// update text nodes
+	updateTexts();
+
+	// if destroyed, possible drop pickup
+	if (isDestroyed() && nShowExplosion)
+	{
+		checkPickupDrop(commands);
+		nExplosion.update(dt);
+
+		// play the explosion sound
+		if (!nPlayedExplosionSound)
+		{
+			SoundEffect::ID soundEffect = (randomInt(2) == 0) ? SoundEffect::Explosion1 : SoundEffect::Explosion2;
+			playLocalSound(commands, soundEffect);
+			nPlayedExplosionSound = true;
+		}
+
+		return;
+	}
+
+	nAnimationComponent->update(dt);
+//	nCharacterAnimation.update(dt);
+
+	// check projectile changes
+	checkProjectileChanges(dt);
+
+	// check if attacks are fired
+	checkProjectileLaunch(dt, commands);
+
+	// update movement
+	updateMovementPattern(dt);
+
+	// checkBoostStatus();
+	checkBoostStatus(dt);
+
+	// apply velocity, call virtual parent class function here
+	Entity::updateCurrent(dt, commands);
+
 }
 
 // creating attacks
@@ -233,16 +317,6 @@ float Character::getMaxSpeed() const
 	return CharacterTable[nType].speed;
 }
 
-// overidden draw function
-void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
-{
-	if (isDestroyed() && nShowExplosion)
-		target.draw(nExplosion, states);
-	else
-		target.draw(nCharacterAnimation, states);
-	//	target.draw(nSprite, states);			// draw from the character sprite
-}
-
 
 // override getCategory virtual function for command dispatch
 unsigned int Character::getCategory() const
@@ -255,49 +329,6 @@ unsigned int Character::getCategory() const
 	default:
 		return Category::EnemyCharacter;
 	}
-}
-
-
-// update for main loop
-void Character::updateCurrent(sf::Time dt, CommandQueue& commands)
-{
-	// update text nodes
-	updateTexts();
-
-	// if destroyed, possible drop pickup
-	if (isDestroyed() && nShowExplosion)
-	{
-		checkPickupDrop(commands);
-		nExplosion.update(dt);
-		
-		// play the explosion sound
-		if (!nPlayedExplosionSound)
-		{
-			SoundEffect::ID soundEffect = (randomInt(2) == 0) ? SoundEffect::Explosion1 : SoundEffect::Explosion2;
-			playLocalSound(commands, soundEffect);
-			nPlayedExplosionSound = true;
-		}
-
-		return;
-	}
-
-	nCharacterAnimation.update(dt);
-
-	// check projectile changes
-	checkProjectileChanges(dt);
-
-	// check if attacks are fired
-	checkProjectileLaunch(dt, commands);
-
-	// update movement
-	updateMovementPattern(dt);
-
-	// checkBoostStatus();
-	checkBoostStatus(dt);
-
-	// apply velocity, call virtual parent class function here
-	Entity::updateCurrent(dt, commands);		
-
 }
 
 void Character::boostCharacter()

@@ -5,7 +5,7 @@
 
 #include "SceneNode.hpp"
 #include "MovementComponent.hpp"
-
+#include "AnimationComponent.hpp"
 
 
 // base class for entities: game elements
@@ -38,16 +38,18 @@ public:
 	void accelerate(float vx, float vy);
 
 	MovementComponent* getMovementComponent() const;
+	AnimationComponent* getAnimationComponent() const;
 
 protected:
 	// velocity movement is done here, to be accessed by child class
-	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);			// override SceneNode update
-
 	virtual void initializeMovementComponent();
+	virtual void initializeAnimationComponent();
+
+	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);			// override SceneNode update
 
 protected:
 	std::unique_ptr<MovementComponent> nMovementComponent;
-
+	std::unique_ptr<AnimationComponent> nAnimationComponent;
 
 private:
 	// store hitpoint

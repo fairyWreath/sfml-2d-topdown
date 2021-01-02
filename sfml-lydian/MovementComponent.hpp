@@ -17,6 +17,16 @@ public:
 		Down
 	};
 
+	enum State
+	{
+		STATIONARY,
+		MOVING_RIGHT,
+		MOVING_UP,
+		MOVING_LEFT,
+		MOVING_DOWN,
+		MOVINDG_DIRECTED
+	};
+
 public:
 	MovementComponent(Entity& entity);
 
@@ -28,8 +38,19 @@ public:
 
 	void setMovementSpeed(float speed);
 
+	sf::Vector2f getVelocity() const;
+	State getCurrentState() const;
+
+	// get angle of directed movement
+	float getDirectedAngle() const;
+
+private:
+	void updateState();
+
 private:
 	Entity* nEntity;
+
+	State nCurrentState;
 
 	bool nIsOnDirectedMovement;
 	sf::Vector2f nDirectedDestination;
