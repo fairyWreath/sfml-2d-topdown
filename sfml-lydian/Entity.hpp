@@ -15,6 +15,8 @@ public:
 	// add hitpoints
 	explicit Entity(int hitpoints);
 	
+	explicit Entity(int hitpoints, MovementComponent& movement, AnimationComponent& animation);
+
 	// functions to modify hitpoints from outside
 	void heal(int amount);
 	void damage(int amount);
@@ -40,12 +42,18 @@ public:
 	MovementComponent* getMovementComponent() const;
 	AnimationComponent* getAnimationComponent() const;
 
+
+	virtual float getCharacterSpeed() const;
+//	virtual unsigned int getCategory() const;
+
 protected:
 	// velocity movement is done here, to be accessed by child class
 	virtual void initializeMovementComponent();
 	virtual void initializeAnimationComponent();
 
 	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);			// override SceneNode update
+
+	virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
 
 protected:
 	std::unique_ptr<MovementComponent> nMovementComponent;
@@ -55,6 +63,7 @@ private:
 	// store hitpoint
 	int nHitpoints;
 
+	float nSpeed;
 	sf::Vector2f nVelocity;
 
 };

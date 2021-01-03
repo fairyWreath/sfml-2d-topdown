@@ -14,6 +14,16 @@ MovementComponent::MovementComponent(Entity& entity) :
 	
 }
 
+MovementComponent::MovementComponent() :
+	nIsOnDirectedMovement(false),
+	nMovementSpeed(200.f),
+	nCurrentState(STATIONARY),
+	nPreviousState(STATIONARY),
+	nEntity(nullptr)
+{
+
+}
+
 
 void MovementComponent::update(sf::Time dt)
 {
@@ -123,4 +133,7 @@ MovementComponent::State MovementComponent::getPreviousState() const
 	return nPreviousState;
 }
 
-
+void MovementComponent::setEntity(Entity& entity)
+{
+	nEntity = &entity;
+}

@@ -29,6 +29,7 @@ public:
 
 public:
 	MovementComponent(Entity& entity);
+	MovementComponent();
 
 	// move with given player speed
 	void moveToDirection(float speed, Direction direction);
@@ -44,6 +45,9 @@ public:
 
 	// get angle of directed movement
 	float getDirectedAngle() const;
+
+	// set entity at the end
+	void setEntity(Entity& entity);
 
 private:
 	void updateState();

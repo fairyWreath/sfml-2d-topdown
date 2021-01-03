@@ -7,7 +7,6 @@
 #include "ResourceIdentifiers.hpp"	
 #include "SceneNode.hpp"				// for scene graph
 #include "SpriteNode.hpp"				// sprite scenenodes for landscape/background
-#include "Character.hpp"
 #include "Powerup.hpp"
 #include "CommandQueue.hpp"
 #include "BloomEffect.hpp"
@@ -64,8 +63,8 @@ private:
 	void spawnNonPlayerCharacters();
 
 	// adding npcs
-	void addNPC(Character::Type type, float relX, float relY);
-	void addNPCs();		// add a lot at once, hard coded
+//	void addNPC(Character::Type type, float relX, float relY);
+//	void addNPCs();		// add a lot at once, hard coded
 
 
 	// destroy entities outside the view
@@ -80,28 +79,25 @@ private:
 	sf::FloatRect getFieldBounds() const;
 
 private:
-	enum Layer					// scene layering
-	{
-		Background,				
+	enum Layer					
+	{		
 		Map,
-		LowerVoid,						// lowest layer
+		LowerVoid,						
 		LayerCount,
 	};
 
 	// structure for determining spawn points
-	struct SpawnPoint
-	{
-		// character type and location of the spawns
-		SpawnPoint(Character::Type type, float x, float y);
+	//struct SpawnPoint
+	//{
+	//	// character type and location of the spawns
+	//	SpawnPoint(Character::Type type, float x, float y);
 
-		Character::Type type;
-		float x;
-		float y;
-	};
+	//	Character::Type type;
+	//	float x;
+	//	float y;
+	//};
 
 private:
-//	sf::RenderWindow& nWindow;		// memory address of window, gained from game class later on
-	
 	sf::RenderTarget& nTarget;
 	sf::RenderTexture nSceneTexture;
 
@@ -117,18 +113,14 @@ private:
 	sf::FloatRect nWorldBounds;			// rectaungular bounds
 	sf::Vector2f nSpawnPosition;		// starting spawn position
 
-	float nScrollSpeed;					// scroll speed of moving tyle
-	Character* nPlayerCharacter;		// pointer to player character
+//	Character* nPlayerCharacter;		// pointer to player character
+	Entity* nPlayerCharacter;
 
 	TileMap* nTileMap;
 
-	// enemy spawn points
-	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
-
-	// active/alive enemis
+//	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
 	std::vector<Character*> nActiveEnemies;
 
-	// command queue to execute commands
 	CommandQueue nCommandQueue;
 
 	SoundPlayer& nSounds;

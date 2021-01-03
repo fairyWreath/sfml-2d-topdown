@@ -78,7 +78,7 @@ public:
 
 
 	// get speed for player class
-	float getCharacterSpeed();
+	virtual float getCharacterSpeed();
 
 	void modifyCharacterSpeed(float amount);
 
@@ -128,12 +128,10 @@ private:
 
 
 protected:
-	virtual void initializeAnimationComponent();
+//	virtual void initializeAnimationComponent();
 
 private:
-
 	Type nType;
-	sf::Sprite nSprite;			// store sprite type
 
 	// actual command code
 	Command nLaunchNormalCommand;

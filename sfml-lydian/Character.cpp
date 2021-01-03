@@ -50,8 +50,8 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	nChangeProjectileCountdown(sf::Time::Zero),
 	nExplosion(textures.get(Textures::Explosion)),
 	nShowExplosion(true),
-	nPlayedExplosionSound(false),
-	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
+	nPlayedExplosionSound(false)
+//	nSprite(textures.get(CharacterTable[type].texture))		// get sprite from texture id type
 {
 	// set up animation here
 	nExplosion.setFrameSize(sf::Vector2i(256, 256));
@@ -61,8 +61,8 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 	centerOrigin(nExplosion);
 //	centerOrigin(nSprite);
 
-	sf::FloatRect bounds = nSprite.getLocalBounds();
-	nSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);		// divide by 2 to set to center
+// sf::FloatRect bounds = nSprite.getLocalBounds();
+//	nSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);		// divide by 2 to set to center
 
 
 	// create ptr for text display
@@ -104,51 +104,8 @@ Character::Character(Type type, const TextureHolder& textures, const FontHolder&
 		nCurrentProjectileType = Projectile::EnemyNormal;
 	}
 
-	initializeAnimationComponent();
-}
-
-void Character::initializeAnimationComponent()
-{
-	switch (nType)
-	{
-	case Elesa:
-	{
-		//  if only inserted texture crashed when map copies
-		Animation movementAnimation(*nSprite.getTexture(), nSprite);
-		movementAnimation.setFrameSize(sf::Vector2i(68, 72));
-		movementAnimation.setNumFrames(16);
-		movementAnimation.setRepeating(true);
-
-		// set duration based on character speed
-		// 20.f per stride
-		// 4 strides per animation
-		float stridesPerSecond = nCharacterSpeed / 35.f;
-		sf::Time animationTime = sf::seconds(4.f / stridesPerSecond);
-		movementAnimation.setDuration(animationTime);
-
-
-		movementAnimation.addSubAnimation(1, 4, 1);
-		movementAnimation.addSubAnimation(5, 8, 2);
-		movementAnimation.addSubAnimation(9, 12, 3);
-		movementAnimation.addSubAnimation(13, 16, 4);
-
-		movementAnimation.addStillFrame(1, 1);
-		movementAnimation.addStillFrame(2, 5);
-		movementAnimation.addStillFrame(3, 9);
-		movementAnimation.addStillFrame(4, 13);
-
-
-
-		nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent());
-		nAnimationComponent->addAnimation(1, movementAnimation);
-		nAnimationComponent->setAnimation(1);
-	//	nAnimationComponent->setSubAnimation(1, 1);
-
-		break;
-	}
-	default:
-		break;
-	}
+//	initializeAnimationComponent();
+	nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent(), textures.get(CharacterTable[type].texture));
 }
 
 // overidden draw function
@@ -160,8 +117,8 @@ void Character::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 	{
 		if (nType == Elesa)
 			nAnimationComponent->draw(target, states);
-		else 
-			target.draw(nSprite, states);
+	//	else 
+		//	target.draw(nSprite, states);
 	}
 }
 
@@ -262,7 +219,8 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
 
 	// set offset and speed 
-	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
+	sf::Vector2f offset(xOffset * nAnimationComponent->getSpriteGlobalBounds().width, yOffset * 
+		nAnimationComponent->getSpriteGlobalBounds().height);
 	sf::Vector2f velocity(0, projectile->getMaxSpeed());
 
 	// if allied or enemy, to set direction
@@ -279,7 +237,7 @@ void Character::createProjectile(SceneNode& node, Projectile::Type type, float x
 	const TextureHolder& textures) const
 {
 	std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(type, textures);
-	sf::Vector2f offset(xOffset * nSprite.getGlobalBounds().width, yOffset * nSprite.getGlobalBounds().height);
+	sf::Vector2f offset(xOffset * nAnimationComponent->getSpriteGlobalBounds().width, yOffset * nAnimationComponent->getSpriteGlobalBounds().height);
 
 	float radians = -toRadian(angleDeg);
 	float vx = projectile->getMaxSpeed() * std::cos(radians);
@@ -411,7 +369,7 @@ void Character::updateTexts()
 // get rect from world transform + sprite
 sf::FloatRect Character::getBoundingRect() const
 {
-	return getWorldTransform().transformRect(nSprite.getGlobalBounds());
+	return getWorldTransform().transformRect(nAnimationComponent->getSpriteGlobalBounds());
 }
 
 void Character::remove()

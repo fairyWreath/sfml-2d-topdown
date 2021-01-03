@@ -36,7 +36,6 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 		360.f
 	),
 	nNonPlayerSpawnPoints(),
-	nScrollSpeed(-50.f),		// set scroll speed -50 float units 
 	nPlayerCharacter(nullptr),
 	nTileMap(nullptr),
 	nPlayer(&player)
@@ -54,10 +53,9 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 }
 
 
-// loading from textures
+// loading textures into the resource holder
 void World::loadTextures()
 {
-	// loading from textures class template, load with identifier and filepath
 	nTextures.load(Textures::Void, "Media/Textures/void.png");
 	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
@@ -75,7 +73,6 @@ void World::loadTextures()
 	nTextures.load(Textures::AlliedSingleQuick, "Media/Textures/Slim-Blue-Beam-Small.png");
 
 	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
-
 	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
 }
 
@@ -114,59 +111,47 @@ void World::buildScene()
 	}
 
 
-	// after the background is loaded, configure the tile to repeat itself
-	sf::Texture& texture = nTextures.get(Textures::Void);			// get memory address of background texture
-	sf::IntRect textureRect(nWorldBounds);				// texture rect with int coordinates, converted from worldbounds
-
-
-	texture.setRepeated(true);				// repeate texture tile
-
-//	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture, textureRect);	
-//	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
-//	nSceneLayers[Background]->attachChild(std::move(backgroundSprite));		// move the ptr and attach it to background layer 
-
-	// add the user character
-	// pass in character type and texture holder
-	std::unique_ptr<Character> main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
-	nPlayerCharacter = main.get();			// get RAW  C pointer from unique_ptr
-	nPlayerCharacter->setPosition(nSpawnPosition);			// set to spawn position
-	nPlayerCharacter->setVelocity(40.f, nScrollSpeed);		// set velocity, 40 to right and 50 up (-50.f x)
-	// add unique_ptr of the character to 2nd scene layer
-	nSceneLayers[LowerVoid]->attachChild(std::move(main));
+	//std::unique_ptr<Character> main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
+	//nPlayerCharacter = main.get();			
+	//nPlayerCharacter->setPosition(nSpawnPosition);				
+	//nSceneLayers[LowerVoid]->attachChild(std::move(main));
 	
-	// add particles
+	MovementComponent movement;
+	AnimationComponent animation(movement, nTextures.get(Textures::Elesa));
+//	Entity main(400, movement, animation);
+	auto main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
+	nPlayerCharacter = main.get();			
+	nPlayerCharacter->setPosition(nSpawnPosition);				
+	nSceneLayers[LowerVoid]->attachChild(std::move(main));
+
+
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
 
-
-	
-
-	// add sound node
 	std::unique_ptr<SoundNode> soundNode = std::make_unique<SoundNode>(nSounds);
 	nSceneGraph.attachChild(std::move(soundNode));
-	// add NPCS
-	addNPCs();
+
+//	addNPCs();
 }
 
 
-// drawing the scene graph, expensive operation
+// drawing the whole scene graph
 void World::draw()
 {
 	if (PostEffect::isSupported())
 	{
-		// draw here
 		nSceneTexture.clear();
 		nSceneTexture.setView(nWorldView);
 		nSceneTexture.draw(nSceneGraph);
 		nSceneTexture.display();
 
 		/* set view here to prevent flickering */
-		nSceneTexture.setView(nSceneTexture.getDefaultView());
+	//	nSceneTexture.setView(nSceneTexture.getDefaultView());
 
 		// apply bloom effect to rendertexture and target
 		nBloomEffect.apply(nSceneTexture, nTarget);
 
-		nSceneTexture.setView(nSceneTexture.getDefaultView());
+	//	nSceneTexture.setView(nSceneTexture.getDefaultView());
 	}
 	else		
  	{
@@ -180,44 +165,31 @@ void World::draw()
 // updating the scene graph
 void World::update(sf::Time dt)
 {
-//	 repeat the tile here, along the x axis
 //	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
-	nPlayerCharacter->setVelocity(0.f, 0.f);
+//	nPlayerCharacter->setVelocity(0.f, 0.f);
 	
 	
-	// destroy entities outside view
 	destroyEntitiesOutsideView();
-
-	// guide special attacks
 	guideSpecialAttacks();
 
 	// forward commands from queue to the scene graph
-	while (!nCommandQueue.isEmpty())			// while not empty
+	while (!nCommandQueue.isEmpty())			
 	{		
-		//std::cout << "queue size: " << nCommandQueue.nQueue.size() << std::endl;
 		nSceneGraph.onCommand(nCommandQueue.pop(), dt);			// pop form queue run command
 	}
 
+	adaptPlayerVelocity();		// slow down when in diagonal movement
+//	handleCollisions();
 
-
-	// adapt diagonal velocity
-	adaptPlayerVelocity();
-
-	handleCollisions();
-
-	// remove wrecks, starting from root scene graph
 	nSceneGraph.removeWrecks();
-
 	spawnNonPlayerCharacters();
 
 	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
-	// keep player position within view bounds
 	adaptPlayerPosition();
-
-	updateSounds();
+//	updateSounds();
 }
 
 void World::updateSounds()
@@ -238,7 +210,6 @@ void World::destroyEntitiesOutsideView()
 			if (!getFieldBounds().intersects(entity.getBoundingRect()))
 			{
 				entity.remove();
-			//	std::cout << "Entity destroyed\n";
 			}
 	});
 
@@ -253,9 +224,6 @@ CommandQueue& World::getCommandQueue()
 }
 
 
-
-// misc game logic
-
 // for diagonal movement
 void World::adaptPlayerVelocity()
 {
@@ -263,8 +231,6 @@ void World::adaptPlayerVelocity()
 
 	if (velocity.x != 0.f && velocity.y != 0.f)				// if velocity not nil
 		nPlayerCharacter->setVelocity(velocity / std::sqrt(2.f));		// get diagonal
-
-//	nPlayerCharacter->accelerate(0.f, nScrollSpeed);
 }
 
 // keep player within screen bounds
@@ -272,8 +238,7 @@ void World::adaptPlayerPosition()
 {
 	// get viewbound from world view
 	sf::FloatRect viewBounds(nWorldView.getCenter() - nWorldView.getSize() / 2.f, nWorldView.getSize());
-	const float borderDistance = 40.f;			// border distance
-
+	const float borderDistance = 50.f;			
 
 	// change character position
 	sf::Vector2f position = nPlayerCharacter->getPosition();		// get current position
@@ -291,8 +256,6 @@ World::SpawnPoint::SpawnPoint(Character::Type type, float x, float y) :
 	type(type), x(x), y(y)
 {
 }
-
-
 
 // spawn npcs
 void World::spawnNonPlayerCharacters()
@@ -436,9 +399,6 @@ void World::guideSpecialAttacks()
 }
 
 
-
-/* collisions */
-
 // check if match parameter types
 static bool matchesCategories(SceneNode::Pair& colliders, Category::Type first, Category::Type second)
 {
@@ -469,8 +429,6 @@ void World::handleCollisions()
 	// get all pairs from the main scenegraph
 	nSceneGraph.checkSceneCollision(nSceneGraph, collisionPairs);
 
-	//std::cout << "Number of collisions: " << collisionPairs.size() << "\n";
-
 	for (SceneNode::Pair pair : collisionPairs)
 	{
 		/* implemenation of matching collisions here */
@@ -478,8 +436,6 @@ void World::handleCollisions()
 		// betweenplaye and enemy character
 		if (matchesCategories(pair, Category::PlayerCharacter, Category::EnemyCharacter))
 		{
-		//	std::cout << "character collision detected\n";
-
 			auto& player = static_cast<Character&>(*pair.first);
 			auto& enemy = static_cast<Character&>(*pair.second);
 
@@ -511,11 +467,15 @@ void World::handleCollisions()
 // mission status
 bool World::hasAlivePlayer() const
 {
-	return !nPlayerCharacter->isMarkedForRemoval();
+//	return !nPlayerCharacter->isMarkedForRemoval();
+
+	return true;
 }
 
 bool World::gameReachedEnd() const
 {
 	// character within world bounds
-	return !nWorldBounds.contains(nPlayerCharacter->getPosition());
+//	return !nWorldBounds.contains(nPlayerCharacter->getPosition());
+
+	return false;
 }

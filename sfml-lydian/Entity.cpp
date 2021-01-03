@@ -1,12 +1,26 @@
 #include "Entity.hpp"
 
+#include <memory>
 #include <iostream>
 
 Entity::Entity(int hitpoints) :
 	nVelocity(),
-	nHitpoints(hitpoints)
+	nHitpoints(hitpoints),
+	nSpeed(200.f)
 {
 	initializeMovementComponent();
+	
+//	nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent(), textures.get(CharacterTable[type].texture));
+}
+
+Entity::Entity(int hitpoints, MovementComponent& movement, AnimationComponent& animation) :
+	nVelocity(),
+	nHitpoints(hitpoints),
+	nSpeed(200.f)
+{
+	nMovementComponent = std::make_unique<MovementComponent>(std::move(movement));
+	nMovementComponent->setEntity(*this);
+	nAnimationComponent = std::make_unique<AnimationComponent>(std::move(animation));
 }
 
 void Entity::initializeMovementComponent()
@@ -49,6 +63,10 @@ int Entity::getHitpoints() const
 	return nHitpoints;
 }
 
+float Entity::getCharacterSpeed() const
+{
+	return nSpeed;
+}
 
 
 // setting the velocity
@@ -80,13 +98,21 @@ void Entity::accelerate(float vx, float vy)
 	nVelocity.y += vy;
 }
 
+
+void Entity::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	nAnimationComponent->draw(target, states);
+}
+
+
 void Entity::updateCurrent(sf::Time dt, CommandQueue&)
 {
-	// longer time(dt) leads to a bigger step
-	
-	//move(nVelocity * dt.asSeconds());
+	nAnimationComponent->update(dt);
 	nMovementComponent->update(dt);
 }
+
+
+
 
 void Entity::remove()
 {

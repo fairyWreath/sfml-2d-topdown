@@ -154,6 +154,7 @@ struct CharacterMover
 	void operator() (Character& character, sf::Time) const
 	{
 		float speed = character.getCharacterSpeed();
+	//	float speed = 200.f;
 		MovementComponent* component = character.getMovementComponent();
 		component->moveToDirection(speed, direction);
 	}
