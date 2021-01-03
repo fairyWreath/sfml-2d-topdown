@@ -79,17 +79,8 @@ namespace Textures
 		Elesa,
 
 
-		// tilesets
-
-	};
-}
-
-
-namespace Tiles
-{
-	enum ID
-	{
-
+		// tilesets / tilesheets
+		Outside1
 	};
 }
 
@@ -159,6 +150,6 @@ typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;			// typedef fo
 typedef ResourceHolder<sf::Font, Fonts::ID> FontHolder;
 
 // for shader / bloom effect
- typedef ResourceHolder<sf::Shader, Shaders::ID> ShaderHolder;
+typedef ResourceHolder<sf::Shader, Shaders::ID> ShaderHolder;
 
 #endif

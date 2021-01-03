@@ -4,7 +4,7 @@ MusicPlayer::MusicPlayer()	:
 	nMusic(),
 	nFileNames(),
 	nCurrentMusic(Music::None),
-	nVolume(100.f)		// set to 100 initially
+	nVolume(60.f)		// set to 100 initially
 {
 	// mapping the music files 
 	nFileNames[Music::MainTheme] = "Media/Music/MainTheme.ogg";

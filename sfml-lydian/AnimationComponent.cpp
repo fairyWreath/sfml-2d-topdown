@@ -149,9 +149,9 @@ void AnimationComponent::initializeAnimations()
 {
 	Animation movementAnimation(*nSprite.getTexture(), nSprite);
 //	movementAnimation.setFrameSize(sf::Vector2i(85, 90));
-//	movementAnimation.setFrameSize(sf::Vector2i(68, 72));
+	movementAnimation.setFrameSize(sf::Vector2i(68, 72));
 //	movementAnimation.setFrameSize(sf::Vector2i(34, 46));
-	movementAnimation.setFrameSize(sf::Vector2i(51, 54));
+//	movementAnimation.setFrameSize(sf::Vector2i(51, 54));
 
 
 	movementAnimation.setNumFrames(16);

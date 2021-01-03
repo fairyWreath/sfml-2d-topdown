@@ -26,9 +26,9 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 	nWorldBounds(				// floatrect type
 		0.f,	// left x position
 		0.f,	// top y position
-		4000.f,	  // view/entire window width
+		400.f,	  // view/entire window width
 	//	nWorldView.getSize().y				//  height, for tile repeating
-		4000.f
+		8000.f
 	),
 	nSpawnPosition(
 	//	nWorldView.getSize().x  / 2.f,			// middle x 
@@ -48,10 +48,11 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 
 	buildMap();
 	buildScene();		// build scene graph
+	
 
 	nWorldView.setCenter(nSpawnPosition);		// move view to correct start position
 	nPlayer->setWorldView(nWorldView);
-	nWorldView.zoom(0.65f);		// initial zoom
+//	nWorldView.zoom(0.65f);		// initial zoom
 }
 
 
@@ -67,7 +68,7 @@ void World::loadTextures()
 	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");
 
 	//nTextures.load(Textures::Elesa, "Media/Characters/BW081.png");
-	nTextures.load(Textures::Elesa, "Media/Characters/Elesa-75-Resized.png");
+	nTextures.load(Textures::Elesa, "Media/Characters/Elesa.png");
 
 	nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
 	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
@@ -78,17 +79,19 @@ void World::loadTextures()
 
 	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
 	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
+
+	nTextures.load(Textures::Outside1, "Media/Tilesets/Outside-1.png");
 }
 
 void World::buildMap()
 {
-	auto map = std::make_unique<TileMap>();
+	auto map = std::make_unique<TileMap>(nTextures);
 
-	for (unsigned i = 0; i < 60 ; i++)
+	for (unsigned i = 0; i < 200 ; i++)
 	{
-		for (unsigned j = 0; j < 60; j++)
+		for (unsigned j = 0; j < 250; j++)
 		{
-			map->addTile(i, j, 0);
+	//		map->addTile(i, j, 0);
 		}
 	}
 
@@ -121,10 +124,10 @@ void World::buildScene()
 	nPlayerCharacter->setPosition(nSpawnPosition);				
 	nSceneLayers[LowerVoid]->attachChild(std::move(main));
 
-	sf::Texture& texture = nTextures.get(Textures::Void);			
+	sf::Texture& texture = nTextures.get(Textures::Outside1);			
 	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture);	
 	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
-	nSceneLayers[Map]->attachChild(std::move(backgroundSprite));
+	nSceneLayers[LowerVoid]->attachChild(std::move(backgroundSprite));
 
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
@@ -190,38 +193,39 @@ void World::updateTileMap()
 	unsigned gridSize = nTileMap->getGridSize();		// square a
 	int startX, endX, startY, endY;
 
-	int xSpan = nTarget.getSize().x / gridSize / 2 + 2;
-	int ySpan = nTarget.getSize().y / gridSize / 2 + 2;
+	int xSpan = nTarget.getSize().x / gridSize / 2 + 2;		// 42
+	int ySpan = nTarget.getSize().y / gridSize / 2 + 2;		// 13.25
 
 	// get based on view position
-	startX = nWorldView.getCenter().x / gridSize - xSpan;
-	endX = nWorldView.getCenter().x / gridSize + xSpan;
-	startY = nWorldView.getCenter().y / gridSize - ySpan;
-	endY = nWorldView.getCenter().y / gridSize + ySpan;
+	startX = (int)nWorldView.getCenter().x / gridSize - xSpan;
+	endX = (int)nWorldView.getCenter().x / gridSize + xSpan;
+	startY = (int)nWorldView.getCenter().y / gridSize - ySpan;
+	endY = (int)nWorldView.getCenter().y / gridSize + ySpan;
 
-	std::cout << "CenterXY: " << nWorldView.getCenter().x << " " << nWorldView.getCenter().y << std::endl;
+//	std::cout << "CenterXY: " << nWorldView.getCenter().x << " " << nWorldView.getCenter().y << std::endl;
 
-	int mapSize = nTileMap->getMapSize().x;			// square does not matter
+	int mapSizeX = nTileMap->getMapSize().x;			// square does not matter
+	int mapSizeY = nTileMap->getMapSize().y;
 
 	if (startX < 0)
 		startX = 0;
-	else if (startX >= mapSize)
-		startX = mapSize - 1;
+	else if (startX >= mapSizeX)
+		startX = mapSizeX - 1;
 
 	if (endX < 0)
 		endX = 0;
-	else if (endX >= mapSize)
-		endX = mapSize - 1;
+	else if (endX >= mapSizeX)
+		endX = mapSizeX - 1;
 
 	if (startY < 0)
 		startY = 0;
-	else if (startY >= mapSize)
-		startY = mapSize - 1;
+	else if (startY >= mapSizeY)
+		startY = mapSizeY - 1;
 
 	if (endY < 0)
 		endY = 0;
-	else if (endY >= mapSize)
-		endY = mapSize - 1;
+	else if (endY >= mapSizeY)
+		endY = mapSizeY - 1;
 
 	nTileMap->setRenderLimit(startX, endX, startY, endY);
 }

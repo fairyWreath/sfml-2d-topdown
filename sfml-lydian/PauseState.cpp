@@ -26,7 +26,7 @@ PauseState::PauseState(StateStack& stack, Context context) :
 	nPausedText.setCharacterSize(70);
 	nPausedText.setFillColor(sf::Color(164, 231, 223));
 	centerOrigin(nPausedText);
-	nPausedText.setPosition(0.5f * viewSize.x, 0.4f * viewSize.y - 50.f);
+	nPausedText.setPosition(0.48f * context.window->getSize().x, 0.35f * context.window->getSize().y);
 
 
 	// windowsize from texture, convert from Vector2u to Vector2f

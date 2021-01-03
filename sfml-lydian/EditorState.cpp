@@ -1,11 +1,14 @@
 #include "EditorState.hpp"
 #include "World.hpp"
 #include "Player.hpp"
+#include "Utility.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <iostream>
 #include <memory>
+
+using namespace std::placeholders;
 
 EditorState::EditorState(StateStack& stack, Context context) :
 	State(stack, context),
@@ -23,6 +26,13 @@ EditorState::EditorState(StateStack& stack, Context context) :
 	nGridSelector.setFillColor(sf::Color::Transparent);
 	nGridSelector.setOutlineThickness(1.5f);
 	nGridSelector.setOutlineColor(sf::Color::Magenta);
+
+	nMousePosViewText.setFont(context.fonts->get(Fonts::Main));
+	nMousePosViewText.setString("");
+	nMousePosViewText.setCharacterSize(12);
+	nMousePosViewText.setFillColor(sf::Color::Magenta);
+//	centerOrigin(nMousePosViewText);
+	nMousePosViewText.setPosition(0.f, 0.f);
 }
 
 void EditorState::draw()
@@ -31,12 +41,15 @@ void EditorState::draw()
 
 	// draw the grid selector above the world
 	nWindow.draw(nGridSelector);
+	nWindow.draw(nMousePosViewText);
 
 //	nWindow.setView(nWindow.getDefaultView());
 }
 
 bool EditorState::update(sf::Time dt)
 {
+	updateMouseText();
+
 	handleRealtimeInput(dt);
 
 	nWorld->update(dt);
@@ -46,6 +59,22 @@ bool EditorState::update(sf::Time dt)
 	nPlayer->handleRealtimeInput(commands);
 
 	return true;
+}
+
+void EditorState::updateMouseText()
+{
+	sf::Vector2i mousePosition = sf::Mouse::getPosition(nWindow);
+	nWindow.setView(*nWorldView);
+	sf::Vector2f worldPosition = nWindow.mapPixelToCoords(mousePosition);
+	nMousePosViewText.setPosition((float)worldPosition.x, (float)worldPosition.y + 25);
+
+	std::string text = std::to_string((int)worldPosition.x) + ", " + std::to_string((int)worldPosition.y);
+	nMousePosViewText.setString(text);
+}
+
+void EditorState::initializeActions()
+{
+	
 }
 
 void EditorState::handleRealtimeInput(sf::Time dt)
@@ -114,11 +143,8 @@ bool EditorState::handleEvent(const sf::Event& event)
 
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 	{
-	//	requestStateClear();
-	//	requestStackPush(States::Menu);
 		requestStackPush(States::Pause);
 	}
-
 
 	// always update?
 	if (event.type == sf::Event::MouseMoved || true)
@@ -143,7 +169,12 @@ bool EditorState::handleEvent(const sf::Event& event)
 		nGridSelector.setPosition((float)mousePosGrid.x * gridSize, (float)mousePosGrid.y * gridSize);
 
 		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+		{
 			nTileMap->addTile(mousePosGrid.x, mousePosGrid.y, 0);
+			std::cout << "Grid Pos: " << mousePosGrid.x << " " << mousePosGrid.y << std::endl;
+		}
+		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
+			nTileMap->removeTile(mousePosGrid.x, mousePosGrid.y, 0);
 	}
 
 	// mouse zoom in and zoom out

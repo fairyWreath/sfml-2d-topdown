@@ -1,9 +1,11 @@
 #include "TileMap.hpp"
+#include "TileIdentifiers.hpp"
 
 #include <iostream>
 
-TileMap::TileMap() :
+TileMap::TileMap(TextureHolder& textures) :
 	SceneNode(Category::None),
+	nTextures(textures),
 	nGridSizeF(32.f),
 	nGridSizeU(),
 	nNumLayers(1),
@@ -14,21 +16,24 @@ TileMap::TileMap() :
 {
 	nGridSizeU = static_cast<unsigned>(nGridSizeF);
 
-	nMaxSize.x = 60;
-	nMaxSize.y = 60;
+	nMaxSize.x = 200;
+	nMaxSize.y = 250;			//8000.f
 
-	for (size_t i = 0; i < nMaxSize.x; i++)
+	nPtrMap.resize(nMaxSize.x);
+
+	for (size_t j = 0; j < nMaxSize.x; j++)
+	{
+		nPtrMap[j].resize(nMaxSize.y);
+	}
+
+	/*for (size_t i = 0; i < nMaxSize.x; i++)
 	{
 		nPtrMap.push_back(std::vector<std::vector<TilePtr>>());
 		for (size_t j = 0; j < nMaxSize.y; j++)
 		{
 			nPtrMap[i].push_back(std::vector<TilePtr>());
-			/*for (size_t k = 0; k < nNumLayers; k++)
-			{
-				nMap[i][j].push_back(Tile(nGridSizeF, i * nGridSizeF, j * nGridSizeF));
-			}*/
 		}
-	}
+	}*/
 }
 
 unsigned int TileMap::getGridSize() const
@@ -38,24 +43,14 @@ unsigned int TileMap::getGridSize() const
 
 void TileMap::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	//for (auto& x : nPtrMap)
-	//{
-	//	for (auto& y : x)
-	//	{
-	//		for (auto& z : y)
-	//		{
-	//			z->drawCurrent(target, states);
-	//		}
-	//	}
-	//}
-
 	for (int x = nStartX; x < nEndX; x++)
 	{
 		for (int y = nStartY ; y < nEndY; y++)
 		{
 			for (auto& z : nPtrMap[x][y])
 			{
-				z->drawCurrent(target, states);
+				if (z != nullptr)
+					z->drawCurrent(target, states);
 			}
 		}
 	}
@@ -65,12 +60,25 @@ void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z)
 {
 	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
 	{
+	//	std::cout << "Can add\n";
 		if (nPtrMap[x][y].size() == 0)		// add if zero
 		{
-			auto tile = std::make_unique<TileNode>(nGridSizeF);
+			auto tile = std::make_unique<TileNode>(Tiles::Concrete1, nGridSizeF, nTextures);
 			tile->setPosition(x * nGridSizeF, y * nGridSizeF);
 			nPtrMap[x][y].push_back(std::move(tile));
-			std::cout << "Tile added\n";
+	//		std::cout << "Tile added\n";
+		}
+	}
+}
+
+void TileMap::removeTile(const unsigned x, const unsigned y, const unsigned z)
+{
+	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
+	{
+		if (nPtrMap[x][y].size() > z && nPtrMap[x][y][z] != nullptr)
+		{
+		//	nPtrMap[x][y][z].reset(nullptr);
+			nPtrMap[x][y].pop_back();
 		}
 	}
 }

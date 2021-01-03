@@ -17,7 +17,7 @@ namespace
 SoundPlayer::SoundPlayer() :
 	nSoundBuffers(),
 	nSounds(),
-	nVolume(100.f)
+	nVolume(60.f)
 {
 	// loading from the files
 	nSoundBuffers.load(SoundEffect::ButtonSelect, "Media/Sound/ButtonSelect.wav");

@@ -3,6 +3,7 @@
 
 #include "SceneNode.hpp"
 #include "TileNode.hpp"
+#include "ResourceIdentifiers.hpp"
 
 #include <array>
 
@@ -12,11 +13,12 @@ public:
 	typedef std::unique_ptr<TileNode> TilePtr;
 
 public:
-	explicit TileMap();
+	explicit TileMap(TextureHolder& textures);
 
 	unsigned int getGridSize() const;
 
 	void addTile(const unsigned x, const unsigned y, const unsigned z);
+	void removeTile(const unsigned x, const unsigned y, const unsigned z);
 
 	sf::Vector2u getMapSize() const;
 
@@ -43,6 +45,8 @@ private:
 	int nEndX;
 	int nStartY;
 	int nEndY;
+
+	TextureHolder& nTextures;
 
 	std::vector<std::vector<std::vector<TilePtr>>> nPtrMap;
 	sf::Vector2u nMaxSize;		// max x y size
