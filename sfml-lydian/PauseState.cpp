@@ -86,7 +86,7 @@ PauseState::~PauseState()
 	// getContext().musicPlayer->setPaused(false);
 	
 	// play when returning to game
-	getContext().musicPlayer->play(Music::MissionTheme);		// play pause theme
+	getContext().musicPlayer->play(nPreviousMusic);		// play pause theme
 	getContext().musicPlayer->setCurrentMusicOffset(nPreviousMusicOffset);
 }
 

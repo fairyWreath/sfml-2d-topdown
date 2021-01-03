@@ -43,6 +43,7 @@ public:
 	bool hasAlivePlayer() const;
 	bool gameReachedEnd() const;
 
+	TileMap* getTileMap();
 	sf::View* getWorldView();
 
 private:
@@ -56,6 +57,8 @@ private:
 	void adaptPlayerVelocity();			// adapt player velocity for eg.diagonal movements
 	void adaptPlayerPosition();			// keep player within screen bounds
 
+	// limit tilemap
+	void updateTileMap();
 
 	// collisions
 	void handleCollisions();

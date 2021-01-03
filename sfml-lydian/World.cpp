@@ -51,6 +51,7 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 
 	nWorldView.setCenter(nSpawnPosition);		// move view to correct start position
 	nPlayer->setWorldView(nWorldView);
+	nWorldView.zoom(0.65f);		// initial zoom
 }
 
 
@@ -83,14 +84,15 @@ void World::buildMap()
 {
 	auto map = std::make_unique<TileMap>();
 
-	for (unsigned i = 0; i < 16 ; i++)
+	for (unsigned i = 0; i < 60 ; i++)
 	{
-		for (unsigned j = 0; j < 9; j++)
+		for (unsigned j = 0; j < 60; j++)
 		{
 			map->addTile(i, j, 0);
 		}
 	}
 
+	nTileMap = map.get();
 	nSceneLayers[Map] = map.get();
 	nSceneGraph.attachChild(std::move(map));
 }
@@ -120,8 +122,6 @@ void World::buildScene()
 	nSceneLayers[LowerVoid]->attachChild(std::move(main));
 
 	sf::Texture& texture = nTextures.get(Textures::Void);			
-	//sf::IntRect textureRect();				
-	//texture.setRepeated(true);
 	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture);	
 	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
 	nSceneLayers[Map]->attachChild(std::move(backgroundSprite));
@@ -139,7 +139,7 @@ void World::buildScene()
 // drawing the whole scene graph
 void World::draw()
 {
-	if (PostEffect::isSupported())
+	if (!PostEffect::isSupported())
 	{
 		nSceneTexture.clear();
 		nSceneTexture.setView(nWorldView);
@@ -159,11 +159,9 @@ void World::draw()
 // updating the scene graph
 void World::update(sf::Time dt)
 {
-//	nWorldView.move(0.f, 50.f * dt.asSeconds());		// move the view
-
-	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
 	
+	updateTileMap();
 	
 	destroyEntitiesOutsideView();
 	guideSpecialAttacks();
@@ -182,13 +180,59 @@ void World::update(sf::Time dt)
 
 	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
-	adaptPlayerPosition();
+//	adaptPlayerPosition();
 	updateSounds();
+}
+
+void World::updateTileMap()
+{
+	// limit based on current center view
+	unsigned gridSize = nTileMap->getGridSize();		// square a
+	int startX, endX, startY, endY;
+
+	int xSpan = nTarget.getSize().x / gridSize / 2 + 2;
+	int ySpan = nTarget.getSize().y / gridSize / 2 + 2;
+
+	// get based on view position
+	startX = nWorldView.getCenter().x / gridSize - xSpan;
+	endX = nWorldView.getCenter().x / gridSize + xSpan;
+	startY = nWorldView.getCenter().y / gridSize - ySpan;
+	endY = nWorldView.getCenter().y / gridSize + ySpan;
+
+	std::cout << "CenterXY: " << nWorldView.getCenter().x << " " << nWorldView.getCenter().y << std::endl;
+
+	int mapSize = nTileMap->getMapSize().x;			// square does not matter
+
+	if (startX < 0)
+		startX = 0;
+	else if (startX >= mapSize)
+		startX = mapSize - 1;
+
+	if (endX < 0)
+		endX = 0;
+	else if (endX >= mapSize)
+		endX = mapSize - 1;
+
+	if (startY < 0)
+		startY = 0;
+	else if (startY >= mapSize)
+		startY = mapSize - 1;
+
+	if (endY < 0)
+		endY = 0;
+	else if (endY >= mapSize)
+		endY = mapSize - 1;
+
+	nTileMap->setRenderLimit(startX, endX, startY, endY);
 }
 
 sf::View* World::getWorldView()
 {
 	return &nWorldView;
+}
+TileMap* World::getTileMap()
+{
+	return nTileMap;
 }
 
 void World::updateSounds()

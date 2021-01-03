@@ -12,17 +12,27 @@ EditorState::EditorState(StateStack& stack, Context context) :
 	nWorld(context.world),
 	nWindow(*context.window),
 	nPlayer(context.player),
+	nTileMap(context.world->getTileMap()),
 	nScrollSpeed(400.f),
 	nZoomSpeed(0.8f),
-	nBackgroundSprite(),
 	nWorldView(nWorld->getWorldView())
 {
 	context.musicPlayer->play(Music::SecondaryTheme);
+
+	nGridSelector.setSize(sf::Vector2f((float)nTileMap->getGridSize(), (float)nTileMap->getGridSize()));
+	nGridSelector.setFillColor(sf::Color::Transparent);
+	nGridSelector.setOutlineThickness(1.5f);
+	nGridSelector.setOutlineColor(sf::Color::Magenta);
 }
 
 void EditorState::draw()
 {
 	nWorld->draw();
+
+	// draw the grid selector above the world
+	nWindow.draw(nGridSelector);
+
+//	nWindow.setView(nWindow.getDefaultView());
 }
 
 bool EditorState::update(sf::Time dt)
@@ -109,16 +119,31 @@ bool EditorState::handleEvent(const sf::Event& event)
 		requestStackPush(States::Pause);
 	}
 
-	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+
+	// always update?
+	if (event.type == sf::Event::MouseMoved || true)
 	{
 		sf::Vector2i mousePosition = sf::Mouse::getPosition(nWindow);
 
 		/* set view again for window before getting coords */
 		nWindow.setView(*nWorldView);
 		sf::Vector2f worldPosition = nWindow.mapPixelToCoords(mousePosition);
+	
+		// based on grid
+		sf::Vector2u mousePosGrid;
+		
+		unsigned gridSize = nTileMap->getGridSize();
 
-//		std::cout << "Coord X: " << worldPosition.x << std::endl;
-//		std::cout << "Coord Y: " << worldPosition.y << std::endl;
+		if (worldPosition.x >= 0.f)
+			mousePosGrid.x = (unsigned)worldPosition.x / nTileMap->getGridSize();
+		if (worldPosition.y >= 0.f)
+			mousePosGrid.y = (unsigned)worldPosition.y / nTileMap->getGridSize();
+	
+		// set tile position
+		nGridSelector.setPosition((float)mousePosGrid.x * gridSize, (float)mousePosGrid.y * gridSize);
+
+		if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+			nTileMap->addTile(mousePosGrid.x, mousePosGrid.y, 0);
 	}
 
 	// mouse zoom in and zoom out
@@ -131,7 +156,7 @@ bool EditorState::handleEvent(const sf::Event& event)
 	}
 
 
-//	nGUIContainer.handleEvent(event);
+	nGUIContainer.handleEvent(event);
 
 	return true;
 }

@@ -21,13 +21,16 @@ public:
 	void handleRealtimeInput(sf::Time dt);
 
 private:
-	// sfml members
-	sf::Sprite nBackgroundSprite;
-
 	sf::RenderWindow& nWindow;
+
+	// grid selector
+	sf::RectangleShape nGridSelector;
+
+	// change to object references later maybe?
 	World* nWorld;
 	sf::View* nWorldView;		// to move around the world
-	
+	TileMap* nTileMap;
+
 	Player* nPlayer;
 
 	float nScrollSpeed;

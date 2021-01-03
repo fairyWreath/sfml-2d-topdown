@@ -14,7 +14,14 @@ public:
 public:
 	explicit TileMap();
 
+	unsigned int getGridSize() const;
+
 	void addTile(const unsigned x, const unsigned y, const unsigned z);
+
+	sf::Vector2u getMapSize() const;
+
+	// limit current x y indexes
+	void setRenderLimit(int startX, int endX, int startY, int endY);
 
 public:
 	enum Layers
@@ -31,9 +38,13 @@ private:
 private:
 //	std::array<SceneNode*, LayerCount> nMapLayers;
 
+	// limit current drawn
+	int nStartX;
+	int nEndX;
+	int nStartY;
+	int nEndY;
+
 	std::vector<std::vector<std::vector<TilePtr>>> nPtrMap;
-
-
 	sf::Vector2u nMaxSize;		// max x y size
 	unsigned nGridSizeU;
 	float nGridSizeF;
