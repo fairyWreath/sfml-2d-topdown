@@ -13,6 +13,7 @@
 #include "SoundPlayer.hpp"
 #include "TileMap.hpp"
 #include "State.hpp"
+#include "Character.hpp"
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/View.hpp>			// view/viewports
@@ -63,8 +64,8 @@ private:
 	void spawnNonPlayerCharacters();
 
 	// adding npcs
-//	void addNPC(Character::Type type, float relX, float relY);
-//	void addNPCs();		// add a lot at once, hard coded
+	void addNPC(Character::Type type, float relX, float relY);
+	void addNPCs();		// add a lot at once, hard coded
 
 
 	// destroy entities outside the view
@@ -87,15 +88,15 @@ private:
 	};
 
 	// structure for determining spawn points
-	//struct SpawnPoint
-	//{
-	//	// character type and location of the spawns
-	//	SpawnPoint(Character::Type type, float x, float y);
+	struct SpawnPoint
+	{
+		// character type and location of the spawns
+		SpawnPoint(Character::Type type, float x, float y);
 
-	//	Character::Type type;
-	//	float x;
-	//	float y;
-	//};
+		Character::Type type;
+		float x;
+		float y;
+	};
 
 private:
 	sf::RenderTarget& nTarget;
@@ -118,7 +119,7 @@ private:
 
 	TileMap* nTileMap;
 
-//	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
+	std::vector<SpawnPoint> nNonPlayerSpawnPoints;
 	std::vector<Character*> nActiveEnemies;
 
 	CommandQueue nCommandQueue;

@@ -12,7 +12,7 @@ class AnimationComponent
 public:
 	AnimationComponent(MovementComponent& movementComponent);
 	AnimationComponent(MovementComponent& movementComponent, const sf::Texture& texture);		// single texture
-	AnimationComponent(MovementComponent& movementComponent, const TextureHolder& textures);	// multiple textures
+//	AnimationComponent(MovementComponent& movementComponent, const TextureHolder& textures);	// multiple textures
 
 
 	virtual void addAnimation(int key, Animation animation);

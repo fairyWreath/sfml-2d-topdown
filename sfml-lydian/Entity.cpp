@@ -13,14 +13,15 @@ Entity::Entity(int hitpoints) :
 //	nAnimationComponent = std::make_unique<AnimationComponent>(*getMovementComponent(), textures.get(CharacterTable[type].texture));
 }
 
-Entity::Entity(int hitpoints, MovementComponent& movement, AnimationComponent& animation) :
+Entity::Entity(int hitpoints, std::unique_ptr<MovementComponent> movement,
+	std::unique_ptr<AnimationComponent> animation) :
 	nVelocity(),
 	nHitpoints(hitpoints),
 	nSpeed(200.f)
 {
-	nMovementComponent = std::make_unique<MovementComponent>(std::move(movement));
+	nMovementComponent = std::move(movement);
 	nMovementComponent->setEntity(*this);
-	nAnimationComponent = std::make_unique<AnimationComponent>(std::move(animation));
+	nAnimationComponent = std::move(animation);	
 }
 
 void Entity::initializeMovementComponent()
@@ -111,7 +112,10 @@ void Entity::updateCurrent(sf::Time dt, CommandQueue&)
 	nMovementComponent->update(dt);
 }
 
-
+unsigned int Entity::getCategory() const
+{
+	return Category::PlayerCharacter;
+}
 
 
 void Entity::remove()

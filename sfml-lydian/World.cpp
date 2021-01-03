@@ -35,7 +35,7 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 		//nWorldBounds.height - nWorldView.getSize().y / 2.f
 		360.f
 	),
-	nNonPlayerSpawnPoints(),
+//	nNonPlayerSpawnPoints(),
 	nPlayerCharacter(nullptr),
 	nTileMap(nullptr),
 	nPlayer(&player)
@@ -116,10 +116,15 @@ void World::buildScene()
 	//nPlayerCharacter->setPosition(nSpawnPosition);				
 	//nSceneLayers[LowerVoid]->attachChild(std::move(main));
 	
-	MovementComponent movement;
-	AnimationComponent animation(movement, nTextures.get(Textures::Elesa));
+//	MovementComponent movement;
+//	AnimationComponent animation(movement, nTextures.get(Textures::Elesa));
 //	Entity main(400, movement, animation);
-	auto main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
+//	auto main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
+	
+	auto movement = std::make_unique<MovementComponent>();
+	auto animation = std::make_unique<AnimationComponent>(*movement, nTextures.get(Textures::Elesa));
+
+	auto main = std::make_unique<Entity>(400, std::move(movement), std::move(animation));
 	nPlayerCharacter = main.get();			
 	nPlayerCharacter->setPosition(nSpawnPosition);				
 	nSceneLayers[LowerVoid]->attachChild(std::move(main));
@@ -168,7 +173,7 @@ void World::update(sf::Time dt)
 //	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
-//	nPlayerCharacter->setVelocity(0.f, 0.f);
+	nPlayerCharacter->setVelocity(0.f, 0.f);
 	
 	
 	destroyEntitiesOutsideView();

@@ -15,7 +15,8 @@ public:
 	// add hitpoints
 	explicit Entity(int hitpoints);
 	
-	explicit Entity(int hitpoints, MovementComponent& movement, AnimationComponent& animation);
+	explicit Entity(int hitpoints, std::unique_ptr<MovementComponent> movement, 
+		std::unique_ptr<AnimationComponent> animation);
 
 	// functions to modify hitpoints from outside
 	void heal(int amount);
@@ -44,7 +45,7 @@ public:
 
 
 	virtual float getCharacterSpeed() const;
-//	virtual unsigned int getCategory() const;
+	virtual unsigned int getCategory() const;
 
 protected:
 	// velocity movement is done here, to be accessed by child class
