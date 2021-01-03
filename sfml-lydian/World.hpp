@@ -43,6 +43,8 @@ public:
 	bool hasAlivePlayer() const;
 	bool gameReachedEnd() const;
 
+	sf::View* getWorldView();
+
 private:
 	void loadTextures();		// load textures/sprites from resourceholder
 	void buildScene();			// draw the scenes

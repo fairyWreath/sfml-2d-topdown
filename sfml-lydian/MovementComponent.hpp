@@ -38,6 +38,7 @@ public:
 	void update(sf::Time dt);
 
 	void setMovementSpeed(float speed);
+	float getMovementSpeed() const;
 
 	sf::Vector2f getVelocity() const;
 	State getCurrentState() const;

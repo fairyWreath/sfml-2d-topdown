@@ -12,7 +12,7 @@ public:
 	typedef std::unique_ptr<TileNode> TilePtr;
 
 public:
-	TileMap();
+	explicit TileMap();
 
 	void addTile(const unsigned x, const unsigned y, const unsigned z);
 

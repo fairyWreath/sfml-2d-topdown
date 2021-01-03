@@ -59,13 +59,13 @@ void Player::handleRealtimeInput(CommandQueue& commands)
 	}
 }
 
-struct DirectedCharacterMover
+struct DirectedEntityMover
 {
-	DirectedCharacterMover(sf::Vector2f destination) : destination(destination) { }
+	DirectedEntityMover(sf::Vector2f destination) : destination(destination) { }
 
-	void operator() (Character& character, sf::Time) const
+	void operator() (Entity& entity, sf::Time) const
 	{
-		MovementComponent* component = character.getMovementComponent();
+		MovementComponent* component = entity.getMovementComponent();
 		component->moveToLocation(destination.x, destination.y);
 	}
 
@@ -105,7 +105,7 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 
 		Command command;
 		command.category = Category::PlayerCharacter;
-		command.action = derivedAction<Character>(DirectedCharacterMover(worldPosition));
+		command.action = derivedAction<Entity>(DirectedEntityMover(worldPosition));
 		commands.push(command);
 	}
 }
@@ -147,13 +147,13 @@ sf::Keyboard::Key Player::getAssignedKey(KeyboardAction action) const
 
 
 // functor
-struct CharacterMover
+struct EntityMover
 {
-	CharacterMover(MovementComponent::Direction direction) : direction(direction) { }
+	EntityMover(MovementComponent::Direction direction) : direction(direction) { }
 
-	void operator() (Character& character, sf::Time) const
+	void operator() (Entity& character, sf::Time) const
 	{
-		float speed = character.getCharacterSpeed();
+		float speed = character.getEntitySpeed();
 	//	float speed = 200.f;
 		MovementComponent* component = character.getMovementComponent();
 		component->moveToDirection(speed, direction);
@@ -175,17 +175,17 @@ void Player::initializeActions()
 	//		}, _1));
 
 
-	nKeyboardActionBinding[MoveLeft].action = derivedAction<Character>(CharacterMover(MovementComponent::Left));
-	nKeyboardActionBinding[MoveUp].action = derivedAction<Character>(CharacterMover(MovementComponent::Up));
-	nKeyboardActionBinding[MoveRight].action = derivedAction<Character>(CharacterMover(MovementComponent::Right));
-	nKeyboardActionBinding[MoveDown].action = derivedAction<Character>(CharacterMover(MovementComponent::Down));
+	nKeyboardActionBinding[MoveLeft].action = derivedAction<Entity>(EntityMover(MovementComponent::Left));
+	nKeyboardActionBinding[MoveUp].action = derivedAction<Entity>(EntityMover(MovementComponent::Up));
+	nKeyboardActionBinding[MoveRight].action = derivedAction<Entity>(EntityMover(MovementComponent::Right));
+	nKeyboardActionBinding[MoveDown].action = derivedAction<Entity>(EntityMover(MovementComponent::Down));
 
 	// launching attacks
 	// action is launchnormal from character class
 	/* std::bind
 	-> binds fixed parameters to function, with _1, _2 as prams/placeholder
 	*/
-	nKeyboardActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
+	/*nKeyboardActionBinding[LaunchNormal].action = derivedAction<Character>(std::bind(&Character::launchNormalWithType, _1,
 		Character::AttackType::NormalCircular));
 	nKeyboardActionBinding[LaunchSpecial].action = derivedAction<Character>(std::bind(&Character::launchSpecial, _1));
 
@@ -212,7 +212,7 @@ void Player::initializeActions()
 	nKeyboardActionBinding[ModifyPlayerSpeed].action = derivedAction<Character>(std::bind(&Character::modifyCharacterSpeed, _1,
 		100.f));
 
-	nKeyboardActionBinding[BoostPlayerCharacter].action = derivedAction<Character>(std::bind(&Character::boostCharacter, _1));
+	nKeyboardActionBinding[BoostPlayerCharacter].action = derivedAction<Character>(std::bind(&Character::boostCharacter, _1));*/
 }
 
 

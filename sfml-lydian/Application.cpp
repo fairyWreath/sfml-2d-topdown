@@ -11,7 +11,7 @@
 #include "SettingsState.hpp"
 #include "ConfigState.hpp"
 #include "GameEndState.hpp"
-
+#include "EditorState.hpp"
 
 #include <iostream>		// for debugging
 
@@ -23,7 +23,8 @@ Application::Application() :
 	nWindow(sf::VideoMode(1280,720), "Easy Carefree Existence", sf::Style::Close),		// sf::Style::Close means window has x button to close
 	nTextures(),
 	nFonts(),
-	nStateStack(State::Context(nWindow, nTextures, nFonts, nPlayer, nMusicPlayer, nSoundPlayer)),		// create new state context here and pass it in
+	nWorld(nWindow, nFonts, nSoundPlayer, nPlayer),			// remember to reset later
+	nStateStack(State::Context(nWindow, nTextures, nFonts, nPlayer, nMusicPlayer, nSoundPlayer, nWorld)),		// create new state context here and pass it in
 	nPlayer(nWindow),
 	nStatisticsText(),
 	nStatisticsUpdateTime(),
@@ -173,6 +174,7 @@ void Application::registerStates()
 	nStateStack.registerState<SettingsState>(States::Settings);
 	nStateStack.registerState<ConfigState>(States::Config);
 	nStateStack.registerState<GameEndState>(States::GameEnd);
+	nStateStack.registerState<EditorState>(States::Editor);
 }
 
 

@@ -10,7 +10,8 @@ AnimationComponent::AnimationComponent(MovementComponent& movementComponent) :
 	nCurrentKey(0),
 	nCurrentSubKey(0),
 	nIsCurrentSubAnimation(false),
-	nSprite()
+	nSprite(),
+	nMainDuration(sf::Time::Zero)
 {
 
 }
@@ -20,7 +21,8 @@ AnimationComponent::AnimationComponent(MovementComponent& movementComponent, con
 	nCurrentKey(0),
 	nCurrentSubKey(0),
 	nIsCurrentSubAnimation(false),
-	nSprite()
+	nSprite(),
+	nMainDuration(sf::Time::Zero)
 {
 	// currently just set for Elesa
 	nSprite.setTexture(texture);
@@ -90,6 +92,16 @@ sf::FloatRect AnimationComponent::getSpriteLocalBounds() const
 
 void AnimationComponent::updateAnimations()
 {
+	// get from current movement speed if still zero
+	if (nMainDuration.asSeconds() < 0.01f)
+	{
+		float speed = nMovementComponent->getMovementSpeed();
+		float stridesPerSecond = speed / 17.5f;
+		sf::Time animationTime = sf::seconds(4.f / stridesPerSecond);
+		nAnimations[nCurrentKey].setDuration(animationTime);
+		nMainDuration = animationTime;
+	}
+
 	switch (nMovementComponent->getCurrentState())
 	{
 	// based on external animations
@@ -136,20 +148,26 @@ void AnimationComponent::updateAnimations()
 void AnimationComponent::initializeAnimations()
 {
 	Animation movementAnimation(*nSprite.getTexture(), nSprite);
-	movementAnimation.setFrameSize(sf::Vector2i(68, 72));
+//	movementAnimation.setFrameSize(sf::Vector2i(85, 90));
+//	movementAnimation.setFrameSize(sf::Vector2i(68, 72));
+//	movementAnimation.setFrameSize(sf::Vector2i(34, 46));
+	movementAnimation.setFrameSize(sf::Vector2i(51, 54));
+
+
 	movementAnimation.setNumFrames(16);
 	movementAnimation.setRepeating(true);
 
 	// temporary
-	float nCharacterSpeed = 200.f;
+	float nCharacterSpeed = nMovementComponent->getMovementSpeed();
+//	float nCharacterSpeed = 200.f;
 
 	// set duration based on character speed
-	// 20.f per stride
+	// 17.5.f per stride
 	// 4 strides per animation
 	float stridesPerSecond = nCharacterSpeed / 35.f;
 	sf::Time animationTime = sf::seconds(4.f / stridesPerSecond);
 	movementAnimation.setDuration(animationTime);
-
+	nMainDuration = animationTime;
 
 	movementAnimation.addSubAnimation(1, 4, 1);
 	movementAnimation.addSubAnimation(5, 8, 2);

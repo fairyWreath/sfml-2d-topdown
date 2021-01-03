@@ -24,6 +24,7 @@ class CommandQueue;
 2. sf::Transformable for rotaion, position, scaling
 3. sf::NonCopyable to state that scene nodes cannot be copied(with copy constuctor etc.)
 */
+//class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
 
 class SceneNode : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
 {

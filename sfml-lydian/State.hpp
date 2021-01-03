@@ -24,6 +24,7 @@ namespace sf
 
 class StateStack;			// forward declare here, header for statestack included in state.cpp
 class Player;
+class World;
 
 class State
 {
@@ -38,6 +39,9 @@ public:
 		// constructor that receives resources, window and player class
 		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player, 
 			MusicPlayer& music, SoundPlayer& sound);
+
+		Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player,
+			MusicPlayer& music, SoundPlayer& sound, World& world);
 	
 		// pointers that hold shared objects above
 		sf::RenderWindow* window;
@@ -46,8 +50,7 @@ public:
 		Player* player;
 		MusicPlayer* musicPlayer;
 		SoundPlayer* soundPlayer;
-
-		TileMap* tileMap;
+		World* world;
 	};
 
 public:
@@ -61,6 +64,7 @@ public:
 	virtual void draw() = 0;			// set to 'null'
 	virtual bool update(sf::Time dt) = 0;
 	virtual bool handleEvent(const sf::Event& event) = 0;
+//	virtual bool handleRealTimeInput(sf::Time dt) = 0;
 
 protected:
 	// functions for stack operations

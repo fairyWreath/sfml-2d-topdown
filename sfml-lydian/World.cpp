@@ -18,6 +18,7 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 	nTextures(),		// set these to empty first
 	nFonts(fonts),
 	nSounds(sounds),
+//	nTileMap(nMap),
 	nSceneGraph(),
 	nSceneTexture(),
 	nSceneLayers(),
@@ -25,19 +26,19 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 	nWorldBounds(				// floatrect type
 		0.f,	// left x position
 		0.f,	// top y position
-		nWorldView.getSize().x,	  // view/entire window width
+		4000.f,	  // view/entire window width
 	//	nWorldView.getSize().y				//  height, for tile repeating
 		4000.f
 	),
 	nSpawnPosition(
-		nWorldView.getSize().x  / 2.f,			// middle x 
+	//	nWorldView.getSize().x  / 2.f,			// middle x 
 	//	nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
 		//nWorldBounds.height - nWorldView.getSize().y / 2.f
+		640.f,
 		360.f
 	),
 //	nNonPlayerSpawnPoints(),
 	nPlayerCharacter(nullptr),
-	nTileMap(nullptr),
 	nPlayer(&player)
 {
 	// create the render texture here
@@ -56,14 +57,16 @@ World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sou
 // loading textures into the resource holder
 void World::loadTextures()
 {
-	nTextures.load(Textures::Void, "Media/Textures/void.png");
+	nTextures.load(Textures::Void, "Media/Tilesets/Museum Interior.png");
+
 	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
 	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
 	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
 	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
 	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");
 
-	nTextures.load(Textures::Elesa, "Media/Characters/BW081.png");
+	//nTextures.load(Textures::Elesa, "Media/Characters/BW081.png");
+	nTextures.load(Textures::Elesa, "Media/Characters/Elesa-75-Resized.png");
 
 	nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
 	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
@@ -78,8 +81,8 @@ void World::loadTextures()
 
 void World::buildMap()
 {
-	std::unique_ptr<TileMap> map = std::make_unique<TileMap>();
-	
+	auto map = std::make_unique<TileMap>();
+
 	for (unsigned i = 0; i < 16 ; i++)
 	{
 		for (unsigned j = 0; j < 9; j++)
@@ -89,8 +92,6 @@ void World::buildMap()
 	}
 
 	nSceneLayers[Map] = map.get();
-	nTileMap = map.get();
-
 	nSceneGraph.attachChild(std::move(map));
 }
 
@@ -109,17 +110,6 @@ void World::buildScene()
 
 		nSceneGraph.attachChild(std::move(layer));			// attach to scene graph children directly below the root node
 	}
-
-
-	//std::unique_ptr<Character> main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
-	//nPlayerCharacter = main.get();			
-	//nPlayerCharacter->setPosition(nSpawnPosition);				
-	//nSceneLayers[LowerVoid]->attachChild(std::move(main));
-	
-//	MovementComponent movement;
-//	AnimationComponent animation(movement, nTextures.get(Textures::Elesa));
-//	Entity main(400, movement, animation);
-//	auto main = std::make_unique<Character>(Character::Elesa, nTextures, nFonts);
 	
 	auto movement = std::make_unique<MovementComponent>();
 	auto animation = std::make_unique<AnimationComponent>(*movement, nTextures.get(Textures::Elesa));
@@ -129,6 +119,12 @@ void World::buildScene()
 	nPlayerCharacter->setPosition(nSpawnPosition);				
 	nSceneLayers[LowerVoid]->attachChild(std::move(main));
 
+	sf::Texture& texture = nTextures.get(Textures::Void);			
+	//sf::IntRect textureRect();				
+	//texture.setRepeated(true);
+	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture);	
+	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
+	nSceneLayers[Map]->attachChild(std::move(backgroundSprite));
 
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
@@ -149,14 +145,7 @@ void World::draw()
 		nSceneTexture.setView(nWorldView);
 		nSceneTexture.draw(nSceneGraph);
 		nSceneTexture.display();
-
-		/* set view here to prevent flickering */
-	//	nSceneTexture.setView(nSceneTexture.getDefaultView());
-
-		// apply bloom effect to rendertexture and target
 		nBloomEffect.apply(nSceneTexture, nTarget);
-
-	//	nSceneTexture.setView(nSceneTexture.getDefaultView());
 	}
 	else		
  	{
@@ -170,7 +159,7 @@ void World::draw()
 // updating the scene graph
 void World::update(sf::Time dt)
 {
-//	nWorldView.move(0.f, nScrollSpeed * dt.asSeconds());		// move the view
+//	nWorldView.move(0.f, 50.f * dt.asSeconds());		// move the view
 
 	// set initial velocity to null, not moving when not pressed
 	nPlayerCharacter->setVelocity(0.f, 0.f);
@@ -186,7 +175,7 @@ void World::update(sf::Time dt)
 	}
 
 	adaptPlayerVelocity();		// slow down when in diagonal movement
-//	handleCollisions();
+	handleCollisions();
 
 	nSceneGraph.removeWrecks();
 	spawnNonPlayerCharacters();
@@ -194,7 +183,12 @@ void World::update(sf::Time dt)
 	nSceneGraph.update(dt, nCommandQueue);			// update the scenegraph
 
 	adaptPlayerPosition();
-//	updateSounds();
+	updateSounds();
+}
+
+sf::View* World::getWorldView()
+{
+	return &nWorldView;
 }
 
 void World::updateSounds()

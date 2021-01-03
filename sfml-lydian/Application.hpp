@@ -12,6 +12,8 @@
 #include "Player.hpp"
 #include "StateStack.hpp"
 #include "MusicPlayer.hpp"
+#include "TileMap.hpp"
+#include "World.hpp"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -49,6 +51,7 @@ private:
 	Player nPlayer;		// player input handling is done inside Game::processInput
 	MusicPlayer nMusicPlayer;
 	SoundPlayer nSoundPlayer;
+	World nWorld;
 
 	// the state stack
 	StateStack nStateStack;

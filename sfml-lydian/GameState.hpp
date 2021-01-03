@@ -22,7 +22,8 @@ public:
 
 private:
 	// world class
-	World nWorld;
+//	World nWorld;
+	World* nWorld;
 
 	// memadress to palyer
 	Player& nPlayer;

@@ -17,7 +17,7 @@ Entity::Entity(int hitpoints, std::unique_ptr<MovementComponent> movement,
 	std::unique_ptr<AnimationComponent> animation) :
 	nVelocity(),
 	nHitpoints(hitpoints),
-	nSpeed(200.f)
+	nSpeed(100.f)
 {
 	nMovementComponent = std::move(movement);
 	nMovementComponent->setEntity(*this);
@@ -64,7 +64,7 @@ int Entity::getHitpoints() const
 	return nHitpoints;
 }
 
-float Entity::getCharacterSpeed() const
+float Entity::getEntitySpeed() const
 {
 	return nSpeed;
 }

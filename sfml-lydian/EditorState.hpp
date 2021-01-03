@@ -3,6 +3,7 @@
 
 #include "State.hpp"
 #include "Container.hpp"
+#include "SceneNode.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -17,14 +18,23 @@ public:
 	virtual bool update(sf::Time dt);
 	virtual bool handleEvent(const sf::Event& event);
 
+	void handleRealtimeInput(sf::Time dt);
+
 private:
 	// sfml members
 	sf::Sprite nBackgroundSprite;
 
+	sf::RenderWindow& nWindow;
+	World* nWorld;
+	sf::View* nWorldView;		// to move around the world
+	
+	Player* nPlayer;
+
+	float nScrollSpeed;
+	float nZoomSpeed;
+
 	// GUI container
 	GUI::Container nGUIContainer;
-
-
 };
 
 

@@ -7,16 +7,16 @@
 MovementComponent::MovementComponent(Entity& entity) :
 	nEntity(&entity),
 	nIsOnDirectedMovement(false),
-	nMovementSpeed(200.f),
+	nMovementSpeed(),
 	nCurrentState(STATIONARY),
 	nPreviousState(STATIONARY)
 {
-	
+	nMovementSpeed = nEntity->getEntitySpeed();
 }
 
 MovementComponent::MovementComponent() :
 	nIsOnDirectedMovement(false),
-	nMovementSpeed(200.f),
+	nMovementSpeed(0.f),
 	nCurrentState(STATIONARY),
 	nPreviousState(STATIONARY),
 	nEntity(nullptr)
@@ -117,6 +117,10 @@ void MovementComponent::setMovementSpeed(float speed)
 	nMovementSpeed = speed;
 }
 
+float MovementComponent::getMovementSpeed() const
+{
+	return nMovementSpeed;
+}
 
 sf::Vector2f MovementComponent::getVelocity() const
 {
@@ -136,4 +140,5 @@ MovementComponent::State MovementComponent::getPreviousState() const
 void MovementComponent::setEntity(Entity& entity)
 {
 	nEntity = &entity;
+	nMovementSpeed = nEntity->getEntitySpeed();
 }

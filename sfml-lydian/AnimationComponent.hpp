@@ -40,6 +40,8 @@ protected:
 	std::map<int, Animation> nAnimations;	
 	MovementComponent* nMovementComponent;
 
+	sf::Time nMainDuration;
+
 	sf::Sprite nSprite;
 
 };

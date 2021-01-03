@@ -13,6 +13,18 @@ State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontH
 {
 }
 
+State::Context::Context(sf::RenderWindow& window, TextureHolder& textures, FontHolder& fonts, Player& player,
+	MusicPlayer& music, SoundPlayer& sound, World& world) :
+	window(&window),		// pass in ptr
+	textures(&textures),
+	fonts(&fonts),
+	player(&player),
+	musicPlayer(&music),
+	soundPlayer(&sound),
+	world(&world)
+{
+}
+
 // constructor for the state class itself
 State::State(StateStack& stack, Context context) :
 	nStack(&stack),		// set statestack pointer

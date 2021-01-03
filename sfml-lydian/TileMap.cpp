@@ -5,12 +5,12 @@
 TileMap::TileMap() :
 	SceneNode(Category::None)
 {
-	nGridSizeF = 80.f;
+	nGridSizeF = 32.f;
 	nGridSizeU = static_cast<unsigned>(nGridSizeF);
 	nNumLayers = 1;
 
-	nMaxSize.x = 16;
-	nMaxSize.y = 9;
+	nMaxSize.x = 40;
+	nMaxSize.y = 23;
 
 	for (size_t i = 0; i < nMaxSize.x; i++)
 	{

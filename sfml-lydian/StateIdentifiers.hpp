@@ -14,7 +14,8 @@ namespace States
 		Loading,
 		Pause,
 		Game,
-		GameEnd
+		GameEnd,
+		Editor
 	};
 }
 

@@ -53,14 +53,24 @@ MenuState::MenuState(StateStack& stack, Context context) :
 		});
 
 	// return to title menu
-	auto titleButton = std::make_shared<GUI::Button>(context);
-	titleButton->setPosition(400, 540);
-	titleButton->setText("Return to Title");
-	titleButton->setCallback([this]()
+	//auto titleButton = std::make_shared<GUI::Button>(context);
+	//titleButton->setPosition(400, 540);
+	//titleButton->setText("Return to Title");
+	//titleButton->setCallback([this]()
+	//	{
+	//		// clear and go to menu
+	//		requestStateClear();
+	//		requestStackPush(States::Title);
+	//	});
+
+	auto editorButton = std::make_shared<GUI::Button>(context);
+	editorButton->setPosition(400, 540);
+	editorButton->setText("Editor");
+	editorButton->setCallback([this]()
 		{
 			// clear and go to menu
 			requestStateClear();
-			requestStackPush(States::Title);
+			requestStackPush(States::Editor);
 		});
 
 	// exit button
@@ -84,7 +94,7 @@ MenuState::MenuState(StateStack& stack, Context context) :
 	nGUIContainer.pack(playButton);
 	nGUIContainer.pack(settingsButton);
 	nGUIContainer.pack(configButton);
-	nGUIContainer.pack(titleButton);
+	nGUIContainer.pack(editorButton);
 	nGUIContainer.pack(exitButton);
 
 	nGUIContainer.pack(titleLabel);

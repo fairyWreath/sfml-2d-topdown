@@ -44,7 +44,7 @@ public:
 	AnimationComponent* getAnimationComponent() const;
 
 
-	virtual float getCharacterSpeed() const;
+	virtual float getEntitySpeed() const;
 	virtual unsigned int getCategory() const;
 
 protected:
