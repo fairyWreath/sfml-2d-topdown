@@ -11,89 +11,37 @@
 #include <algorithm>		// std::sort
 #include <limits>		// std::numeric_limits
 
-// world constructor
+
 World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds, Player& player) :
 	nTarget(outputTarget),
-	nWorldView(outputTarget.getDefaultView()),		// default window view, view covers whole window
-	nTextures(),		// set these to empty first
+	nWorldView(outputTarget.getDefaultView()),		
+	nTextures(),		
 	nFonts(fonts),
 	nSounds(sounds),
-//	nTileMap(nMap),
 	nSceneGraph(),
 	nSceneTexture(),
 	nSceneLayers(),
 	nActiveEnemies(),
-	nWorldBounds(				// floatrect type
-		0.f,	// left x position
-		0.f,	// top y position
-		400.f,	  // view/entire window width
-	//	nWorldView.getSize().y				//  height, for tile repeating
-		8000.f
-	),
-	nSpawnPosition(
-	//	nWorldView.getSize().x  / 2.f,			// middle x 
-	//	nWorldView.getSize().y / 2.f			// bottom of the world minus half a screen height
-		//nWorldBounds.height - nWorldView.getSize().y / 2.f
-		640.f,
-		360.f
-	),
-//	nNonPlayerSpawnPoints(),
+	nWorldBounds(0.f, 0.f, 1024.f, 32000.f),
+	nSpawnPosition( 640.f, 360.f),
+	nNonPlayerSpawnPoints(),
 	nPlayerCharacter(nullptr),
 	nPlayer(&player)
 {
-	// create the render texture here
 	nSceneTexture.create(nTarget.getSize().x, nTarget.getSize().y);
 
-	loadTextures();		// load textures from resource holder
+	loadTextures();	
+	buildScene();		
 
-	buildMap();
-	buildScene();		// build scene graph
-	
-
-	nWorldView.setCenter(nSpawnPosition);		// move view to correct start position
+	nWorldView.setCenter(nSpawnPosition);	
 	nPlayer->setWorldView(nWorldView);
-//	nWorldView.zoom(0.65f);		// initial zoom
 }
 
 
-// loading textures into the resource holder
-void World::loadTextures()
-{
-	nTextures.load(Textures::Void, "Media/Tilesets/Museum Interior.png");
-
-	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
-	nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
-	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
-	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
-	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");
-
-	//nTextures.load(Textures::Elesa, "Media/Characters/BW081.png");
-	nTextures.load(Textures::Elesa, "Media/Characters/Elesa.png");
-
-	nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
-	nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
-	nTextures.load(Textures::EnemyNormal, "Media/Textures/Pink-Flower.png");
-	nTextures.load(Textures::AlliedSingle, "Media/Textures/Pink-Beam.png");
-	nTextures.load(Textures::AlliedSingleBurst, "Media/Textures/Green-Plasma-Beam.png");
-	nTextures.load(Textures::AlliedSingleQuick, "Media/Textures/Slim-Blue-Beam-Small.png");
-
-	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
-	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
-
-	nTextures.load(Textures::Outside1, "Media/Tilesets/Outside-1.png");
-}
 
 void World::buildMap()
 {
 	auto map = std::make_unique<TileMap>(nTextures);
-
-	for (unsigned i = 0; i < 200 ; i++)
-	{
-		for (unsigned j = 0; j < 250; j++)
-		{
-	//		map->addTile(i, j, 0);
-		}
-	}
 
 	nTileMap = map.get();
 	nSceneLayers[Map] = map.get();
@@ -104,9 +52,14 @@ void World::buildMap()
 // building the scene from the scenegraph
 void World::buildScene()
 {
+	// order of sprite layers depends on order of attachChild
 	for (std::size_t i = 0; i < LayerCount; i++)
 	{
-		if (i == Map) continue;
+		if (i == Map)
+		{
+			buildMap();
+			continue;
+		}
 
 		Category::Type category = (i == LowerVoid) ? Category::SceneVoidLayer : Category::None;
 
@@ -116,18 +69,36 @@ void World::buildScene()
 		nSceneGraph.attachChild(std::move(layer));			// attach to scene graph children directly below the root node
 	}
 	
+
+	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(nTextures.get(Textures::Fullset1));
+	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
+	nSceneLayers[Background]->attachChild(std::move(backgroundSprite));
+
+	std::unique_ptr<SpriteNode> bg2 = std::make_unique<SpriteNode>(nTextures.get(Textures::Fullset2));
+	bg2->setPosition(384, nWorldBounds.top);		// set to top corner
+	nSceneLayers[Background]->attachChild(std::move(bg2));
+
+
+	std::unique_ptr<SpriteNode> bg3 = std::make_unique<SpriteNode>(nTextures.get(Textures::Fullset3));
+	bg3->setPosition(0, 7824);		// set to top corner
+	nSceneLayers[Background]->attachChild(std::move(bg3));
+
+	std::unique_ptr<SpriteNode> bg4 = std::make_unique<SpriteNode>(nTextures.get(Textures::Fullset4));
+	bg4->setPosition(384, 7824);		// set to top corner
+	nSceneLayers[Background]->attachChild(std::move(bg4));
+	
 	auto movement = std::make_unique<MovementComponent>();
 	auto animation = std::make_unique<AnimationComponent>(*movement, nTextures.get(Textures::Elesa));
 
+
+	// builde here, below player above background
+
+
 	auto main = std::make_unique<Entity>(400, std::move(movement), std::move(animation));
-	nPlayerCharacter = main.get();			
-	nPlayerCharacter->setPosition(nSpawnPosition);				
+	nPlayerCharacter = main.get();
+	nPlayerCharacter->setPosition(nSpawnPosition);
 	nSceneLayers[LowerVoid]->attachChild(std::move(main));
 
-	sf::Texture& texture = nTextures.get(Textures::Outside1);			
-	std::unique_ptr<SpriteNode> backgroundSprite = std::make_unique<SpriteNode>(texture);	
-	backgroundSprite->setPosition(nWorldBounds.left, nWorldBounds.top);		// set to top corner
-	nSceneLayers[LowerVoid]->attachChild(std::move(backgroundSprite));
 
 	std::unique_ptr<ParticleNode> cyanTrailNode = std::make_unique<ParticleNode>(Particle::CyanHeartBeam, nTextures);
 	nSceneLayers[LowerVoid]->attachChild(std::move(cyanTrailNode));
@@ -525,4 +496,47 @@ bool World::gameReachedEnd() const
 //	return !nWorldBounds.contains(nPlayerCharacter->getPosition());
 
 	return false;
+}
+
+void World::loadTextures()
+{
+	nTextures.load(Textures::Void, "Media/Tilesets/Museum Interior.png");
+
+	nTextures.load(Textures::DarkMagician, "Media/Textures/Magician-Girl-Down.png");
+	/*nTextures.load(Textures::Shinobu, "Media/Textures/Shinobu-Resized.png");
+	nTextures.load(Textures::Izuko, "Media/Textures/Izuko-Resized.png");
+	nTextures.load(Textures::Hitagi, "Media/Textures/Hitagi-Resized.png");
+	nTextures.load(Textures::Yotsugi, "Media/Textures/Yotsugi.png");*/
+
+	nTextures.load(Textures::Elesa, "Media/Characters/Elesa.png");
+
+	//nTextures.load(Textures::AlliedNormal, "Media/Textures/Pink-Flower-2.png");
+	//nTextures.load(Textures::SpecialHeart, "Media/Textures/Special-Heart-Cyan.png");
+	//nTextures.load(Textures::EnemyNormal, "Media/Textures/Pink-Flower.png");
+	//nTextures.load(Textures::AlliedSingle, "Media/Textures/Pink-Beam.png");
+	//nTextures.load(Textures::AlliedSingleBurst, "Media/Textures/Green-Plasma-Beam.png");
+	//nTextures.load(Textures::AlliedSingleQuick, "Media/Textures/Slim-Blue-Beam-Small.png");
+
+	nTextures.load(Textures::CyanHeartBeam, "Media/Textures/Particle.png");
+	nTextures.load(Textures::Explosion, "Media/Textures/Explosion.png");
+
+//	nTextures.load(Textures::Outside1, "Media/Tilesets/Outside-1.png");
+	nTextures.load(Textures::Outside2, "Media/Tilesets/Outside-2.png");
+	nTextures.load(Textures::Outdoor, "Media/Tilesets/Outdoor.png");
+	nTextures.load(Textures::GameRoomBig, "Media/Tilesets/Game Room Big.png");
+
+	nTextures.load(Textures::Fullset1, "Media/Tilesets/Fullset-1.png");
+	nTextures.load(Textures::Fullset2, "Media/Tilesets/Fullset-2.png");
+	nTextures.load(Textures::Fullset3, "Media/Tilesets/Fullset-3.png");
+	nTextures.load(Textures::Fullset4, "Media/Tilesets/Fullset-4.png");
+	nTextures.load(Textures::Fullset5, "Media/Tilesets/Fullset-5.png");
+	nTextures.load(Textures::Fullset6, "Media/Tilesets/Fullset-6.png");
+	nTextures.load(Textures::Fullset7, "Media/Tilesets/Fullset-7.png");
+
+}
+
+
+TextureHolder& World::getWorldTextures() 
+{
+	return nTextures;
 }

@@ -6,10 +6,10 @@ namespace Tiles
 {
 	enum ID
 	{
-		Auto,
+//		Auto,
 
 
-		Grass,
+		TallGrass2,
 		Concrete1,
 
 

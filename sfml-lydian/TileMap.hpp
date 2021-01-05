@@ -17,6 +17,10 @@ public:
 
 	unsigned int getGridSize() const;
 
+
+	void addTile(const unsigned x, const unsigned y, const unsigned z, Tiles::ID tileID);
+
+
 	void addTile(const unsigned x, const unsigned y, const unsigned z);
 	void removeTile(const unsigned x, const unsigned y, const unsigned z);
 

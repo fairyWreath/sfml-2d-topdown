@@ -46,10 +46,12 @@ public:
 	// events, handled by child classes
 	virtual void handleEvent(const sf::Event& event) = 0;
 
+
+
+
 private:
 	bool nIsSelected;
 	bool nIsActive;
-
 };
 
 

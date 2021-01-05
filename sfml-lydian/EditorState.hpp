@@ -32,12 +32,15 @@ public:
 	virtual bool handleEvent(const sf::Event& event);
 
 private:
-
 	void initializeActions();
+	void initializeTexts();
 
 	void handleRealtimeInput(sf::Time dt);
 
 	void updateMouseText();
+	void updateGridSelector();
+	void updateCurrentTile();			// not used
+	void updateTextureSelector();
 
 private:
 	std::map<EditAction, EditCommand> nActionBindings;
@@ -46,21 +49,31 @@ private:
 
 	// grid selector
 	sf::RectangleShape nGridSelector;
-
-	// mouse pos view label
 	sf::Text nMousePosViewText;
+	sf::Sprite nCurrentTile;			// not used
 
 	// change to object references later maybe?
 	World* nWorld;
 	sf::View* nWorldView;		// to move around the world
 	TileMap* nTileMap;
 
+	// currently selected tilesheet for the tile map builder
+	Tiles::ID nCurrentTileID;
+
+	// delete later
+	sf::Vector2f nTextureSelectorPosition;		// texture selector window position
+
 	Player* nPlayer;
+	TextureHolder& nTextures;
 
 	float nScrollSpeed;
 	float nZoomSpeed;
 
-	// GUI container
+
+	// update slowly
+	sf::Time nElapsedTime;
+
+
 	GUI::Container nGUIContainer;
 };
 

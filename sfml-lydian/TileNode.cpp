@@ -23,11 +23,8 @@ TileNode::TileNode(Tiles::ID ID, float gridSize, TextureHolder& textures) :
 	nGrid.setOutlineThickness(2.f);
 
 
-	if (nID != Tiles::Auto)
-	{
-		nSprite.setTexture(nTextures.get(SheetData[nID].textureID));
-		nSprite.setTextureRect(SheetData[nID].textureRect);
-	}
+	nSprite.setTexture(nTextures.get(SheetData[nID].textureID));
+	nSprite.setTextureRect(SheetData[nID].textureRect);
 }
 
 Tiles::ID TileNode::getTileID() const
@@ -40,10 +37,7 @@ void TileNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 	// transform here because this drawCurrent is NOT called from SceneNode draw
 	states.transform *= getTransform();
 
-	if (nID == Tiles::Auto)
-		target.draw(nGrid, states);
-	else
-		target.draw(nSprite, states);
+	target.draw(nSprite, states);
 }
 
 

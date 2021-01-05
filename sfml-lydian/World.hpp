@@ -45,6 +45,7 @@ public:
 
 	TileMap* getTileMap();
 	sf::View* getWorldView();
+	TextureHolder& getWorldTextures();
 
 private:
 	void loadTextures();		// load textures/sprites from resourceholder
@@ -87,6 +88,7 @@ private:
 private:
 	enum Layer					
 	{		
+		Background,
 		Map,
 		LowerVoid,						
 		LayerCount,

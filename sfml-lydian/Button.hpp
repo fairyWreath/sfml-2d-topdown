@@ -44,29 +44,16 @@ public:
 	};
 
 public:
-	// constructor, passing in fonts and textures
 	Button(State::Context context, ButtonType type = Sprite);
-//	Button(State::Context context, ButtonType type);
 
-	// set std::function callback
 	void setCallback(Callback callback);
-
-	// change button text
 	void setText(const std::string& text);
-
-	// button toggle
 	void setToggle(bool flag);
-
-	// change type
 	void setType(ButtonType type);
 
-	// overide default texture
 	void setTexture(const sf::Texture& texture, ButtonState state);
-
 	void setShape(std::unique_ptr<sf::CircleShape> shape);
 	void setShapeColor(sf::Color& color, ButtonState state);
-
-	// virtual override functions from Component class
 	virtual bool isSelectable() const;	
 
 	virtual void select();

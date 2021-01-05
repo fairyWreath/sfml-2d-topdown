@@ -5,6 +5,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include <iostream>
+#include <cassert>
 
 namespace GUI
 {
@@ -142,10 +143,56 @@ void Container::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	// get transform from sf::Transform and append it with overlaoded *
 	states.transform *= getTransform();
 
+	if (nHasBackground)
+		target.draw(*nBackground, states);
+
 	// draw all components
 	for (const auto& child : nChildren)
 		target.draw(*child, states);
 }
 
+
+
+void Container::setBackground(bool hasBackground)
+{
+	nHasBackground = hasBackground;
+
+	if (nHasBackground && nBackground == nullptr)
+	{
+		nBackground = std::make_unique<sf::RectangleShape>();
+	}
+}
+
+void Container::setBackgroundColor(sf::Color color)
+{
+	assert(nHasBackground);
+
+	nBackground->setFillColor(color);
+}
+
+void Container::setBackgroundOutlineColor(sf::Color color)
+{
+	assert(nHasBackground);
+
+	nBackground->setOutlineThickness(2.f);
+	nBackground->setOutlineColor(color);
+}
+
+void Container::setBackgroundSize(float x, float y)
+{
+	assert(nHasBackground);
+
+	nBackground->setSize(sf::Vector2f(x, y));
+}
+
+void Container::setBackgroundPosition(float x, float y)
+{
+	assert(nHasBackground);
+
+	// set transformable position
+	//setPosition(x, y);
+
+	nBackground->setPosition(x, y);
+}
 
 }

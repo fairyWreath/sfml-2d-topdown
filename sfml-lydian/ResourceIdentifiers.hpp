@@ -80,7 +80,22 @@ namespace Textures
 
 
 		// tilesets / tilesheets
-		Outside1
+		Outside1,
+		Outside2,
+
+		Outdoor,
+
+		Fullset1,
+		Fullset2,
+		Fullset3,
+		Fullset4,
+		Fullset5,
+		Fullset6,
+		Fullset7,
+
+
+		GameRoomBig,
+
 	};
 }
 

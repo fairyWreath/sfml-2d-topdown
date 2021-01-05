@@ -6,7 +6,7 @@
 TileMap::TileMap(TextureHolder& textures) :
 	SceneNode(Category::None),
 	nTextures(textures),
-	nGridSizeF(32.f),
+	nGridSizeF(48.f),
 	nGridSizeU(),
 	nNumLayers(1),
 	nStartX(0),
@@ -56,32 +56,6 @@ void TileMap::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) con
 	}
 }
 
-void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z)
-{
-	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
-	{
-	//	std::cout << "Can add\n";
-		if (nPtrMap[x][y].size() == 0)		// add if zero
-		{
-			auto tile = std::make_unique<TileNode>(Tiles::Concrete1, nGridSizeF, nTextures);
-			tile->setPosition(x * nGridSizeF, y * nGridSizeF);
-			nPtrMap[x][y].push_back(std::move(tile));
-	//		std::cout << "Tile added\n";
-		}
-	}
-}
-
-void TileMap::removeTile(const unsigned x, const unsigned y, const unsigned z)
-{
-	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
-	{
-		if (nPtrMap[x][y].size() > z && nPtrMap[x][y][z] != nullptr)
-		{
-		//	nPtrMap[x][y][z].reset(nullptr);
-			nPtrMap[x][y].pop_back();
-		}
-	}
-}
 
 sf::Vector2u TileMap::getMapSize() const
 {
@@ -94,4 +68,44 @@ void TileMap::setRenderLimit(int startX, int endX, int startY, int endY)
 	nEndX = endX;
 	nStartY = startY;
 	nEndY = endY;
+}
+
+
+void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z, Tiles::ID tileID)
+{
+	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
+	{
+		if (nPtrMap[x][y].size() == 0)
+		{
+			auto tile = std::make_unique<TileNode>(tileID, nGridSizeF, nTextures);
+			tile->setPosition(x * nGridSizeF, y * nGridSizeF);
+			nPtrMap[x][y].push_back(std::move(tile));
+		}
+	}
+}
+
+
+void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z)
+{
+	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
+	{
+		if (nPtrMap[x][y].size() == 0)		
+		{
+			auto tile = std::make_unique<TileNode>(Tiles::Concrete1, nGridSizeF, nTextures);
+			tile->setPosition(x * nGridSizeF, y * nGridSizeF);
+			nPtrMap[x][y].push_back(std::move(tile));
+		}
+	}
+}
+
+void TileMap::removeTile(const unsigned x, const unsigned y, const unsigned z)
+{
+	if (x < nMaxSize.x && y < nMaxSize.y && z < nNumLayers)
+	{
+		if (nPtrMap[x][y].size() > z && nPtrMap[x][y][z] != nullptr)
+		{
+			//	nPtrMap[x][y][z].reset(nullptr);
+			nPtrMap[x][y].pop_back();
+		}
+	}
 }
